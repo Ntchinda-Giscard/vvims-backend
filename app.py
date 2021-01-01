@@ -276,31 +276,32 @@ def uploads_save(files):
     return mime_type, file_size, file_url, str(files.filename)
 
 
-@app.post("/api/v1/add-with-visitor")
+@app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
         visit_details: CrateVisitWithVisitor,
         user: str = Depends(get_current_user),
-        face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...),
+        face: Optional[UploadFile] = File(...), front: Optional[UploadFile] = File(...), back: Optional[UploadFile] = File(...),
 
         ):
-    if not front:
-        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
+    # if not front:
+    #     return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
     if face:
         face_mimetype, face_file_size, face_file_url, face_filename =  uploads_save(face)
     if back:
         back_mimetype, back_file_size, back_file_url, back_filename = uploads_save(back)
-    front_mimetype, front_file_size, front_file_url, front_filename = uploads_save(front)
+    if front:
+        front_mimetype, front_file_size, front_file_url, front_filename = uploads_save(front)
     with(next(get_db())) as db:
         try:
-
-            db_front = UploadedFile(
-                file_name=front_filename,
-                file_url=front_file_url,
-                mime_type=front_mimetype,
-                file_size=front_file_size
-            )
-            db.add(db_front)
-            db.commit()
+            if front:
+                db_front = UploadedFile(
+                    file_name=front_filename,
+                    file_url=front_file_url,
+                    mime_type=front_mimetype,
+                    file_size=front_file_size
+                )
+                db.add(db_front)
+                db.commit()
             if face:
                 db_face = UploadedFile(
                     file_name=face_filename,
