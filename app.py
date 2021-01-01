@@ -599,7 +599,7 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_visit)
                 db.commit()
-                return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id)})
+                return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id), "face_file_url": face_file_url})
         except Exception as e:
             logger.exception(e)
             db.rollback()
@@ -730,22 +730,22 @@ async def get_pdf_reports(
     ):
     report_service = ReportService()
     data, pdf_bytes = await report_service.generate_report(request)
-    print(f"REport type ====> {request.report_type}")
-    # report_name = ReportName[request.report_type]
+    print(f"Report type ====> {request.report_type}")
+    report_name = ReportName[request.report_type]
     report_name= "None"
     s3_url = upload_report_to_s3(pdf_bytes, report_name)
-    # with next(get_db()) as db:
-    #
-    #
-    #
-    #     report = Report(
-    #         report_link=s3_url,
-    #         types = request.report_type,
-    #         from_date = datetime.now(),
-    #         to_date = datetime.now(),
-    #         name = report_name
-    #     )
-    #     db.add(report)
+    with next(get_db()) as db:
+
+
+
+        report = Report(
+            report_link=s3_url,
+            types = request.report_type,
+            from_date = datetime.now(),
+            to_date = datetime.now(),
+            name = report_name
+        )
+        db.add(report)
     #     db.commit()
 
     return {"s3_url": s3_url, "data" : data

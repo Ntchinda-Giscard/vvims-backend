@@ -102,11 +102,11 @@ class ReportGeneratorContext:
     def generate_report(self):
         return self.strategy.generate_pdf()
 
-def upload_report_to_s3(pdf_data, report_type):
+def upload_report_to_s3(pdf_data):
     pdf_buffer = io.BytesIO(pdf_data)
     now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     random_number = str(random.randint(1, 99999)).zfill(5)
-    file_name = f"{report_type}_report_{now}_{random_number}.pdf"
+    file_name = f"Report_{now}_{random_number}.pdf"
     s3.upload_fileobj(pdf_buffer, "vvims-visitor", file_name)
     s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/{file_name}"
     return s3_url
