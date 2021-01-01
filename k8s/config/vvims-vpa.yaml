@@ -1,0 +1,21 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: memory-only-vpa
+  namespace: default
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: vvims-deployment
+  updatePolicy:
+    updateMode: "Auto"  # Options: "Off", "Initial", "Auto"
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      mode: "Auto"
+      controlledResources: ["memory"]  # Only adjust memory
+      minAllowed:
+        memory: 50Mi
+      maxAllowed:
+        memory: 1Gi

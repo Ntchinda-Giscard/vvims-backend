@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vvims-dashboard-deployment
+  labels:
+    app: vvims-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vvims-dashboard
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: vvims-dashboard
+    spec:
+      containers:
+        - name: vvims-sed-dashbaord
+          image: ntchindagiscard/vvims-sed-dashbaord:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3000
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: vvims-dashboard-service
+  labels:
+    app: vvims-dashboard
+spec:
+  type: NodePort
+  selector:
+    app: vvims-dashboard
+  ports:
+  - protocol: TCP
+    port: 80       # The port that the Service will expo se
+    targetPort: 3000  # The port on the container that the Service will forward to
+    nodePort: 30011  # The port on each node that will forward traffic to the Service

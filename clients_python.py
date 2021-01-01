@@ -8,7 +8,7 @@ from io import BytesIO
 import os
 
 # Generate a UUID
-unique_id = "6a7b670b-a5be-45b9-a74b-f9544482320f"
+unique_id = "d94085cf-286a-4895-b346-14401c69736d"
 
 # Generate the QR code using the UUID
 url = pyqrcode.QRCode(unique_id, error='H')
@@ -22,7 +22,7 @@ buffer.seek(0)
 qr_image = Image.open(buffer).convert("RGBA")
 
 # Open the logo image using the specified path
-logo_path = '/Users/ntchindagiscard/Downloads/PHOTO-2024-10-20-16-09-38.jpg'
+logo_path = '/Users/ntchindagiscard/Downloads/PHOTO-2025-02-19-14-13-09.jpg'
 if not os.path.exists(logo_path):
     raise FileNotFoundError(f"Logo file not found at {logo_path}")
 

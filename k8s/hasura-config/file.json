@@ -1,0 +1,6 @@
+{
+    "detail":
+    {"info":
+    {"admin_secret_set":true,"auth_hook":null,"auth_hook_mode":null,"console_assets_dir":null,"console_sentry_dsn":null,"cors_config":
+    {"allowed_origins":"*","disabled":false,"ws_read_cookie":null},
+    "enable_allowlist":false,"enable_console":true,"enable_maintenance_mode":false,"enable_metadata_query_logging":false,"enable_telemetry":true,"enabled_apis":["config","pgdump","metadata","graphql"],"enabled_log_types":["jwk-refresh-log","webhook-log","http-log","startup","websocket-log"],"events_fetch_batch_size":100,"experimental_features":[],"graceful_shutdown_timeout":60,"infer_function_permissions":true,"jwt_secret":[],"live_query_options":{"batch_size":100,"refetch_delay":1},"log_level":"info","port":8080,"remote_schema_permissions":false,"server_host":"HostAny","stringify_numeric_types":false,"transaction_isolation":"ISOLATION LEVEL READ COMMITTED","unauth_role":null,"use_prepared_statements":true,"v1-boolean-null-collapse":false,"websocket_compression_options":"NoCompression","websocket_connection_init_timeout":"Refined (Seconds {seconds = 3s})","websocket_keep_alive":"KeepAliveDelay {unKeepAliveDelay = Refined (Seconds {seconds = 5s})}"},"kind":"server_configuration"},"level":"info","timestamp":"2024-10-23T11:06:29.035+0000","type":"startup"}

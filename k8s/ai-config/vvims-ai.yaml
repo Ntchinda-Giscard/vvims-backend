@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: vvims-ai
+  labels:
+    app: vvims-ai
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: vvims-ai
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 1
+  template:
+    metadata:
+      labels:
+        app: vvims-ai
+    spec:
+      containers:
+        - name: ntchinda-giscard-ai-vvims
+          image: registry.hf.space/ntchinda-giscard-new-vvims:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 7860
+          env:
+            - name: SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vvims-secret
+                  key: x-secret-key
+            - name: ROBOFLOW_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vvims-secret
+                  key: roboflow-key
+            - name: AWS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: vvims-secret
+                  key: aws-access-key
+            - name: AWS_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: vvims-secret
+                  key: aws-secret-key
+      #     volumeMounts:
+      #       - mountPath: /app/uploads
+      #         name: file-storage
+      # volumes:
+      #   - name: file-storage
+      #     persistentVolumeClaim:
+      #       claimName: file-storage-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ai-service
+  labels:
+    app: vvims-ai
+spec:
+  type: NodePort
+  selector:
+    app: vvims-ai
+  ports:
+    - protocol: TCP
+      port: 7860 # The port that the Service will expose
+      targetPort: 7860 # The port on the container that the Service will forward to
+      nodePort: 30100 # The port on each node that will forward traffic to the Service
+
+# apiVersion: v1
+# kind: Service
+# metadata:
+#   name: ai-service
+# spec:
+#   selector:
+#     app: vvims-ai
+#   ports:
+#   - port: 80
+#     targetPort: 7860
