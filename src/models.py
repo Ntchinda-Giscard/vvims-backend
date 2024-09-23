@@ -272,6 +272,8 @@ class AttendanceNew(Base):
 
     #relationships
     employee = relationship('Employee', back_populates='attendance_new')
+    shift = relationship('Shift', back_populates='attendance')
+    attendance_state = relationship('AttendanceState', back_populates='attendance')
 
 class Attendance(Base):
     __tablename__ = 'attendance'
