@@ -134,7 +134,6 @@ class Employee(Base):
     attendance = relationship('Attendance', back_populates='employee', cascade="all, delete-orphan")
     files = relationship('UploadedFile', back_populates='employee')
     employee_shifts = relationship("EmployeeShift", back_populates='employee')
-    attendance_new = relationship('AttendanceNew', back_populates='employee')
     # shifts = relationship('Shift', secondary='employee_shifts', primaryjoin='Employee.id == EmployeeShift.employee_id', secondaryjoin='Shift.id == EmployeeShift.shift_id', back_populates='employees')
 
 
@@ -261,20 +260,6 @@ class LeaveApproval(Base):
     leave = relationship("Leave", back_populates='approval')
     approver = relationship("Employee")
 
-class AttendanceNew(Base):
-    __tablename__ = 'attendance_new'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), unique=True)
-    location = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=True)
-    shift_id = Column(UUID(as_uuid=True), ForeignKey('shifts.id'), nullable=True)
-    clock_in_time = Column(DateTime(timezone=True), nullable=True)
-    clock_out_time = Column(DateTime(timezone=True), nullable=True)
-    clock_in_date = Column(Date, server_default=func.now(), unique=True)
-
-    #relationships
-    employee = relationship('Employee', back_populates='attendance_new')
-    shift = relationship('Shift', back_populates='attendance')
-    attendance_state = relationship('AttendanceState', back_populates='attendance')
 
 class Attendance(Base):
     __tablename__ = 'attendance'
