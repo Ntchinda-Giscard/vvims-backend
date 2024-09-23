@@ -186,8 +186,8 @@ async def insert_face(
 async def upload_app(name: str, version: str, app: UploadFile = File(...)):
     try:
         file_path = f"uploads/app"
-        mime_type, _ = mimetypes.guess_type(file_path)
-        file_size = os.path.getsize(file_path)
+        # mime_type, _ = mimetypes.guess_type(file_path)
+        # file_size = os.path.getsize(file_path)
         with open(file_path, "wb") as f:
             f.write(await app.read())
     except Exception as e:
