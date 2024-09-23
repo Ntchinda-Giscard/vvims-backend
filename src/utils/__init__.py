@@ -100,7 +100,7 @@ class PineconeSigleton:
 
 
 
-def upload_to_s3(local_file, bucket_name, s3_file, s3):
+def upload_to_s3(local_file, bucket_name, s3_file, s3, is_apk=False):
     try:
         # Upload the file to S3
         s3.upload_file(local_file, bucket_name, s3_file)
