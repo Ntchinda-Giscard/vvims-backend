@@ -265,6 +265,7 @@ class AttendanceNew(Base):
     __tablename__ = 'attendance_new'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), unique=True)
+    location = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=True)
     shift_id = Column(UUID(as_uuid=True), ForeignKey('shifts.id'), nullable=True)
     clock_in_time = Column(DateTime(timezone=True), nullable=True)
     clock_out_time = Column(DateTime(timezone=True), nullable=True)
