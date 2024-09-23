@@ -1,0 +1,122 @@
+import uuid
+from datetime import datetime, timedelta, time, date
+import requests
+from pinecone import Pinecone
+import boto3
+from botocore.exceptions import NoCredentialsError
+
+
+
+def is_employee_late(clock_in_time, start_work_time, max_late_time: timedelta) -> bool:
+    # Convert clock_in_time to datetime.time if it's a string
+    if isinstance(clock_in_time, str):
+        clock_in_time = datetime.strptime(clock_in_time, "%H:%M:%S").time()
+
+    # Convert start_work_time to datetime.time if it's a string
+    if isinstance(start_work_time, str):
+        start_work_time = datetime.strptime(start_work_time, "%H:%M:%S").time()
+
+    # Combine start work time with today's date
+    start_work_datetime = datetime.combine(datetime.today(), start_work_time)
+
+    # Add max late time (timedelta) to start work time
+    max_allowed_time = start_work_datetime + max_late_time
+
+    # Combine clock in time with today's date
+    clock_in_datetime = datetime.combine(datetime.today(), clock_in_time)
+
+    # Check if the employee is late
+    return clock_in_datetime > max_allowed_time
+
+
+
+
+
+def run_hasura_mutation(mutation, variables, url, admin_secret):
+    """
+    Execute a GraphQL mutation against a Hasura instance.
+
+    Args:
+        mutation (str): The GraphQL mutation query as a string.
+        variables (dict): A dictionary of variables to pass to the mutation.
+        url (str): The Hasura GraphQL endpoint URL.
+        admin_secret (str): The Hasura admin secret for authentication.
+
+    Returns:
+        dict: The response from Hasura, either the result of the mutation or an error.
+    """
+
+    headers = {
+        "Content-Type": "application/json",
+        "x-hasura-admin-secret": admin_secret
+    }
+
+    data = {
+        "query": mutation,
+        "variables": variables
+    }
+
+    # Send the POST request
+    response = requests.post(url, json=data, headers=headers)
+
+    # Return the response as a JSON object
+    return response.json()
+
+
+class PineconeSigleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(PineconeSigleton, cls).__new__(cls, *args, **kwargs)
+            cls._instance.pinecone_client = Pinecone(api_key="dc53a991-1d1a-4f03-b718-1ec0df3b0f00")
+            cls._instance.index = cls._instance.pinecone_client.Index("faces-id")
+        return cls._instance
+
+    def insert(self, embedding, firstname="", lastname="", phone_number="", date=""):
+        self.index.upsert(vectors=[
+            {
+                "id": str(uuid.uuid4()),
+                "values": embedding,
+                "metadata": {"firstname": firstname, "lastname": lastname, "phone_number": phone_number, "date": date},
+            }],
+            namespace="ns1"
+        )
+
+    def query(self, embedding, top_k=1):
+        today = date.today()
+        matches = self.index.query(
+            namespace="ns1",
+            vector=embedding,
+            top_k=top_k,
+            include_values=False,
+            include_metadata=True,
+            filter={"date": {"$eq": str(today.strftime('%B %d, %Y'))}}
+        )
+
+        print(matches["matches"])
+
+        return matches["matches"]
+
+
+
+def upload_to_s3(local_file, bucket_name, s3_file, s3):
+    try:
+        # Upload the file to S3
+        s3.upload_file(local_file, bucket_name, s3_file)
+        print(f'Successfully uploaded {local_file} to {bucket_name}/{s3_file}')
+
+        # Construct the file's URL
+        location = s3.get_bucket_location(Bucket=bucket_name)['LocationConstraint']
+        file_url = f"https://{bucket_name}.s3.{location}.amazonaws.com/{s3_file}"
+
+        return file_url
+
+    except FileNotFoundError:
+        print(f'The file {local_file} was not found.')
+        return None
+    except NoCredentialsError:
+        print('Credentials not available.')
+        return None
+
+
