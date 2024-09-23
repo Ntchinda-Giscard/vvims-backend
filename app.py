@@ -140,6 +140,7 @@ async def insert_face(
             local_file=image_path,
             bucket_name='vvims-visitor'
         )
+        print("File url", file_url)
     except Exception as e:
         logger.exception(e)
 
