@@ -134,8 +134,9 @@ async def insert_face(
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
+        apk_name = str(uuid.uuid4())
         file_url = upload_to_s3(
-            s3_file=str(uuid.uuid4()),
+            s3_file=file_url,
             s3=s3,
             local_file=image_path,
             bucket_name='vvims-visitor'
@@ -147,7 +148,8 @@ async def insert_face(
     with next(get_db()) as db:
         try:
             file = UploadedFile(
-                file_name = f"{face.filename}",
+                # file_name = f"{face.filename}",
+                file_name = apk_name,
                 file_url = file_url,
                 mime_type = f"{mime_type}",
                 file_size = (file_size/1024)
