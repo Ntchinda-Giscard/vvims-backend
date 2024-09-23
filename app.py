@@ -14,7 +14,7 @@ from src import models, logger
 from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
-from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions
+from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile
 from src.schema.input_type import LoginInput
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3
 from deepface import DeepFace
@@ -146,7 +146,7 @@ async def insert_face(
 
     with next(get_db()) as db:
         try:
-            file = File(
+            file = UploadedFile(
                 file_name = f"{face.filename}",
                 file_url = file_url,
                 mime_type = f"{mime_type}",

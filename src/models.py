@@ -132,7 +132,7 @@ class Employee(Base):
     supervisor = relationship('Employee', remote_side=[id], backref='subordinates')
     position = relationship('Position', back_populates='employee')
     attendance = relationship('Attendance', back_populates='employee', cascade="all, delete-orphan")
-
+    files = relationship('UploadedFile', back_populates='employee')
     employee_shifts = relationship("EmployeeShift", back_populates='employee')
     # shifts = relationship('Shift', secondary='employee_shifts', primaryjoin='Employee.id == EmployeeShift.employee_id', secondaryjoin='Shift.id == EmployeeShift.shift_id', back_populates='employees')
 
@@ -175,13 +175,15 @@ class Translations(Base):
     content = Column(UUID(as_uuid=True), ForeignKey('text_content.id'))
 
 
-class File(Base):
+class UploadedFile(Base):
     __tablename__ = 'files'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     file_name = Column(String, nullable=True)
     file_url = Column(String, nullable=True)
     mime_type = Column(String, nullable=True)
     file_size = Column(Float, nullable=True)
+
+    employee = relationship('Employee', back_populates='files')
 
 
 class Visitor(Base):
