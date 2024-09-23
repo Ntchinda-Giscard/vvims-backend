@@ -224,7 +224,7 @@ async def upload_app(name: str, version: str, app: UploadFile = File(...)):
 async def get_app():
     with next(get_db()) as db:
         try:
-            app_version = db.query(AppVersions).order_by(AppVersions.version.desc()).first()
+            app_version = db.query(AppVersions).order_by(AppVersions.version.asc()).first()
             return app_version
         except Exception as e:
             db.rollback()
