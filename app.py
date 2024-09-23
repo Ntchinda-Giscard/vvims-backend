@@ -220,7 +220,7 @@ async def upload_app(name: str, version: str, app: UploadFile = File(...)):
         finally:
             db.close()
 
-@app.get("/api/v1/upload-app/")
+@app.get("/api/v1/get-app/")
 async def get_app():
     with next(get_db()) as db:
         try:
