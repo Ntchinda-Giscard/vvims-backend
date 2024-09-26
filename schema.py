@@ -160,6 +160,10 @@ class Mutation:
                 employee.password = hashed_pwd
                 db.commit()
                 db.refresh(employee)
+
+                return UpdatePasswordOutputType(
+                    success = "Password succesfuly updated"
+                )
             except Exception as e:
                 db.rollback()
                 db.close()
