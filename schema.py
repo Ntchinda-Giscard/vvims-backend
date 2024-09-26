@@ -37,9 +37,10 @@ class Query:
         return "Strawberry"
 
     @strawberry.field
-    def login_employee(self, phone_number: str, password: str) -> typing.Optional[LoginReturnType]:
+    def login_employee(self, phone_number: str, password: str, firebase_token: typing.Optional[str] = None) -> typing.Optional[LoginReturnType]:
         with next(get_db()) as db:
             employee_with_role = authenticate_employee(db, phone_number, password)
+            employee_with_role.firebase_token = firebase_token if firebase_token else employee_with_role.firebase_token
             if employee_with_role:
                 token = create_token(employee_with_role)
                 # token = base64.b64encode(token).decode('utf-8')

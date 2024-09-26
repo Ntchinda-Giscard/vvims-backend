@@ -4,7 +4,24 @@ import requests
 from pinecone import Pinecone
 import boto3
 from botocore.exceptions import NoCredentialsError
+import json
+import google.auth
+from google.oauth2 import service_account
+import google.auth.transport.requests
 
+
+def auth_firebase_token() -> str:
+    SERVICE_ACCOUNT_FILE= './vvims-emplo-firebase-adminsdk-sg73f-d935f36b7e.json'
+
+    SCOPES=['https://www.googleapis.com/auth/firebase.messaging']
+
+    credentials = service_account.Credentials.from_service_account_file(SERVICE_ACCOUNT_FILE, scopes=SCOPES)
+
+    request =google.auth.transport.requests.Request()
+    credentials.refresh(request)
+    access_token = credentials.token
+    print(access_token)
+    return access_token
 
 
 def is_employee_late(clock_in_time, start_work_time, max_late_time: timedelta) -> bool:

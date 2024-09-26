@@ -55,7 +55,7 @@ class UpdatePasswordInputType:
     new_password: str
 
 class LoginInput(BaseModel):
-
+    firebase_token: Optional[str] = None
     phone_number: str
     password: str
 
