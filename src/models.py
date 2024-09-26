@@ -1,3 +1,5 @@
+from datetime import timezone
+
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, func, DateTime, UUID, Float, Enum, Date, Time, \
     Interval, ARRAY, Boolean
 from sqlalchemy.orm import relationship
@@ -83,6 +85,7 @@ class Service(Base):
 
     # Relationships
     department = relationship('Department', back_populates='services')
+    visit = relationship('Visit', back_populates='service')
 
     # Specify the foreign key to use in the employees relationship
     employees = relationship('Employee', back_populates='service', foreign_keys='Employee.service_id')
@@ -136,6 +139,7 @@ class Employee(Base):
     files = relationship('UploadedFile', back_populates='employee')
     employee_shifts = relationship("EmployeeShift", back_populates='employee')
     employee_notifications = relationship("EmployeeNotification", back_populates='employee')
+    visit = relationship('Visit', back_populates='employee')
     # shifts = relationship('Shift', secondary='employee_shifts', primaryjoin='Employee.id == EmployeeShift.employee_id', secondaryjoin='Shift.id == EmployeeShift.shift_id', back_populates='employees')
 
 
@@ -154,6 +158,7 @@ class Department(Base):
     agency = relationship('Agency', back_populates='departments')
     services = relationship('Service', back_populates='department')
     parent_department = relationship('Department', remote_side=[id])
+    visit = relationship('Visit', back_populates='department')
 
     # Specify foreign_keys argument to resolve ambiguity
     employees = relationship('Employee', back_populates='department', foreign_keys='Employee.department_id')
@@ -200,17 +205,36 @@ class Visitor(Base):
     back_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     id_number = Column(String, unique=True)
 
+    # relationship
+    visit = relationship('Visit', back_populates='visitors')
+
 
 class Visit(Base):
     __tablename__ = 'visits'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
     host_employee = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     host_department = Column(UUID(as_uuid=True), ForeignKey('departments.id'), nullable=True)
     host_service = Column(UUID(as_uuid=True), ForeignKey('services.id'), nullable=True)
-    vehicle = Column(UUID(as_uuid=True), ForeignKey('vehicles.id'), nullable=True)
     visitor = Column(UUID(as_uuid=True), ForeignKey('visitors.id'), nullable=False)
+
+    vehicle = Column(UUID(as_uuid=True), ForeignKey('vehicles.id'), nullable=True)
+    status = Column(String, nullable=True)
+    reason = Column(String, nullable=True)
+    date = Column(Date(timezone=True), server_default=func.now())
+    check_in_at = Column(Time, server_default=func.now())
+    check_out_at = Column(Time, server_default=func.now())
+    reg_no = Column(String, nullable=True)
+
+    # relationship
+    employee = relationship('Employee', back_populates='visit')
+    department = relationship('Department', back_populates='visit')
+    service = relationship('Service', back_populates='visit')
+    visitors = relationship('Visitor', back_populates='visit')
+
+
 
 
 class Vehicle(Base):
@@ -272,7 +296,7 @@ class Attendance(Base):
     shift_id = Column(UUID(as_uuid=True), ForeignKey('shifts.id'), nullable=True)
     clock_in_time = Column(DateTime(timezone=True), nullable=True)
     clock_out_time = Column(DateTime(timezone=True), nullable=True)
-    clock_in_date = Column(Date, server_default=func.now(), unique=True)
+    clock_in_date = Column(Date, server_default=func.now(), unique=False)
 
 
     # relationship
