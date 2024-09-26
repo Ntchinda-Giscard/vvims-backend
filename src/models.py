@@ -135,6 +135,7 @@ class Employee(Base):
     attendance = relationship('Attendance', back_populates='employee', cascade="all, delete-orphan")
     files = relationship('UploadedFile', back_populates='employee')
     employee_shifts = relationship("EmployeeShift", back_populates='employee')
+    employee_notifications = relationship("EmployeeNotification", back_populates='employee')
     # shifts = relationship('Shift', secondary='employee_shifts', primaryjoin='Employee.id == EmployeeShift.employee_id', secondaryjoin='Shift.id == EmployeeShift.shift_id', back_populates='employees')
 
 
@@ -330,3 +331,17 @@ class AppVersions(Base):
     name = Column(String, nullable=False)
     url = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
+
+
+class EmployeeNotification(Base):
+    __tablename__ = 'employee_notifications'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'))
+    action = Column(String, nullable=False)
+    title = Column(String, nullable=False)
+    message = Column(String, nullable=False)
+    is_read = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    employee = relationship("Employee", back_populates='employee_notifications')
