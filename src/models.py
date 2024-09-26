@@ -223,7 +223,7 @@ class Visit(Base):
     vehicle = Column(UUID(as_uuid=True), ForeignKey('vehicles.id'), nullable=True)
     status = Column(String, nullable=True)
     reason = Column(String, nullable=True)
-    date = Column(Date(timezone=True), server_default=func.now())
+    date = Column(Date, server_default=func.now())
     check_in_at = Column(Time, server_default=func.now())
     check_out_at = Column(Time, server_default=func.now())
     reg_no = Column(String, nullable=True)
