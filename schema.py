@@ -171,3 +171,8 @@ class Mutation:
                 logger.exception(e)
             finally:
                 db.close()
+
+    @strawberry.mutation
+    def create_visitor(self) -> str:
+
+        return "create visitor"

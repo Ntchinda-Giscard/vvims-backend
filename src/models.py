@@ -48,9 +48,10 @@ class Company(Base):
     phone_number = Column(String, nullable=True, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-    # realtionships
+    # relationships
     agencies = relationship('Agency', back_populates='company')
     company_settings = relationship('CompanySettings', back_populates='company')
+    visitors = relationship('Visitor', back_populates='company')
 
 
 class Agency(Base):
@@ -203,10 +204,12 @@ class Visitor(Base):
     photo = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     front_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     back_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
     id_number = Column(String, unique=True)
 
     # relationship
     visit = relationship('Visit', back_populates='visitors')
+    company = relationship('Company', back_populates='visitors')
 
 
 class Visit(Base):
