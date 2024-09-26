@@ -118,6 +118,7 @@ class Employee(Base):
     profile_picture = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    firebase_token = Column(String, nullable=True)
     ####
     region = Column(String, nullable=True)
     id_card_number = Column(String, nullable=True)
@@ -194,6 +195,8 @@ class Visitor(Base):
     firstname = Column(String)
     lastname = Column(String)
     photo = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
+    front_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
+    back_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     id_number = Column(String, unique=True)
 
 

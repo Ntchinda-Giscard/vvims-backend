@@ -26,6 +26,10 @@ class EmployeeUpdateType:
     lastname: str
     address: str
 
+@strawberry.type
+class UpdatePasswordOutputType:
+    success: str
+
 
 @strawberry.type
 class EmployeeRole:

@@ -8,9 +8,10 @@ from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole
-from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput
+from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType
 from src import logger
-from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType
+from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
+    UpdatePasswordOutputType
 
 
 # Custom context to hold the user info
@@ -133,6 +134,7 @@ class Mutation:
                 user.firstname = employee.firstname if employee.firstname else user.firstname
                 user.lastname = employee.lastname if employee.lastname else user.lastname
                 user.address = employee.address if employee.address else user.address
+                user.phone_number = employee.phone_number if employee.phone_number else user.phone_number
 
                 db.commit()
                 return EmployeeUpdateType(
@@ -148,3 +150,19 @@ class Mutation:
             finally:
                 db.close()
 
+    @strawberry.mutation
+    def update_employee_password(self, employeeInfo: UpdatePasswordInputType) -> UpdatePasswordOutputType:
+
+        with next(get_db()) as db:
+            try:
+                employee = authenticate_employee(db, employeeInfo.phone_number, employeeInfo.current_password)
+                hashed_pwd = pwd_context.hash(employeeInfo.new_password)
+                employee.password = hashed_pwd
+                db.commit()
+                db.refresh(employee)
+            except Exception as e:
+                db.rollback()
+                db.close()
+                logger.exception(e)
+            finally:
+                db.close()

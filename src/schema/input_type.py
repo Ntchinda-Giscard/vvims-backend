@@ -34,7 +34,7 @@ class UpdateEmployeeInput:
     firstname: Optional[str] = None
     lastname: Optional[str] = None
     # password: str
-    # phone_number: str
+    phone_number: Optional[str] = None
     # email: Optional[str]
     # supervisor_id: Optional[uuid.UUID] = None
     # company_id: uuid.UUID
@@ -48,6 +48,11 @@ class UpdateEmployeeInput:
     address: Optional[str] = None
     # roles:  CreateEmployeeRole
 
+@strawberry.input
+class UpdatePasswordInputType:
+    phone_number: str
+    current_password: str
+    new_password: str
 
 class LoginInput(BaseModel):
 

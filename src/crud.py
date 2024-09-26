@@ -40,7 +40,7 @@ def authenticate_employee(db: Session, phone_number: str, password: str):
     """
     employee = get_employee_by_phone(db, phone_number)
     if employee:
-        print("Employee====>", employee.id)
+        print("Employee====>")
     if pwd_context.verify(password, employee.password):
         print("Same password")
 
