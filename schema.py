@@ -177,7 +177,7 @@ class Mutation:
     def create_visitor(self, visitor: AddVisitorBrowserInputType) -> CreateVisitorType:
 
         if visitor.visitor :
-            if not visitor.host_service or not visitor.host_employee or not visitor.host_department:
+            if not visitor.host_service and not visitor.host_employee and not visitor.host_department:
                 raise Exception(" No services nor department nor employee has been chosen for the visit ")
             with next(get_db()) as db:
                 try:
@@ -203,7 +203,7 @@ class Mutation:
                     db.close()
 
         elif not visitor.visitor:
-            if not visitor.host_service or not visitor.host_employee or not visitor.host_department:
+            if not visitor.host_service and not visitor.host_employee and not visitor.host_department:
                 raise Exception(" No services nor department nor employee has been chosen for the visit ")
             with next(get_db()) as db:
                 try:
