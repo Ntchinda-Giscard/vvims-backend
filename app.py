@@ -119,17 +119,19 @@ async def attendance_trigger(body: Dict):
     return {"message" : "Received and printed"}
 
 @app.post("/api/v1/visit-trigger")
-async def visits_trigger(data: Dict):
+async def visits_trigger(body: Dict):
     with next(get_db()) as db:
         try:
-            db_notif = EmployeeNotification(
-                action = "ADD VISITOR",
-                title = "New Visitor Alert !",
-                message="A new visitor has been! Click here to see more details",
-                is_read = False
-            )
-            db.add(db_notif)
-            db.commit()
+            data = body['event']['data']['new']
+            print(data)
+            # db_notif = EmployeeNotification(
+            #     action = "ADD VISITOR",
+            #     title = "New Visitor Alert !",
+            #     message="A new visitor has been! Click here to see more details",
+            #     is_read = False
+            # )
+            # db.add(db_notif)
+            # db.commit()
 
         except Exception as e:
             db.rollback()
