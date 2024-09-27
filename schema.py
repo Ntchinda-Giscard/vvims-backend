@@ -198,7 +198,7 @@ class Mutation:
                 except Exception as e:
                     db.rollback()
                     db.close()
-                    logger.exceptio(e)
+                    logger.exception(e)
                 finally:
                     db.close()
 
@@ -233,7 +233,7 @@ class Mutation:
                 except Exception as e:
                     db.rollback()
                     db.close()
-                    logger.exceptio(e)
+                    logger.exception(e)
                 finally:
                     db.close()
 
