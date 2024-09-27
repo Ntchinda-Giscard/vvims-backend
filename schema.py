@@ -12,7 +12,7 @@ from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, Updat
     AddVisitorBrowserInputType
 from src import logger
 from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
-    UpdatePasswordOutputType
+    UpdatePasswordOutputType, CreateVisitorType
 
 
 # Custom context to hold the user info
@@ -174,7 +174,7 @@ class Mutation:
                 db.close()
 
     @strawberry.mutation
-    def create_visitor(self, visitor: AddVisitorBrowserInputType) -> str:
+    def create_visitor(self, visitor: AddVisitorBrowserInputType) -> CreateVisitorType:
 
         if visitor.visitor :
             if not visitor.host_service or not visitor.host_employee or not visitor.host_department:
@@ -194,6 +194,7 @@ class Mutation:
 
                     db.add(db_visit)
                     db.commit()
+                    return CreateVisitorType(id = db_visit.id)
                 except Exception as e:
                     db.rollback()
                     db.close()
@@ -228,6 +229,7 @@ class Mutation:
                     )
                     db.add(db_visit)
                     db.commit()
+                    return CreateVisitorType(id=db_visit.id)
                 except Exception as e:
                     db.rollback()
                     db.close()

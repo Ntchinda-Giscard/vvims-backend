@@ -30,6 +30,10 @@ class EmployeeUpdateType:
 class UpdatePasswordOutputType:
     success: str
 
+@strawberry.type
+class CreateVisitorType:
+    id: uuid.UUID
+
 
 @strawberry.type
 class EmployeeRole:
