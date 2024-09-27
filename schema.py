@@ -7,8 +7,9 @@ from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee
 from src.database import get_db
-from src.models import Employee, Role, EmployeeRole
-from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType
+from src.models import Employee, Role, EmployeeRole, Visit, Visitor
+from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
+    AddVisitorBrowserInputType
 from src import logger
 from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType
@@ -173,6 +174,65 @@ class Mutation:
                 db.close()
 
     @strawberry.mutation
-    def create_visitor(self) -> str:
+    def create_visitor(self, visitor: AddVisitorBrowserInputType) -> str:
 
-        return "create visitor"
+        if visitor.visitor :
+            if not visitor.host_service or not visitor.host_employee or not visitor.host_department:
+                raise Exception(" No services nor department nor employee has been chosen for the visit ")
+            with next(get_db()) as db:
+                try:
+                    db_visit = Visit(
+                        host_employee = visitor.host_employee,
+                        host_department= visitor.host_department,
+                        host_service = visitor.host_service,
+                        visitor = visitor.visitor,
+                        vehicle = visitor.vehicle,
+                        status = visitor.status,
+                        reason = visitor.reason,
+                        reg_no = visitor.reg_no
+                    )
+
+                    db.add(db_visit)
+                    db.commit()
+                except Exception as e:
+                    db.rollback()
+                    db.close()
+                    logger.exceptio(e)
+                finally:
+                    db.close()
+
+        elif not visitor.visitor:
+            if not visitor.host_service or not visitor.host_employee or not visitor.host_department:
+                raise Exception(" No services nor department nor employee has been chosen for the visit ")
+            with next(get_db()) as db:
+                try:
+                    db_visitor = Visitor(
+                        firstname = visitor.firstname,
+                        lastname = visitor.lastname,
+                        company_id = visitor.company_id,
+                        id_number = visitor.id_number,
+                        phone_number = visitor.phone_number
+                    )
+                    db.add(db_visitor)
+                    db.commit()
+
+                    db_visit = Visit(
+                        host_employee=visitor.host_employee,
+                        host_department=visitor.host_department,
+                        host_service=visitor.host_service,
+                        visitor=db_visitor.id,
+                        vehicle=visitor.vehicle,
+                        status=visitor.status,
+                        reason=visitor.reason,
+                        reg_no=visitor.reg_no
+                    )
+                    db.add(db_visit)
+                    db.commit()
+                except Exception as e:
+                    db.rollback()
+                    db.close()
+                    logger.exceptio(e)
+                finally:
+                    db.close()
+
+

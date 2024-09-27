@@ -206,6 +206,7 @@ class Visitor(Base):
     back_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
     id_number = Column(String, unique=True)
+    phone_number = Column(String, nullbale=True)
 
     # relationship
     visit = relationship('Visit', back_populates='visitors')
@@ -228,7 +229,7 @@ class Visit(Base):
     reason = Column(String, nullable=True)
     date = Column(Date, server_default=func.now())
     check_in_at = Column(Time, server_default=func.now())
-    check_out_at = Column(Time, server_default=func.now())
+    check_out_at = Column(Time)
     reg_no = Column(String, nullable=True)
 
     # relationship

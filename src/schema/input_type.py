@@ -73,3 +73,25 @@ class CreateEmployee(BaseModel):
     service_id: uuid.UUID
     function: str
     roles:  CreateEmployeeRole
+
+@strawberry.enum
+class VisitStatus(Enum):
+    ACCEPTED = 'ACCEPTED'
+    REJECTED = 'REJECTED'
+    PENDING = 'PENDING'
+
+@strawberry.input
+class AddVisitorBrowserInputType:
+    host_employee: Optional[uuid.UUID] = None
+    host_department: Optional[uuid.UUID] = None
+    host_service: Optional[uuid.UUID] = None
+    visitor: Optional[uuid.UUID] = None
+    vehicle: Optional[uuid.UUID] = None
+    status: VisitStatus
+    reason: Optional[str]
+    reg_no: Optional[str] = None
+    firstname: str
+    lastname: str
+    id_number: str
+    company_id: uuid.UUID
+    phone_number: str
