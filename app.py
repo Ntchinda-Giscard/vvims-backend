@@ -125,14 +125,14 @@ async def visits_trigger(body: Dict):
     with next(get_db()) as db:
         try:
 
-            # db_notif = EmployeeNotification(
-            #     action = "ADD VISITOR",
-            #     title = "New Visitor Alert !",
-            #     message="A new visitor has been! Click here to see more details",
-            #     is_read = False
-            # )
-            # db.add(db_notif)
-            # db.commit()
+            db_notif = EmployeeNotification(
+                action = "ADD VISITOR",
+                title = "New Visitor Alert !",
+                message="A new visitor has been! Click here to see more details",
+                is_read = False
+            )
+            db.add(db_notif)
+            db.commit()
 
         except Exception as e:
             db.rollback()
