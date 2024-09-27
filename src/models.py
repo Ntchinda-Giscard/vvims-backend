@@ -364,7 +364,7 @@ class AppVersions(Base):
 class EmployeeNotification(Base):
     __tablename__ = 'employee_notifications'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'))
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     action = Column(String, nullable=False)
     title = Column(String, nullable=False)
     message = Column(String, nullable=False)

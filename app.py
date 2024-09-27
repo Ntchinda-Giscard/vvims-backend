@@ -14,7 +14,8 @@ from src import models, logger
 from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
-from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile
+from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
+    EmployeeNotification
 from src.schema.input_type import LoginInput
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3
 from deepface import DeepFace
@@ -116,6 +117,27 @@ async def attendance_trigger(body: Dict):
 
 
     return {"message" : "Received and printed"}
+
+@app.post("/api/v1/visit-trigger")
+async def visits_trigger(data: Dict):
+    with next(get_db()) as db:
+        try:
+            db_notif = EmployeeNotification(
+                action = "ADD VISITOR",
+                title = "New Visitor Alert !",
+                message="A new visitor has been! Click here to see more details",
+                is_read = False
+            )
+            db.add(db_notif)
+            db.commit()
+            db.refresh(db_notif)
+        except Exception as e:
+            db.rollback()
+            db.close()
+            logger.exception(e)
+        finally:
+            db.close()
+    return {"message": "Event triggered"}
 
 
 @app.post("/api/v1/profile")
