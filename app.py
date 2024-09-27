@@ -130,7 +130,7 @@ async def visits_trigger(data: Dict):
             )
             db.add(db_notif)
             db.commit()
-            db.refresh(db_notif)
+
         except Exception as e:
             db.rollback()
             db.close()
