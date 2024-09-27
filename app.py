@@ -204,6 +204,8 @@ async def upload_app(name: str, version: str, app: UploadFile = File(...)):
             local_file=file_path,
             bucket_name='vvims-visitor'
         )
+
+        return {"message" : "Upload successful"}
     except Exception as e:
         logger.exception(e)
 
