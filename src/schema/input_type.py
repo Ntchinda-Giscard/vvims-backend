@@ -87,7 +87,7 @@ class AddVisitorBrowserInputType:
     host_service: Optional[uuid.UUID] = None
     visitor: Optional[uuid.UUID] = None
     vehicle: Optional[uuid.UUID] = None
-    status: VisitStatus
+    status: str
     reason: Optional[str]
     reg_no: Optional[str] = None
     firstname: str
