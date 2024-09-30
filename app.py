@@ -230,7 +230,10 @@ async def upload_app(name: str, version: str, app: UploadFile = File(...)):
             bucket_name='vvims-visitor'
         )
 
-        return {"message" : "Upload successful"}
+        if file_url:
+            return {"message" : "Upload successful", "file_url":file_url }
+        else:
+            return {"message" : "Upload failed"}
     except Exception as e:
         logger.exception(e)
 
@@ -256,6 +259,7 @@ async def get_app():
     with next(get_db()) as db:
         try:
             app_version = db.query(AppVersions).order_by(AppVersions.created_at.desc()).first()
+            print(app_version)
             return app_version
         except Exception as e:
             db.rollback()
