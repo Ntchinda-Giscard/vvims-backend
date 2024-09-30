@@ -270,7 +270,7 @@ async def get_app():
 
 
 @app.post("/api/v1/upload-file")
-async def upload_app(app: UploadFile = File(...)):
+async def upload_app(file: UploadFile = File(...)):
     try:
         file_path = f"uploads/file"
         # mime_type, _ = mimetypes.guess_type(file_path)
