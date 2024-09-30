@@ -229,11 +229,6 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
             local_file=file_path,
             bucket_name='vvims-visitor'
         )
-
-        if file_url:
-            return {"message" : "Upload successful", "file_url":file_url }
-        else:
-            return {"message" : "Upload failed"}
     except Exception as e:
         logger.exception(e)
 
@@ -246,6 +241,10 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
             )
             db.add(app_version)
             db.commit()
+            if file_url:
+                return {"message": "Upload successful", "file_url": file_url}
+            else:
+                return {"message": "Upload failed"}
         except Exception as e:
             logger.exception(e)
             db.rollback()
