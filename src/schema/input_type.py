@@ -74,6 +74,21 @@ class CreateEmployee(BaseModel):
     function: str
     roles:  CreateEmployeeRole
 
+class CrateVisitWithVisitor(BaseModel):
+    firstname: str
+    lastname: Optional[str]
+    phone_number: str
+    lastname: str
+    company_id: uuid.UUID
+    host_employee: Optional[uuid.UUID]
+    host_department: Optional[uuid.UUID]
+    host_service: Optional[uuid.UUID]
+    vehicle: uuid.UUID
+    status: str
+    reason: str
+    reg_no: str
+
+
 @strawberry.enum
 class VisitStatus(Enum):
     ACCEPTED = 'ACCEPTED'

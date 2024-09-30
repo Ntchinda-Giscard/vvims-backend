@@ -2,7 +2,7 @@ import os
 import uuid
 import mimetypes
 from fastapi.responses import StreamingResponse, JSONResponse
-from typing import Dict, List
+from typing import Dict, List, Optional
 from datetime import datetime, date
 from dateutil import parser
 import strawberry
@@ -252,6 +252,12 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
             raise e
         finally:
             db.close()
+
+
+@app.post("/api/v1/add-with-visitor")
+async def add_visit_with_visitor(face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...), visit_details: CrateVisitWithVisitor ):
+
+    pass
 
 @app.get("/api/v1/get-app/")
 async def get_app():

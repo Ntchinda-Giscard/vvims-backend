@@ -228,7 +228,7 @@ class Visit(Base):
     status = Column(String, nullable=True)
     reason = Column(String, nullable=True)
     date = Column(Date, server_default=func.now())
-    check_in_at = Column(Time, server_default=func.now())
+    check_in_at = Column(Time)
     check_out_at = Column(Time)
     reg_no = Column(String, nullable=True)
 
