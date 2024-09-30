@@ -254,10 +254,11 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
             db.close()
 
 
-@app.post("/api/v1/add-with-visitor")
-async def add_visit_with_visitor(face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...), visit_details: CrateVisitWithVisitor ):
-
-    pass
+# @app.post("/api/v1/add-with-visitor")
+# async def add_visit_with_visitor(face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...), visit_details: CrateVisitWithVisitor ):
+#     with(next(get_db())) as db:
+#         pass
+#     pass
 
 @app.get("/api/v1/get-app/")
 async def get_app():
