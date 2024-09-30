@@ -281,12 +281,14 @@ async def upload_app(app: UploadFile = File(...)):
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
+        file_name = str(uuid.uuid4())
         file_url = upload_to_s3(
-            s3_file=str(uuid.uuid4()),
+            s3_file=file_name,
             s3=s3,
             local_file=file_path,
             bucket_name='vvims-visitor'
         )
+        print(file_name)
 
         return {"file_url" : file_url}
     except Exception as e:
