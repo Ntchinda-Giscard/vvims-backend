@@ -276,7 +276,7 @@ async def upload_app(file: UploadFile = File(...)):
         # mime_type, _ = mimetypes.guess_type(file_path)
         # file_size = os.path.getsize(file_path)
         with open(file_path, "wb") as f:
-            f.write(await app.read())
+            f.write(await file.read())
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
