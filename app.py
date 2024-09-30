@@ -212,13 +212,13 @@ async def insert_face(
     #     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{str(e)}")
 
 @app.post("/api/v1/upload-app")
-async def upload_app(name: str, version: str, app: UploadFile = File(...)):
+async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
     try:
         file_path = f"uploads/app"
         # mime_type, _ = mimetypes.guess_type(file_path)
         # file_size = os.path.getsize(file_path)
         with open(file_path, "wb") as f:
-            f.write(await app.read())
+            f.write(await apps.read())
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
