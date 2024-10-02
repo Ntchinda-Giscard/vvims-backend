@@ -136,17 +136,17 @@ class Mutation:
                 user.firstname = employee.firstname if employee.firstname else user.firstname
                 user.lastname = employee.lastname if employee.lastname else user.lastname
                 user.address = employee.address if employee.address else user.address
-                if db.query(Employee).filter(Employee.phone_number == employee.phone_number).one() :
+                if db.query(Employee).filter(Employee.phone_number == employee.phone_number).first() and user.phone_number != employee.phone_number :
                     raise Exception("Someone with this phone number exist already")
                 user.phone_number = employee.phone_number if employee.phone_number else user.phone_number
 
                 db.commit()
                 return EmployeeUpdateType(
-                    id=employee.id,
-                    firstname=employee.firstname,
-                    lastname=employee.lastname,
-                    address = employee.address,
-                    phone_number=employee.phone_number
+                    id=user.id,
+                    firstname=user.firstname,
+                    lastname=user.lastname,
+                    address = user.address,
+                    phone_number=user.phone_number
                 )
             except Exception as e:
                 logger.exception(e)
