@@ -20,3 +20,6 @@ pinecone-client
 deepface
 tensorflow==2.12
 tf-keras
+google-auth
+google-auth-oauthlib
+google-auth-httplib2

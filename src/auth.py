@@ -16,7 +16,7 @@ def create_token(employee: Employee) -> str:
     data = {
         "sub": str(employee.id),
         "name": employee.firstname + " " + employee.lastname,
-        # "iat": datetime.now(timezone.utc) + auth_access_token_expires,
+        "iat": datetime.now(timezone.utc) + auth_access_token_expires,
         "admin": is_admin,
         "https://hasura.io/jwt/claims":{
             "x-hasura-allowed-roles": [ r.role.role_name.lower() for r in employee.roles ],

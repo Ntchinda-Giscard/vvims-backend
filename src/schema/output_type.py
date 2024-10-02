@@ -21,10 +21,12 @@ class EmployeeCreationType:
 
 @strawberry.type
 class EmployeeUpdateType:
-    id: uuid.UUID
-    firstname: str
-    lastname: str
-    address: str
+    id: Optional[uuid.UUID]
+    firstname: Optional[str]
+    lastname: Optional[str]
+    address: Optional[str]
+    phone_number: Optional[str]
+
 
 @strawberry.type
 class UpdatePasswordOutputType:
@@ -75,3 +77,7 @@ class EmployeeType:
 class LoginReturnType:
     token: str
     employee: EmployeeType
+
+@strawberry.type
+class CreateVisitorReturnType:
+    id: uuid.UUID

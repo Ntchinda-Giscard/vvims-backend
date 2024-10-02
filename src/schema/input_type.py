@@ -78,16 +78,32 @@ class CrateVisitWithVisitor(BaseModel):
     firstname: str
     lastname: Optional[str]
     phone_number: str
-    lastname: str
+    id_number: str
     company_id: uuid.UUID
     host_employee: Optional[uuid.UUID]
     host_department: Optional[uuid.UUID]
     host_service: Optional[uuid.UUID]
-    vehicle: uuid.UUID
-    status: str
+    vehicle: Optional[uuid.UUID]
+    visitor: Optional[uuid.UUID]
+    status: str = 'PENDING'
     reason: str
     reg_no: str
 
+@strawberry.input
+class CrateVisitWithVisitorType:
+    firstname: str
+    lastname: Optional[str]
+    phone_number: str
+    id_number: str
+    company_id: uuid.UUID
+    host_employee: Optional[uuid.UUID]
+    host_department: Optional[uuid.UUID]
+    host_service: Optional[uuid.UUID]
+    vehicle: Optional[uuid.UUID]
+    visitor: Optional[uuid.UUID]
+    status: str = 'PENDING'
+    reason: str
+    reg_no: str
 
 @strawberry.enum
 class VisitStatus(Enum):

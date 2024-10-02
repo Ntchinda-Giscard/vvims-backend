@@ -15,10 +15,10 @@ from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
-    EmployeeNotification
-from src.schema.input_type import LoginInput
+    EmployeeNotification, Visit, Visitor
+from src.schema.input_type import LoginInput, CrateVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3
-from deepface import DeepFace
+# from deepface import DeepFace
 import boto3
 
 models.Base.metadata.create_all(bind=engine)
@@ -161,7 +161,7 @@ async def insert_face(
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
-        apk_name = str(uuid.uuid4()) + ".apk"
+        apk_name = str(uuid.uuid4())
         file_url = upload_to_s3(
             s3_file=apk_name,
             s3=s3,
@@ -253,12 +253,122 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
         finally:
             db.close()
 
+def uploads_save(files):
+    try:
+        file_path = f"uploads/files"
+        with open(file_path, "wb") as f:
+            f.write(files.read())
+        mime_type, _ = mimetypes.guess_type(file_path)
+        file_size = os.path.getsize(file_path)
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(status_code=500, detail=f"{str(e)}")
+    try:
+        file_url = upload_to_s3(
+            s3_file=str(uuid.uuid4()) + ".apk",
+            s3=s3,
+            local_file=file_path,
+            bucket_name='vvims-visitor'
+        )
+    except Exception as e:
+        logger.exception(e)
+    return mime_type, file_size, file_url, str(files.filename)
 
-# @app.post("/api/v1/add-with-visitor")
-# async def add_visit_with_visitor(face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...), visit_details: CrateVisitWithVisitor ):
-#     with(next(get_db())) as db:
-#         pass
-#     pass
+
+@app.post("/api/v1/add-with-visitor")
+async def add_visit_with_visitor(
+        visit_details: CrateVisitWithVisitor,
+        user: str = Depends(get_current_user),
+        face: Optional[UploadFile] = File(...), front: UploadFile = File(...), back: Optional[UploadFile] = File(...),
+
+        ):
+    if not front:
+        return HTTPException(status=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
+    if face:
+        face_mimetype, face_file_size, face_file_url, face_filename =  uploads_save(face)
+    if back:
+        back_mimetype, back_file_size, back_file_url, back_filename = uploads_save(back)
+    front_mimetype, front_file_size, front_file_url, front_filename = uploads_save(front)
+    with(next(get_db())) as db:
+        try:
+
+            db_front = UploadedFile(
+                file_name=front_filename,
+                file_url=front_file_url,
+                mime_type=front_mimetype,
+                file_size=front_file_size
+            )
+            db.add(db_front)
+            db.commit()
+            if face:
+                db_face = UploadedFile(
+                    file_name=face_filename,
+                    file_url=face_file_url,
+                    mime_type=face_mimetype,
+                    file_size=face_file_size
+                )
+                db.add(db_face)
+                db.commit()
+
+            if back:
+                db_back = UploadedFile(
+                    file_name=back_filename,
+                    file_url=back_file_url,
+                    mime_type=back_mimetype,
+                    file_size=back_file_size
+                )
+                db.add(db_back)
+                db.commit()
+            if visit_details.visitor:
+                db_visits = Visit(
+                    host_employee=visit_details.host_employee,
+                    host_department=visit_details.host_department,
+                    host_service=visit_details.host_service,
+                    visitor=visit_details.visitor,
+                    vehicle=visit_details.vehicle,
+                    status=visit_details.status,
+                    reason=visit_details.reason
+                )
+                db.add(db_visits)
+                db.commit()
+            elif not visit_details.visitor:
+                company_id = db.query(Employee).filter(Employee.id == user).first()
+                db_visitor = Visitor(
+                    firstname=visit_details.firstname,
+                    lastname = visit_details.lastname,
+                    photo = db_face.id,
+                    front_id = db_front.id,
+                    back_id = db_back,
+                    company_id = company_id,
+                    id_number = visit_details.id_number,
+                    phone_number = visit_details.phone_number
+                )
+
+                db.add(db_visitor)
+                db.commit()
+                db_visit = Visit(
+                    host_employee=visit_details.host_employee,
+                    host_department=visit_details.host_department,
+                    host_service=visit_details.host_service,
+                    visitor=db_visitor.id,
+                    vehicle=visit_details.vehicle,
+                    status=visit_details.status,
+                    reason=visit_details.reason
+                )
+                db.add(db_visit)
+                db.commit()
+                db.close()
+
+        except Exception as e:
+            db.rollback()
+            db.close()
+            return HTTPException(status=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+        finally:
+            db.close()
+
+
+
+
 
 @app.get("/api/v1/get-app/")
 async def get_app():
@@ -300,24 +410,24 @@ async def upload_app(file: UploadFile = File(...)):
     except Exception as e:
         logger.exception(e)
 
-@app.post("/recognize")
-async def recognize(
-    embedding: List[float],
-    ):
-
-    matches = pinecone_client.query(embedding)
-
-    serialized_vectors = []
-    for vec in matches:
-        serialized_vectors.append({
-            "id": vec.get("id"),
-            "score": vec.get("score"),
-            "metadata" : vec.get("metadata")
-        })
-    print(serialized_vectors)
-    if(serialized_vectors[0]["score"] >= 0.79):
-        return JSONResponse(status_code=status.HTTP_200_OK, content={"matches": serialized_vectors[0]})
-    return JSONResponse(status_code=status.HTTP_400_NOT_FOUND, content={"matches": [], "message": "Intruder visitor did not regidter today"})
+# @app.post("/recognize")
+# async def recognize(
+#     embedding: List[float],
+#     ):
+#
+#     matches = pinecone_client.query(embedding)
+#
+#     serialized_vectors = []
+#     for vec in matches:
+#         serialized_vectors.append({
+#             "id": vec.get("id"),
+#             "score": vec.get("score"),
+#             "metadata" : vec.get("metadata")
+#         })
+#     print(serialized_vectors)
+#     if(serialized_vectors[0]["score"] >= 0.79):
+#         return JSONResponse(status_code=status.HTTP_200_OK, content={"matches": serialized_vectors[0]})
+#     return JSONResponse(status_code=status.HTTP_400_NOT_FOUND, content={"matches": [], "message": "Intruder visitor did not regidter today"})
 
 if __name__ == "__main__":
     import uvicorn

@@ -143,7 +143,8 @@ class Mutation:
                     id=employee.id,
                     firstname=employee.firstname,
                     lastname=employee.lastname,
-                    address = employee.address
+                    address = employee.address,
+                    phone_number=employee.phone_number
                 )
             except Exception as e:
                 logger.exception(e)

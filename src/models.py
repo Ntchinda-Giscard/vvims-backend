@@ -141,7 +141,7 @@ class Employee(Base):
     employee_shifts = relationship("EmployeeShift", back_populates='employee')
     employee_notifications = relationship("EmployeeNotification", back_populates='employee')
     visit = relationship('Visit', back_populates='employee')
-    # shifts = relationship('Shift', secondary='employee_shifts', primaryjoin='Employee.id == EmployeeShift.employee_id', secondaryjoin='Shift.id == EmployeeShift.shift_id', back_populates='employees')
+    appointments = relationship("Appointment", back_populates='employees')
 
 
 class Department(Base):
@@ -211,6 +211,7 @@ class Visitor(Base):
     # relationship
     visit = relationship('Visit', back_populates='visitors')
     company = relationship('Company', back_populates='visitors')
+    appointments = relationship("Appointment", back_populates='visitors')
 
 
 class Visit(Base):
@@ -373,3 +374,20 @@ class EmployeeNotification(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee", back_populates='employee_notifications')
+
+
+class Appointment(Base):
+    __tablename__ = "appointments"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    visitor_id = Column(UUID(as_uuid=True), ForeignKey('visitors.id'), nullable=True)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
+    start_time = Column(DateTime(timezone=True))
+    end_time = Column(DateTime(timezone=True))
+    description = Column(String)
+    date = Column(Date)
+    status=Column(String)
+
+    employees = relationship("Employee", back_populates='appointments')
+    visitors = relationship("Visitor", back_populates='appointments')
