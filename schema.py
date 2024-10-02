@@ -136,6 +136,8 @@ class Mutation:
                 user.firstname = employee.firstname if employee.firstname else user.firstname
                 user.lastname = employee.lastname if employee.lastname else user.lastname
                 user.address = employee.address if employee.address else user.address
+                if db.query(Employee).filter(Employee.phone_number == employee.phone_number).one() :
+                    raise Exception("Someone with this phone number exist already")
                 user.phone_number = employee.phone_number if employee.phone_number else user.phone_number
 
                 db.commit()
