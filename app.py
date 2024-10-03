@@ -231,6 +231,7 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
         )
     except Exception as e:
         logger.exception(e)
+        raise e
 
     with next(get_db()) as db:
         try:
@@ -283,7 +284,7 @@ async def add_visit_with_visitor(
 
         ):
     if not front:
-        return HTTPException(status=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
+        return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
     if face:
         face_mimetype, face_file_size, face_file_url, face_filename =  uploads_save(face)
     if back:
@@ -362,7 +363,7 @@ async def add_visit_with_visitor(
         except Exception as e:
             db.rollback()
             db.close()
-            return HTTPException(status=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         finally:
             db.close()
 
