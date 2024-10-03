@@ -57,7 +57,7 @@ async def create_employee():
 async  def login(user: LoginInput):
     with next(get_db()) as db:
         employee_with_role = authenticate_employee(db, user.phone_number, user.password)
-        employee_with_role.firebase_token = user.firebase_token if user.firebase_token else employee_with_role.firebase_token
+        # employee_with_role.firebase_token = user.firebase_token if user.firebase_token else employee_with_role.firebase_token
         db.commit()
         try:
             if employee_with_role:
