@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 import base64
 import typing
 import strawberry
@@ -163,11 +164,12 @@ class Mutation:
                 employee = authenticate_employee(db, employeeInfo.phone_number, employeeInfo.current_password)
                 hashed_pwd = pwd_context.hash(employeeInfo.new_password)
                 employee.password = hashed_pwd
+                employee.password_change_at = datetime.now()
                 db.commit()
                 db.refresh(employee)
 
                 return UpdatePasswordOutputType(
-                    success = "Password succesfuly updated"
+                    success = "Password successfully updated"
                 )
             except Exception as e:
                 db.rollback()

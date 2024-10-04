@@ -128,6 +128,7 @@ class Employee(Base):
     id_card_number = Column(String, nullable=True)
     license = Column(String, nullable=True)
     address = Column(String, nullable=True)
+    password_change_at = Column(DateTime(timezone=True))
 
     # Relationships
     roles = relationship('EmployeeRole', back_populates='employee')
