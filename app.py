@@ -334,6 +334,9 @@ async def add_visit_with_visitor(
                 db.add(db_visits)
                 db.commit()
             elif not visit_details.visitor:
+                if not visit_details.firstname or not visit_details.lastname or not visit_details.id_number or not visit_details.phone_number:
+                    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                                         detail="Missing some visitor information")
                 company_id = db.query(Employee).filter(Employee.id == user).first()
                 db_visitor = Visitor(
                     firstname=visit_details.firstname,

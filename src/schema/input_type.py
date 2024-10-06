@@ -75,11 +75,10 @@ class CreateEmployee(BaseModel):
     roles:  CreateEmployeeRole
 
 class CrateVisitWithVisitor(BaseModel):
-    firstname: str
+    firstname: Optional[str]
     lastname: Optional[str]
-    phone_number: str
-    id_number: str
-    company_id: uuid.UUID
+    phone_number: Optional[str]
+    id_number: Optional[str]
     host_employee: Optional[uuid.UUID]
     host_department: Optional[uuid.UUID]
     host_service: Optional[uuid.UUID]
@@ -87,7 +86,7 @@ class CrateVisitWithVisitor(BaseModel):
     visitor: Optional[uuid.UUID]
     status: str = 'PENDING'
     reason: str
-    reg_no: str
+    reg_no: Optional[str]
 
 @strawberry.input
 class CrateVisitWithVisitorType:
