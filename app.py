@@ -333,6 +333,7 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_visits)
                 db.commit()
+                return JSONResponse(status_code=status.HTTP_200_OK, content=db_visits)
             elif not visit_details.visitor:
                 if not visit_details.firstname or not visit_details.lastname or not visit_details.id_number or not visit_details.phone_number:
                     return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
@@ -363,7 +364,7 @@ async def add_visit_with_visitor(
                 db.add(db_visit)
                 db.commit()
                 db.close()
-
+                return JSONResponse(status_code=status.HTTP_200_OK, content=db_visit)
         except Exception as e:
             db.rollback()
             db.close()
