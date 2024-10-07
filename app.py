@@ -364,7 +364,7 @@ async def add_visit_with_visitor(
                 db.add(db_visit)
                 db.commit()
                 db.close()
-                return JSONResponse(status_code=status.HTTP_200_OK, content=db_visit)
+                return JSONResponse(status_code=status.HTTP_200_OK, content="visitor added")
         except Exception as e:
             db.rollback()
             db.close()
