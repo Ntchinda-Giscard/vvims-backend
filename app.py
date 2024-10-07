@@ -280,7 +280,7 @@ def uploads_save(files):
 async def add_visit_with_visitor(
         visit_details: CrateVisitWithVisitor,
         user: str = Depends(get_current_user),
-        face: Optional[UploadFile] = File(...), front: Optional[UploadFile] = File(...), back: Optional[UploadFile] = File(...),
+        face: Optional[UploadFile] = File(None), front: Optional[UploadFile] = File(None), back: Optional[UploadFile] = File(None),
 
         ):
     # if not front:
@@ -371,9 +371,6 @@ async def add_visit_with_visitor(
             return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         finally:
             db.close()
-
-
-
 
 
 @app.get("/api/v1/get-app/")
