@@ -120,8 +120,7 @@ async def attendance_trigger(body: Dict):
 
 @app.post("/api/v1/visit-trigger")
 async def visits_trigger(body: Dict):
-    data = body['event']['data']['new']
-    print(data)
+    print(body)
     with next(get_db()) as db:
         try:
 
@@ -280,47 +279,14 @@ def uploads_save(files):
 async def add_visit_with_visitor(
         visit_details: CrateVisitWithVisitor,
         user: str = Depends(get_current_user),
-        face: Optional[UploadFile] = File(None), front: Optional[UploadFile] = File(None), back: Optional[UploadFile] = File(None),
+        # face: Optional[UploadFile] = File(None), 
+        # front: Optional[UploadFile] = File(None), 
+        # back: Optional[UploadFile] = File(None),
 
         ):
-    # if not front:
-    #     return HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="You need to passe in the a document file to register a visitor")
-    if face:
-        face_mimetype, face_file_size, face_file_url, face_filename =  uploads_save(face)
-    if back:
-        back_mimetype, back_file_size, back_file_url, back_filename = uploads_save(back)
-    if front:
-        front_mimetype, front_file_size, front_file_url, front_filename = uploads_save(front)
     with(next(get_db())) as db:
         try:
-            if front:
-                db_front = UploadedFile(
-                    file_name=front_filename,
-                    file_url=front_file_url,
-                    mime_type=front_mimetype,
-                    file_size=front_file_size
-                )
-                db.add(db_front)
-                db.commit()
-            if face:
-                db_face = UploadedFile(
-                    file_name=face_filename,
-                    file_url=face_file_url,
-                    mime_type=face_mimetype,
-                    file_size=face_file_size
-                )
-                db.add(db_face)
-                db.commit()
 
-            if back:
-                db_back = UploadedFile(
-                    file_name=back_filename,
-                    file_url=back_file_url,
-                    mime_type=back_mimetype,
-                    file_size=back_file_size
-                )
-                db.add(db_back)
-                db.commit()
             if visit_details.visitor:
                 db_visits = Visit(
                     host_employee=visit_details.host_employee,
@@ -334,38 +300,8 @@ async def add_visit_with_visitor(
                 db.add(db_visits)
                 db.commit()
                 return JSONResponse(status_code=status.HTTP_200_OK, content=db_visits)
-            elif not visit_details.visitor:
-                if not visit_details.firstname or not visit_details.lastname or not visit_details.id_number or not visit_details.phone_number:
-                    return HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
-                                         detail="Missing some visitor information")
-                company_id = db.query(Employee).filter(Employee.id == user).first()
-                db_visitor = Visitor(
-                    firstname=visit_details.firstname,
-                    lastname = visit_details.lastname,
-                    photo = db_face.id,
-                    front_id = db_front.id,
-                    back_id = db_back,
-                    company_id = company_id,
-                    id_number = visit_details.id_number,
-                    phone_number = visit_details.phone_number
-                )
-
-                db.add(db_visitor)
-                db.commit()
-                db_visit = Visit(
-                    host_employee=visit_details.host_employee,
-                    host_department=visit_details.host_department,
-                    host_service=visit_details.host_service,
-                    visitor=db_visitor.id,
-                    vehicle=visit_details.vehicle,
-                    status=visit_details.status,
-                    reason=visit_details.reason
-                )
-                db.add(db_visit)
-                db.commit()
-                db.close()
-                return JSONResponse(status_code=status.HTTP_200_OK, content="visitor added")
         except Exception as e:
+            logger.exception(e)
             db.rollback()
             db.close()
             return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
