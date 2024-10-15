@@ -16,7 +16,7 @@ data = {
     "phone_number": "123456789",
     "id_number": "AB123456",
     "host_department": "e5ed40a0-94da-45c6-9a24-0013e20320e4",
-    "visitor": "f319a7c3-90c1-480e-b525-8d2cb01e35dd",
+    # "visitor": "f319a7c3-90c1-480e-b525-8d2cb01e35dd",
     "status": "PENDING",
     "reason": "Meeting",
     "reg_no": "123ABC"
