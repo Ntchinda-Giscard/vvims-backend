@@ -274,7 +274,6 @@ def uploads_save(files):
         logger.exception(e)
     return mime_type, file_size, file_url, str(files.filename)
 
-
 @app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
         visit_details: CrateVisitWithVisitor,
