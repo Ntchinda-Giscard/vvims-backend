@@ -307,12 +307,23 @@ async def add_visit_with_visitor(
         reason: str = Form(...),
         reg_no: Optional[str] = Form(None),
         face: UploadFile = File(None),
+        front_id: UploadFile = File(None),
+        back_id: UploadFile = File(None),
         user: str = Depends(get_current_user)
     ):
+
     if face:
         # Use 'await' to call the asynchronous 'uploads_save' function
         mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
         print(mime_type, file_size, face_file_url, face_file_name)
+    if front_id:
+        # Use 'await' to call the asynchronous 'uploads_save' function
+        front_mime_type, front_file_size, front_file_url, front_file_name = await uploads_save(face)
+        print(front_mime_type, front_file_size, front_file_url, front_file_name)
+    if back_id:
+        # Use 'await' to call the asynchronous 'uploads_save' function
+        back_mime_type, back_file_size, back_file_url, back_file_name = await uploads_save(face)
+        print(back_mime_type, back_file_size, back_file_url, back_file_name)
 
     # Database operations (rest of the logic stays the same)
     with next(get_db()) as db:
@@ -325,6 +336,35 @@ async def add_visit_with_visitor(
                     file_size=file_size
                 )
                 db.add(db_face)
+                db.commit()
+            except Exception as e:
+                logger.exception(e)
+                db.rollback()
+                raise HTTPException(status_code=500, detail=str(e))
+        if front_id:
+            try:
+                db_front = UploadedFile(
+                    file_name=front_file_name,
+                    file_url=front_file_url,
+                    mime_type=front_mime_type,
+                    file_size=front_file_size
+                )
+                db.add(db_front)
+                db.commit()
+            except Exception as e:
+                logger.exception(e)
+                db.rollback()
+                raise HTTPException(status_code=500, detail=str(e))
+        
+        if back_id:
+            try:
+                db_back = UploadedFile(
+                    file_name=back_file_name,
+                    file_url=back_file_url,
+                    mime_type=back_mime_type,
+                    file_size=back_file_size
+                )
+                db.add(db_back)
                 db.commit()
             except Exception as e:
                 logger.exception(e)
@@ -352,7 +392,9 @@ async def add_visit_with_visitor(
                     lastname=lastname,
                     id_number=id_number,
                     phone_number=phone_number,
-                    photo=db_face.id if face else None
+                    photo=db_face.id if face else None,
+                    front_id=db_front.id if front_id else None,
+                    back_id=db_back.id if back_id else None
                 )
                 db.add(db_visitor)
                 db.commit()
