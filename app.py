@@ -311,7 +311,8 @@ async def add_visit_with_visitor(
         back_id: UploadFile = File(None),
         user: str = Depends(get_current_user)
     ):
-
+    if not host_employee and not host_service and not host_department:
+        raise HTTPException(status_code=400, detail="Bad request. Missing one of these: Department, service and employee") 
     if face:
         # Use 'await' to call the asynchronous 'uploads_save' function
         mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
@@ -327,6 +328,7 @@ async def add_visit_with_visitor(
 
     # Database operations (rest of the logic stays the same)
     with next(get_db()) as db:
+       
         if face:
             try:
                 db_face = UploadedFile(
@@ -341,6 +343,7 @@ async def add_visit_with_visitor(
                 logger.exception(e)
                 db.rollback()
                 raise HTTPException(status_code=500, detail=str(e))
+        
         if front_id:
             try:
                 db_front = UploadedFile(
@@ -386,6 +389,7 @@ async def add_visit_with_visitor(
                 db.add(db_visits)
                 db.commit()
                 return JSONResponse(status_code=200, content={"visit": str(db_visits.id)})
+            
             elif not visitor and (firstname or lastname or phone_number or id_number):
                 db_visitor = Visitor(
                     firstname=firstname,
