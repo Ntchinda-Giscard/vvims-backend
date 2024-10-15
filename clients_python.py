@@ -1,7 +1,7 @@
 import requests
 
 # Define the API endpoint
-url = "http://localhost:7860/api/v1/add-visits"
+url = "https://ntchinda-giscard-vvims-backend.hf.space/api/v1/add-visits"
 
 # Authorization header (replace with your actual token)
 headers = {

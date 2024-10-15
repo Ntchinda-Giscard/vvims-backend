@@ -356,6 +356,19 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_visitor)
                 db.commit()
+
+                db_visit = Visit(
+                    host_employee=host_employee,
+                    host_department=host_department,
+                    host_service=host_service,
+                    visitor=db_visitor.id,
+                    vehicle=vehicle,
+                    status=sanitize_none(status),
+                    reason=sanitize_none(reason),
+                    reg_no=sanitize_none(reg_no),
+                )
+                db.add(db_visit)
+                db.commit()
                 return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id)})
         except Exception as e:
             logger.exception(e)
