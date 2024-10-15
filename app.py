@@ -283,11 +283,31 @@ def sanitize_none(value: Optional[str]) -> str:
 
 @app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
-    visit_details: CreatVisitWithVisitor, 
-    user: str = Depends(get_current_user),
-    face: UploadFile= File(None)
-):
+        visit_details: CreatVisitWithVisitor, 
+        user: str = Depends(get_current_user),
+        face: UploadFile= File(None)
+    ):
+
+    if face:
+        face_mime_type, face_file_size, face_file_url, face_file_name = uploads_save(face)
     with next(get_db()) as db:
+        if face:
+            try:
+                db_file = UploadedFile(
+                    file_name=face_file_name,
+                    file_url=face_file_url,
+                    mime_type=face_mime_type,
+                    file_size=face_file_size
+                )
+                db.add(db_file)
+                db.commit()
+            except Exception as e:
+                logger.exception(e)
+                db.rollback()
+                return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
+            finally:
+                db.close()
+                
         try:
             if visit_details.visitor:
                 db_visits = Visit(
@@ -303,7 +323,13 @@ async def add_visit_with_visitor(
                 db.add(db_visits)
                 db.commit()
                 return JSONResponse(status_code=status.HTTP_200_OK, content=json.dumps({"visit": str(db_visits.id)}))
-
+            elif (not visit_details.visitor) and (visit_details.firstname or visit_details.lastname or visit_details.phone_number or visit_details.id_number):
+                db_visitor = Visitor(
+                    firstname=visit_details.firstname,
+                    lastname=visit_details.lastname,
+                    id_number=visit_details.id_number,
+                    phone_number=visit_details.phone_number
+                )
         except Exception as e:
             logger.exception(e)
             db.rollback()
