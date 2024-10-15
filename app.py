@@ -278,7 +278,6 @@ def uploads_save(files):
 async def add_visit_with_visitor(
         visit_details: CrateVisitWithVisitor,
         user: str = Depends(get_current_user),
-
         ):
 
     with(next(get_db())) as db:
