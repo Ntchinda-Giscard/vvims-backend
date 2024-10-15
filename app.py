@@ -319,11 +319,11 @@ async def add_visit_with_visitor(
         print(mime_type, file_size, face_file_url, face_file_name)
     if front_id:
         # Use 'await' to call the asynchronous 'uploads_save' function
-        front_mime_type, front_file_size, front_file_url, front_file_name = await uploads_save(face)
+        front_mime_type, front_file_size, front_file_url, front_file_name = await uploads_save(front_id)
         print(front_mime_type, front_file_size, front_file_url, front_file_name)
     if back_id:
         # Use 'await' to call the asynchronous 'uploads_save' function
-        back_mime_type, back_file_size, back_file_url, back_file_name = await uploads_save(face)
+        back_mime_type, back_file_size, back_file_url, back_file_name = await uploads_save(back_id)
         print(back_mime_type, back_file_size, back_file_url, back_file_name)
 
     # Database operations (rest of the logic stays the same)

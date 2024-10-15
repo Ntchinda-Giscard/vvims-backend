@@ -11,7 +11,7 @@ headers = {
 
 # Prepare the form data (not JSON)
 data = {
-    "firstname": "John",
+    "firstname": "Mark",
     "lastname": "Doe",
     "phone_number": "123456789",
     "id_number": "AB123456",
@@ -24,7 +24,9 @@ data = {
 
 # Open the image file
 files = {
-    "face": open("/Users/ntchindagiscard/Downloads/WhatsApp Image 2024-10-10 at 20.35.50.jpeg", "rb")
+    "face": open("/Users/ntchindagiscard/Downloads/WhatsApp Image 2024-10-10 at 20.35.50.jpeg", "rb"),
+    "back_id": open("/Users/ntchindagiscard/Downloads/WhatsApp Image 2024-10-10 at 20.36.27.jpeg", "rb"),
+    "front_id": open("/Users/ntchindagiscard/Downloads/WhatsApp Image 2024-10-10 at 20.36.05.jpeg", "rb")  # Replace with your actual file paths
 }
 
 # Send the request
