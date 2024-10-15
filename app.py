@@ -7,7 +7,7 @@ from typing import Dict, List, Optional
 from datetime import datetime, date
 from dateutil import parser
 import strawberry
-from fastapi import FastAPI, status, HTTPException, File, UploadFile, Depends
+from fastapi import FastAPI, status, HTTPException, File, UploadFile, Depends, Body
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query
@@ -17,7 +17,7 @@ from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor
-from src.schema.input_type import LoginInput, CrateVisitWithVisitor
+from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3
 # from deepface import DeepFace
 import boto3
@@ -281,8 +281,11 @@ def sanitize_none(value: Optional[str]) -> str:
     """Convert None to an empty string to avoid JSON errors."""
     return value or ""
 
+@app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
-    visit_details: CrateVisitWithVisitor, user: str = Depends(get_current_user),
+    visit_details: CreatVisitWithVisitor, 
+    user: str = Depends(get_current_user),
+    face: UploadFile= File(None)
 ):
     with next(get_db()) as db:
         try:
@@ -295,8 +298,6 @@ async def add_visit_with_visitor(
                     vehicle=visit_details.vehicle,
                     status=sanitize_none(visit_details.status),
                     reason=sanitize_none(visit_details.reason),
-                    check_in_at=visit_details.check_in_at,
-                    check_out_at=visit_details.check_out_at,
                     reg_no=sanitize_none(visit_details.reg_no),
                 )
                 db.add(db_visits)

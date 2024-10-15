@@ -74,7 +74,7 @@ class CreateEmployee(BaseModel):
     function: str
     roles:  CreateEmployeeRole
 
-class CrateVisitWithVisitor(BaseModel):
+class CreatVisitWithVisitor(BaseModel):
     firstname: Optional[str]
     lastname: Optional[str]
     phone_number: Optional[str]
