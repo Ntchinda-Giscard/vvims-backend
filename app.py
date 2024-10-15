@@ -1,4 +1,5 @@
 import os
+import json
 import uuid
 import mimetypes
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -274,13 +275,16 @@ def uploads_save(files):
         logger.exception(e)
     return mime_type, file_size, file_url, str(files.filename)
 
-@app.post("/api/v1/add-visits")
-async def add_visit_with_visitor(
-        visit_details: CrateVisitWithVisitor,
-        user: str = Depends(get_current_user),
-        ):
+from typing import Optional
 
-    with(next(get_db())) as db:
+def sanitize_none(value: Optional[str]) -> str:
+    """Convert None to an empty string to avoid JSON errors."""
+    return value or ""
+
+async def add_visit_with_visitor(
+    visit_details: CrateVisitWithVisitor, user: str = Depends(get_current_user),
+):
+    with next(get_db()) as db:
         try:
             if visit_details.visitor:
                 db_visits = Visit(
@@ -289,17 +293,19 @@ async def add_visit_with_visitor(
                     host_service=visit_details.host_service,
                     visitor=visit_details.visitor,
                     vehicle=visit_details.vehicle,
-                    status=visit_details.status,
-                    reason=visit_details.reason
+                    status=sanitize_none(visit_details.status),
+                    reason=sanitize_none(visit_details.reason),
+                    check_in_at=visit_details.check_in_at,
+                    check_out_at=visit_details.check_out_at,
+                    reg_no=sanitize_none(visit_details.reg_no),
                 )
                 db.add(db_visits)
                 db.commit()
-                return JSONResponse(status_code=status.HTTP_200_OK, content=db_visits)
+                return JSONResponse(status_code=status.HTTP_200_OK, content=json.dumps({"visit": str(db_visits.id)}))
 
         except Exception as e:
             logger.exception(e)
             db.rollback()
-            db.close()
             return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
         finally:
             db.close()
