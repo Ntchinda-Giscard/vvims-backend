@@ -1,4 +1,5 @@
 import os
+from typing import Optional
 import json
 import uuid
 import mimetypes
@@ -7,7 +8,7 @@ from typing import Dict, List, Optional
 from datetime import datetime, date
 from dateutil import parser
 import strawberry
-from fastapi import FastAPI, status, HTTPException, File, UploadFile, Depends, Body
+from fastapi import FastAPI, status, HTTPException, File, UploadFile, Depends, Body, Form
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query
@@ -254,89 +255,113 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
         finally:
             db.close()
 
-def uploads_save(files):
+async def uploads_save(files: UploadFile):
     try:
-        file_path = f"uploads/files"
+        # Define the file path
+        file_path = f"uploads/{files.filename}"
+        
+        # Asynchronously read and save the file
+        content = await files.read()
         with open(file_path, "wb") as f:
-            f.write(files.read())
+            f.write(content)
+
+        # Determine the MIME type and file size
         mime_type, _ = mimetypes.guess_type(file_path)
         file_size = os.path.getsize(file_path)
+        
     except Exception as e:
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
+
     try:
+        # Upload to S3
         file_url = upload_to_s3(
-            s3_file=str(uuid.uuid4()) + ".apk",
+            s3_file=str(uuid.uuid4()),
             s3=s3,
             local_file=file_path,
             bucket_name='vvims-visitor'
         )
     except Exception as e:
         logger.exception(e)
-    return mime_type, file_size, file_url, str(files.filename)
+        raise HTTPException(status_code=500, detail=f"Failed to upload to S3: {str(e)}")
 
-from typing import Optional
+    return mime_type, file_size, file_url, files.filename
 
 def sanitize_none(value: Optional[str]) -> str:
     """Convert None to an empty string to avoid JSON errors."""
     return value or ""
 
+
 @app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
-        visit_details: CreatVisitWithVisitor, 
-        user: str = Depends(get_current_user),
-        face: UploadFile= File(None)
+        firstname: Optional[str] = Form(None),
+        lastname: Optional[str] = Form(None),
+        phone_number: Optional[str] = Form(None),
+        id_number: Optional[str] = Form(None),
+        host_employee: Optional[uuid.UUID] = Form(None),
+        host_department: Optional[uuid.UUID] = Form(None),
+        host_service: Optional[uuid.UUID] = Form(None),
+        vehicle: Optional[uuid.UUID] = Form(None),
+        visitor: Optional[uuid.UUID] = Form(None),
+        status: str = Form("PENDING"),
+        reason: str = Form(...),
+        reg_no: Optional[str] = Form(None),
+        face: UploadFile = File(None),
+        user: str = Depends(get_current_user)
     ):
-
     if face:
-        face_mime_type, face_file_size, face_file_url, face_file_name = uploads_save(face)
+        # Use 'await' to call the asynchronous 'uploads_save' function
+        mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
+        print(mime_type, file_size, face_file_url, face_file_name)
+
+    # Database operations (rest of the logic stays the same)
     with next(get_db()) as db:
         if face:
             try:
                 db_face = UploadedFile(
                     file_name=face_file_name,
                     file_url=face_file_url,
-                    mime_type=face_mime_type,
-                    file_size=face_file_size
+                    mime_type=mime_type,
+                    file_size=file_size
                 )
                 db.add(db_face)
                 db.commit()
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
-                return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-            finally:
-                db.close()
+                raise HTTPException(status_code=500, detail=str(e))
 
         try:
-            if visit_details.visitor:
+            if visitor:
                 db_visits = Visit(
-                    host_employee=visit_details.host_employee,
-                    host_department=visit_details.host_department,
-                    host_service=visit_details.host_service,
-                    visitor=visit_details.visitor,
-                    vehicle=visit_details.vehicle,
-                    status=sanitize_none(visit_details.status),
-                    reason=sanitize_none(visit_details.reason),
-                    reg_no=sanitize_none(visit_details.reg_no),
+                    host_employee=host_employee,
+                    host_department=host_department,
+                    host_service=host_service,
+                    visitor=visitor,
+                    vehicle=vehicle,
+                    status=sanitize_none(status),
+                    reason=sanitize_none(reason),
+                    reg_no=sanitize_none(reg_no),
                 )
                 db.add(db_visits)
                 db.commit()
-                return JSONResponse(status_code=status.HTTP_200_OK, content=json.dumps({"visit": str(db_visits.id)}))
-            elif (not visit_details.visitor) and (visit_details.firstname or visit_details.lastname or visit_details.phone_number or visit_details.id_number):
+                return JSONResponse(status_code=200, content={"visit": str(db_visits.id)})
+            elif not visitor and (firstname or lastname or phone_number or id_number):
                 db_visitor = Visitor(
-                    firstname=visit_details.firstname,
-                    lastname=visit_details.lastname,
-                    id_number=visit_details.id_number,
-                    phone_number=visit_details.phone_number,
-                    photo=db_face.id
+                    firstname=firstname,
+                    lastname=lastname,
+                    id_number=id_number,
+                    phone_number=phone_number,
+                    photo=db_face.id if face else None
                 )
+                db.add(db_visitor)
+                db.commit()
+                return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id)})
         except Exception as e:
             logger.exception(e)
             db.rollback()
-            return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
-        finally:
-            db.close()
+            raise HTTPException(status_code=500, detail=str(e))
+
 
 
 @app.get("/api/v1/get-app/")
