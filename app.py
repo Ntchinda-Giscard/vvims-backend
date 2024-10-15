@@ -293,13 +293,13 @@ async def add_visit_with_visitor(
     with next(get_db()) as db:
         if face:
             try:
-                db_file = UploadedFile(
+                db_face = UploadedFile(
                     file_name=face_file_name,
                     file_url=face_file_url,
                     mime_type=face_mime_type,
                     file_size=face_file_size
                 )
-                db.add(db_file)
+                db.add(db_face)
                 db.commit()
             except Exception as e:
                 logger.exception(e)
@@ -307,7 +307,7 @@ async def add_visit_with_visitor(
                 return HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e))
             finally:
                 db.close()
-                
+
         try:
             if visit_details.visitor:
                 db_visits = Visit(
@@ -328,7 +328,8 @@ async def add_visit_with_visitor(
                     firstname=visit_details.firstname,
                     lastname=visit_details.lastname,
                     id_number=visit_details.id_number,
-                    phone_number=visit_details.phone_number
+                    phone_number=visit_details.phone_number,
+                    photo=db_face.id
                 )
         except Exception as e:
             logger.exception(e)
