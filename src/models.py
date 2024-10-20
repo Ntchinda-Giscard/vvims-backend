@@ -303,6 +303,8 @@ class Attendance(Base):
     clock_in_time = Column(DateTime(timezone=True), nullable=True)
     clock_out_time = Column(DateTime(timezone=True), nullable=True)
     clock_in_date = Column(Date, server_default=func.now(), unique=False)
+    location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
+    buidling_id = Column(UUID(as_uuid=True), nullable=True)
 
 
     # relationship
@@ -392,3 +394,12 @@ class Appointment(Base):
 
     employees = relationship("Employee", back_populates='appointments')
     visitors = relationship("Visitor", back_populates='appointments')
+
+
+class Location(Base):
+    __tablename__ = "locations"
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    location = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=True)
+    buidling_id = Column(UUID(as_uuid=True), nullable=True)
