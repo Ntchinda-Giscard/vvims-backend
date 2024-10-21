@@ -4,6 +4,8 @@ from fastapi.security import OAuth2PasswordBearer
 import jwt
 from src import logger
 from src.models import Employee
+import time
+
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 JWT_SECRET_KEY: str = "aP3x!9Qz@2Lk#8Vw$7Jm^5Bn&4Xy*6Tg"
@@ -16,7 +18,7 @@ def create_token(employee: Employee) -> str:
     data = {
         "sub": str(employee.id),
         "name": employee.firstname + " " + employee.lastname,
-        "iat": datetime.now(timezone.utc) + auth_access_token_expires,
+        "iat": datetime.now(timezone.utc),
         "admin": is_admin,
         "https://hasura.io/jwt/claims":{
             "x-hasura-allowed-roles": [ r.role.role_name.lower() for r in employee.roles ],
