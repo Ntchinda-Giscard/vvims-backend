@@ -23,6 +23,7 @@ def create_token(employee: Employee) -> str:
         "https://hasura.io/jwt/claims":{
             "x-hasura-allowed-roles": [ r.role.role_name.lower() for r in employee.roles ],
             "x-hasura-role": "admin" if is_admin else "employee",
+            "x-hasura-default-role" : "admin" if is_admin else "employee",
             "x-hasura-user-id": str(employee.id),
             "x-hasura-employee-level": employee.position.level
         }
