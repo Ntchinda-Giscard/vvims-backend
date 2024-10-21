@@ -25,7 +25,7 @@ def create_token(employee: Employee) -> str:
             "x-hasura-role": "admin" if is_admin else "employee",
             "x-hasura-default-role" : "admin" if is_admin else "employee",
             "x-hasura-user-id": str(employee.id),
-            "x-hasura-employee-level": employee.position.level
+            "x-hasura-employee-level": str(employee.position.level)
         }
     }
     token = jwt.encode(data, JWT_SECRET_KEY, algorithm=ALGORITHM)
