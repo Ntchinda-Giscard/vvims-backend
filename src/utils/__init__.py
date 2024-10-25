@@ -45,7 +45,21 @@ def is_employee_late(clock_in_time, start_work_time, max_late_time: timedelta) -
     # Check if the employee is late
     return clock_in_datetime > max_allowed_time
 
+def enforce_date(value):
+    if isinstance(value, str):
+        try:
+            return datetime.strptime(value, "%Y-%m-%d")
+        except ValueError:
+            raise ValueError("Incorrect date format, should be YYYY-MM-DDD")
+    elif isinstance(value, datetime):
+        return value
+    else:
+        raise TypeError("Expected string or datetime object")
+
 def generate_date_range(start_date, end_date):
+    start_date = enforce_date(start_date)
+    end_date = enforce_date(end_date)
+
     current_date = start_date
 
     while current_date <= end_date:
