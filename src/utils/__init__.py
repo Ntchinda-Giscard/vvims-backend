@@ -67,7 +67,10 @@ def generate_date_range(start_date, end_date):
         yield current_date
         current_date += timedelta(days=1)
 
-
+def calculate_time_in_building(clock_in, clock_out):
+    if clock_out:
+        return clock_out - clock_in
+    return None
 
 def get_attendance_for_day(db, date):
     # Query attendance for a specific date (filtering on clock_in date only)

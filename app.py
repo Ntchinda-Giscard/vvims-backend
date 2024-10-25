@@ -19,7 +19,7 @@ from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
-from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day
+from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 # from deepface import DeepFace
 import boto3
 
@@ -467,10 +467,10 @@ async def get_attendance_by_date_range(start_date, end_date):
             attend = []
             if attendances:
                 for attendance in attendances:
-                    employee_name = attendance.employee.name
-                    clock_in = attendance.clock_in.strftime("%H:%M:%S")
-                    clock_out = attendance.clock_out.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
-                    time_spent = calculate_time_in_building(attendance.clock_in, attendance.clock_out)
+                    employee_name = attendance.employee.firstname
+                    clock_in = attendance.clock_in_time.strftime("%H:%M:%S")
+                    clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
+                    time_spent = calculate_time_in_building(attendance.clock_in_time, attendance.clock_out_time)
                     attend.append([employee_name, clock_in, clock_out, time_spent])
                     
                     print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
