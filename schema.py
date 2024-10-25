@@ -76,7 +76,31 @@ class Query:
                 result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
                 
+@strawberry.type
+class Subscription:
 
+    @strawberry.subscription
+    async def get_report_attandance(self, input: AttendanceInpuType) -> List[DayAttendanceType]:
+        date_range = list(generate_date_range(input.start_date, input.end_date))
+        result = []
+        with next(get_db()) as db:
+            for date in date_range:
+                print(f"\nDate: {date.strftime('%Y-%m-%d')}")
+                
+                attendances = get_attendance_for_day(db, date)
+
+                attendance_list = [
+                    AttendanceType(
+                        employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
+                        clock_in=att.clock_in_time,
+                        clock_out=att.clock_out_time,
+                        time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
+                    ) for att in attendances
+                ]
+
+                result.append(DayAttendanceType(date=date, attendance=attendance_list))
+            return result
+   
 
 @strawberry.type
 class Mutation:
