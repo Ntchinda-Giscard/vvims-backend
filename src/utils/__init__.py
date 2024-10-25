@@ -9,6 +9,7 @@ import json
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
+from src.models import Attendance
 
 def auth_firebase_token() -> str:
     SERVICE_ACCOUNT_FILE= './vvims-emplo-firebase-adminsdk-sg73f-d935f36b7e.json'
