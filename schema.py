@@ -69,7 +69,7 @@ class Query:
                         employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
                         clock_in=att.clock_in_time,
                         clock_out=att.clock_out_time,
-                        time_in_building = calculate_time_in_building(clock_in, clock_out)
+                        time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S"))
                     ) for att in attendances
                 ]
 
