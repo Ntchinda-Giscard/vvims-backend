@@ -458,6 +458,7 @@ async def upload_app(file: UploadFile = File(...)):
 @app.post("/api/v1/get-attendance/")
 async def get_attendance_by_date_range(start_date, end_date):
     date_range = list(generate_date_range(start_date, end_date))
+    result = {}
     
     for date in date_range:
         print(f"\nDate: {date.strftime('%Y-%m-%d')}")
@@ -476,7 +477,7 @@ async def get_attendance_by_date_range(start_date, end_date):
                     print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
             else:
                 print("No employees were present.")
-        
+        result[date] = attend
         return attend
 # @app.post("/recognize")
 # async def recognize(
