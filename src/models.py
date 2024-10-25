@@ -304,7 +304,7 @@ class Attendance(Base):
     clock_out_time = Column(DateTime(timezone=True), nullable=True)
     clock_in_date = Column(Date, server_default=func.now(), unique=False)
     location = Column(Geometry(geometry_type="POINT", srid=4326), nullable=True)
-    buidling_id = Column(UUID(as_uuid=True), nullable=True)
+    building_id = Column(UUID(as_uuid=True), nullable=True)
 
 
     # relationship
