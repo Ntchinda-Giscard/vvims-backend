@@ -90,12 +90,11 @@ class Query:
                 
                 else:
                     print("No employees were present.")
-                    date_time_attendance = None
-                date_time_attendance = DayAttendanceType(
-                    date= f"\nDate: {date.strftime('%Y-%m-%d')}",
-                    attendance = attend
-                )
-            return date_time_attendance
+                    
+            return DayAttendanceType(
+                        date= f"\nDate: {date.strftime('%Y-%m-%d')}",
+                        attendance = attend
+                    )
 
 
 @strawberry.type
