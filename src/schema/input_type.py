@@ -118,5 +118,5 @@ class AddVisitorBrowserInputType:
 
 @strawberry.input
 class AttendanceInpuType:
-    start_date: str
-    end_date: str
+    start_date: datetime
+    end_date: datetime
