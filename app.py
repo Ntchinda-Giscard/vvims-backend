@@ -469,7 +469,7 @@ async def get_attendance_by_date_range(start_date, end_date):
                 for attendance in attendances:
                     employee_name = attendance.employee.firstname
                     clock_in = attendance.clock_in_time.strftime("%H:%M:%S")
-                    clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
+                    clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out_time else "Not clocked out"
                     time_spent = calculate_time_in_building(attendance.clock_in_time, attendance.clock_out_time)
                     attend.append([employee_name, clock_in, clock_out, time_spent])
                     
