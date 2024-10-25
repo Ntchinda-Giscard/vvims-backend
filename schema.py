@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 import base64
+from typing import List
 import typing
 import strawberry
 from fastapi import Depends
@@ -54,7 +55,7 @@ class Query:
                 raise Exception("Employee not found or wrong credentials")
 
     @strawberry.field
-    def get_report_attandance(self, input: AttendanceInpuType) -> DataType:
+    def get_report_attandance(self, input: AttendanceInpuType) -> List[DayAttendanceType]:
         date_range = list(generate_date_range(input.start_date, input.end_date))
         result = []
         with next(get_db()) as db:
@@ -62,39 +63,19 @@ class Query:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
                 
                 attendances = get_attendance_for_day(db, date)
-                attend = []
-                if attendances:
-                    for attendance in attendances:
-                        firstname = attendance.employee.firstname
-                        lastname = attendance.employee.lastname
 
-                        employee = EmployeeAttendatceType(
-                            id = attendance.employee.id,
-                            firstname = attendance.employee.firstname,
-                            lastname = attendance.employee.lastname
-                        )
-                        clock_in = attendance.clock_in_time.strftime("%H:%M:%S")
-                        clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out_time else None
+                attendance_list = [
+                    AttendanceType(
+                        employee=EmployeeAttendatceType(id=att.employee.id, name=att.employee.firstname),
+                        clock_in=att.clock_in_time,
+                        clock_out=att.clock_out_time,
                         time_in_building = calculate_time_in_building(clock_in, clock_out)
-                        
-                        print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
-                        attend.append(
-                            AttendanceType(
-                                employee=employee,
-                                clock_in= clock_in,
-                                clock_out= clock_out,
-                                time_in_building = time_in_building
-                            )
-                        )
+                    ) for att in attendances
+                ]
 
+                result.append(DayAttendanceType(date=date, attendances=attendance_list))
+            return result
                 
-                else:
-                    print("No employees were present.")
-                result.append(DayAttendanceType(
-                        date= f"\nDate: {date.strftime('%Y-%m-%d')}",
-                        attendance = attend
-                    ))   
-            return DataType(data= result)
 
 
 @strawberry.type
