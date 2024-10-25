@@ -461,7 +461,7 @@ async def get_attendance_by_date_range(start_date, end_date):
     
     for date in date_range:
         print(f"\nDate: {date.strftime('%Y-%m-%d')}")
-        with next(get_db()) as db
+        with next(get_db()) as db:
             attendances = get_attendance_for_day(db, date)
             print(attendances)
             attend = []
