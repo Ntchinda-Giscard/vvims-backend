@@ -83,7 +83,7 @@ class CreateVisitorReturnType:
 
 
 @strawberry.type
-class EmployeeType:
+class EmployeeAttendatceType:
     id: uuid.UUID
     firstname: str
     lastname: str
@@ -91,7 +91,7 @@ class EmployeeType:
 @strawberry.type
 class AttendanceType:
     # id: uuid.UUID
-    employee: EmployeeType
+    employee: EmployeeAttendatceType
     clock_in: datetime
     clock_out: Optional[datetime]
     time_in_building: Optional[str]

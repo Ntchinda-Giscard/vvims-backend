@@ -13,7 +13,7 @@ from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, Updat
     AddVisitorBrowserInputType, AttendanceInpuType
 from src import logger
 from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
-    UpdatePasswordOutputType, CreateVisitorType, DayAttendanceType, EmployeeType, AttendanceType, DayAttendanceType
+    UpdatePasswordOutputType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 
 # Custom context to hold the user info
@@ -68,7 +68,7 @@ class Query:
                         firstname = attendance.employee.firstname
                         lastname = attendance.employee.lastname
 
-                        employee = EmployeeType(
+                        employee = EmployeeAttendatceType(
                             id = attendance.employee.id,
                             firstname = attendance.employee.firstname,
                             lastname = attendance.employee.lastname
