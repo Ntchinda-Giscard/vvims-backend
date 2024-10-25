@@ -101,8 +101,6 @@ class DayAttendanceType:
     date: datetime
     attendance: List[AttendanceType]
 
-
-
 @strawberry.type
 class DataType:
     data: List[DayAttendanceType]
