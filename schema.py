@@ -80,8 +80,8 @@ class Query:
                         attend.append(
                             AttendanceType(
                                 employee=employee,
-                                clock_in= clock_in
-                                clock_out= clock_out
+                                clock_in= clock_in,
+                                clock_out= clock_out,
                                 time_in_building = time_in_building
                             )
                         )
