@@ -455,7 +455,7 @@ async def upload_app(file: UploadFile = File(...)):
         logger.exception(e)
 
 
-@app.post("api/v1/get-attendance")
+@app.post("/api/v1/get-attendance")
 async def get_attendance_by_date_range(start_date, end_date):
     date_range = list(generate_date_range(start_date, end_date))
     
