@@ -9,7 +9,7 @@ import json
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
-from src.models import Attendance
+from src.models import Attendance, Employee
 
 def auth_firebase_token() -> str:
     SERVICE_ACCOUNT_FILE= './vvims-emplo-firebase-adminsdk-sg73f-d935f36b7e.json'
@@ -73,8 +73,8 @@ def get_attendance_for_day(db, date):
     # Query attendance for a specific date (filtering on clock_in date only)
     return db.query(Attendance).join(Employee).filter(
         and_(
-            Attendance.clock_in >= date,
-            Attendance.clock_in < date + timedelta(days=1)
+            Attendance.clock_in_time >= date,
+            Attendance.clock_in_time < date + timedelta(days=1)
         )
     ).all()
 
