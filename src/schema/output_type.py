@@ -90,7 +90,7 @@ class EmployeeType:
 
 @strawberry.type
 class AttendanceType:
-    id: uuid.UUID
+    # id: uuid.UUID
     employee: EmployeeType
     clock_in: datetime
     clock_out: Optional[datetime]

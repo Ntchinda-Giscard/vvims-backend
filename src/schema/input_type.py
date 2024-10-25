@@ -116,4 +116,7 @@ class AddVisitorBrowserInputType:
     phone_number: str
 
 
-
+@strawberry.input
+class AttendanceInpuType:
+    start_date: str
+    end_date: str

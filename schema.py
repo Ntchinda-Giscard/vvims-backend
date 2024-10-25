@@ -10,11 +10,11 @@ from src.crud import pwd_context, authenticate_employee
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    AddVisitorBrowserInputType
+    AddVisitorBrowserInputType, AttendanceInpuType
 from src import logger
 from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
-    UpdatePasswordOutputType, CreateVisitorType
-
+    UpdatePasswordOutputType, CreateVisitorType, DayAttendanceType, EmployeeType, AttendanceType, DayAttendanceType
+from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 
 # Custom context to hold the user info
 class Context:
@@ -53,9 +53,47 @@ class Query:
             else:
                 raise Exception("Employee not found or wrong credentials")
 
-    # @strawberry.field
-    # def get_report_attandance(self, input: Info) -> :
+    @strawberry.field
+    def get_report_attandance(self, input: AttendanceInpuType) -> DayAttendanceType:
+        date_range = list(generate_date_range(input.start_date, input.end_date))
 
+        with next(get_db()) as db:
+            for date in date_range:
+                print(f"\nDate: {date.strftime('%Y-%m-%d')}")
+                
+                attendances = get_attendance_for_day(db, date)
+                attend = []
+                if attendances:
+                    for attendance in attendances:
+                        firstname = attendance.employee.firstname
+                        lastname = attendance.employee.lastname
+
+                        employee = EmployeeType(
+                            id = attendance.employee.id,
+                            firstname = attendance.employee.firstname,
+                            lastname = attendance.employee.lastname
+                        )
+                        clock_in = attendance.clock_in_time.strftime("%H:%M:%S")
+                        clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out_time else None
+                        time_in_building = calculate_time_in_building(clock_in, clock_out)
+                        
+                        attend.append(
+                            AttendanceType(
+                                employee=employee,
+                                clock_in= datetime.strptime(clock_in, "%H:%M:%S")
+                                clock_out= datetime.strptime(clock_out, "%H:%M:%S")
+                                time_in_building = time_in_building
+                            )
+                        )
+
+                        print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
+                
+                date_time_attendance = DayAttendanceType(
+                    date= f"\nDate: {date.strftime('%Y-%m-%d')}",
+                    attendance = attend
+                )
+                else:
+                    print("No employees were present.")
 @strawberry.type
 class Mutation:
     @strawberry.mutation
