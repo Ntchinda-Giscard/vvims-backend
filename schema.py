@@ -88,12 +88,15 @@ class Query:
 
                         print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
                 
+                else:
+                    print("No employees were present.")
                 date_time_attendance = DayAttendanceType(
                     date= f"\nDate: {date.strftime('%Y-%m-%d')}",
                     attendance = attend
                 )
-                else:
-                    print("No employees were present.")
+            return date_time_attendance
+
+
 @strawberry.type
 class Mutation:
     @strawberry.mutation
