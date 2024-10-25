@@ -464,7 +464,6 @@ async def get_attendance_by_date_range(start_date, end_date):
         print(f"\nDate: {date.strftime('%Y-%m-%d')}")
         with next(get_db()) as db:
             attendances = get_attendance_for_day(db, date)
-            print(attendances)
             attend = []
             if attendances:
                 for attendance in attendances:
@@ -477,8 +476,7 @@ async def get_attendance_by_date_range(start_date, end_date):
                     print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
             else:
                 print("No employees were present.")
-        result[date] = attend
-        return attend
+        # return result
 # @app.post("/recognize")
 # async def recognize(
 #     embedding: List[float],
