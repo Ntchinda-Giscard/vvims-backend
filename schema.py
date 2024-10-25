@@ -54,7 +54,7 @@ class Query:
                 raise Exception("Employee not found or wrong credentials")
 
     @strawberry.field
-    def get_report_attandance(self, input: AttendanceInpuType) -> DayAttendanceType:
+    def get_report_attandance(self, input: AttendanceInpuType) -> DataType:
         date_range = list(generate_date_range(input.start_date, input.end_date))
         result = []
         with next(get_db()) as db:
