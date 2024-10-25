@@ -1,12 +1,23 @@
 from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
+from sqlalchemy import and_
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position
+from src.models import Employee, EmployeeRole, Role, Position, Attendance
 from src.schema.output_type import EmployeeType
+from datetime import timedelta
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
+def get_attendance_for_day(db: Session, date):
+
+    return db.query(Attendance).join(Employee).filter(
+        and_(
+            Attendance.clock_in_time >= date,
+            Attendance.clock_out_time <= date + timedelta(days=1) # Assuming 24-hour time
+        )
+    )
 
 def get_employee_by_phone(db: Session, phone_number: str) -> EmployeeType :
     """

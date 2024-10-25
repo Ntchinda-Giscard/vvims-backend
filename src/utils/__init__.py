@@ -1,3 +1,4 @@
+from sqlalchemy import and_
 import uuid
 from datetime import datetime, timedelta, time, date
 import requests
@@ -8,7 +9,6 @@ import json
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
-
 
 def auth_firebase_token() -> str:
     SERVICE_ACCOUNT_FILE= './vvims-emplo-firebase-adminsdk-sg73f-d935f36b7e.json'
@@ -45,9 +45,23 @@ def is_employee_late(clock_in_time, start_work_time, max_late_time: timedelta) -
     # Check if the employee is late
     return clock_in_datetime > max_allowed_time
 
+def generate_date_range(start_date, end_date):
+    current_date = start_date
+
+    while current_date <= end_date:
+        yield current_date
+        current_date += timedelta(days=1)
 
 
 
+def get_attendance_for_day(db, date):
+    # Query attendance for a specific date (filtering on clock_in date only)
+    return db.query(Attendance).join(Employee).filter(
+        and_(
+            Attendance.clock_in >= date,
+            Attendance.clock_in < date + timedelta(days=1)
+        )
+    ).all()
 
 def run_hasura_mutation(mutation, variables, url, admin_secret):
     """

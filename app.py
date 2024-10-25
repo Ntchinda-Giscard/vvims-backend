@@ -19,7 +19,7 @@ from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
-from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3
+from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day
 # from deepface import DeepFace
 import boto3
 
@@ -454,6 +454,25 @@ async def upload_app(file: UploadFile = File(...)):
     except Exception as e:
         logger.exception(e)
 
+
+@app.post("api/v1/get-attendance")
+async def get_attendance_by_date_range(start_date, end_date):
+    date_range = list(generate_date_range(start_date, end_date))
+    
+    for date in date_range:
+        print(f"\nDate: {date.strftime('%Y-%m-%d')}")
+        attendances = get_attendance_for_day(db, date)
+        
+        if attendances:
+            for attendance in attendances:
+                employee_name = attendance.employee.name
+                clock_in = attendance.clock_in.strftime("%H:%M:%S")
+                clock_out = attendance.clock_out.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
+                time_spent = calculate_time_in_building(attendance.clock_in, attendance.clock_out)
+                
+                print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
+        else:
+            print("No employees were present.")
 # @app.post("/recognize")
 # async def recognize(
 #     embedding: List[float],

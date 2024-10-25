@@ -27,7 +27,6 @@ class EmployeeUpdateType:
     address: Optional[str]
     phone_number: Optional[str]
 
-
 @strawberry.type
 class UpdatePasswordOutputType:
     success: str
@@ -35,7 +34,6 @@ class UpdatePasswordOutputType:
 @strawberry.type
 class CreateVisitorType:
     id: uuid.UUID
-
 
 @strawberry.type
 class EmployeeRole:
@@ -45,6 +43,7 @@ class EmployeeRole:
     created_at: Optional[datetime]
     updated_at: Optional[datetime]
     role: RoleType
+
 @strawberry.type
 class PositionType:
     id: uuid.UUID
@@ -81,3 +80,23 @@ class LoginReturnType:
 @strawberry.type
 class CreateVisitorReturnType:
     id: uuid.UUID
+
+
+@strawberry.type
+class EmployeeType:
+    id: uuid.UUID
+    firstname: str
+    lastname: str
+
+@strawberry.type
+class AttendanceType:
+    id: uuid.UUID
+    employee: EmployeeType
+    clock_in: datetime
+    clock_out: Optional[datetime]
+    time_in_building: Optional[str]
+
+@strawberry.type
+class DayAttendanceType:
+    date: datetime
+    attendance: List[AttendanceType]

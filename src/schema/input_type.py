@@ -1,8 +1,9 @@
-from typing import Optional
+from typing import Optional, List
 from pydantic import  BaseModel
 import strawberry
 import uuid
 from enum import Enum
+from datetime import datetime
 
 @strawberry.enum
 class CreateEmployeeRole(Enum):
@@ -33,20 +34,8 @@ class UpdateEmployeeInput:
     id: uuid.UUID
     firstname: Optional[str] = None
     lastname: Optional[str] = None
-    # password: str
     phone_number: Optional[str] = None
-    # email: Optional[str]
-    # supervisor_id: Optional[uuid.UUID] = None
-    # company_id: uuid.UUID
-    # agency_id: Optional[uuid.UUID] = None
-    # position_id: uuid.UUID
-    # department_id: uuid.UUID
-    # service_id: uuid.UUID
-    # function: str
-    # region: str
-    # license: str
     address: Optional[str] = None
-    # roles:  CreateEmployeeRole
 
 @strawberry.input
 class UpdatePasswordInputType:
@@ -125,3 +114,6 @@ class AddVisitorBrowserInputType:
     id_number: str
     company_id: uuid.UUID
     phone_number: str
+
+
+
