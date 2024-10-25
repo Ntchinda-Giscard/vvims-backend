@@ -94,7 +94,7 @@ class Query:
                         date= f"\nDate: {date.strftime('%Y-%m-%d')}",
                         attendance = attend
                     ))   
-            return DataType(data: result)
+            return DataType(data= result)
 
 
 @strawberry.type
