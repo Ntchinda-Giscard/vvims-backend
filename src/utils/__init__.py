@@ -70,7 +70,8 @@ def generate_date_range(start_date, end_date):
 def calculate_time_in_building(clock_in, clock_out):
     fmt = "%H:%M:%S"
     if clock_out:
-        
+        clock_in = datetime.strptime(clock_in, fmt)
+        clock_out = datetime.strptime(clock_out, fmt)
         return clock_out - clock_in
     return None
 
