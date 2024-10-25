@@ -77,6 +77,7 @@ class Query:
                         clock_out = attendance.clock_out_time.strftime("%H:%M:%S") if attendance.clock_out_time else None
                         time_in_building = calculate_time_in_building(clock_in, clock_out)
                         
+                        print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
                         attend.append(
                             AttendanceType(
                                 employee=employee,
@@ -86,7 +87,6 @@ class Query:
                             )
                         )
 
-                        print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
                 
                 else:
                     print("No employees were present.")
