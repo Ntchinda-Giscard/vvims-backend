@@ -103,6 +103,6 @@ class DayAttendanceType:
 
 
 
-@starwberry.type
+@strawberry.type
 class DataType:
     data: DayAttendanceType
