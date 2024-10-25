@@ -53,8 +53,8 @@ class Query:
             else:
                 raise Exception("Employee not found or wrong credentials")
 
-    @strawberry.field
-    def get_report_attandance(self, input: Info) -> :
+    # @strawberry.field
+    # def get_report_attandance(self, input: Info) -> :
 
 @strawberry.type
 class Mutation:
