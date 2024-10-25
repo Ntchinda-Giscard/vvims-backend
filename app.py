@@ -461,20 +461,21 @@ async def get_attendance_by_date_range(start_date, end_date):
     
     for date in date_range:
         print(f"\nDate: {date.strftime('%Y-%m-%d')}")
-        attendances = get_attendance_for_day(db, date)
-        print(attendances)
-        attend = []
-        if attendances:
-            for attendance in attendances:
-                employee_name = attendance.employee.name
-                clock_in = attendance.clock_in.strftime("%H:%M:%S")
-                clock_out = attendance.clock_out.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
-                time_spent = calculate_time_in_building(attendance.clock_in, attendance.clock_out)
-                attend.append([employee_name, clock_in, clock_out, time_spent])
-                
-                print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
-        else:
-            print("No employees were present.")
+        with next(get_db()) as db
+            attendances = get_attendance_for_day(db, date)
+            print(attendances)
+            attend = []
+            if attendances:
+                for attendance in attendances:
+                    employee_name = attendance.employee.name
+                    clock_in = attendance.clock_in.strftime("%H:%M:%S")
+                    clock_out = attendance.clock_out.strftime("%H:%M:%S") if attendance.clock_out else "Not clocked out"
+                    time_spent = calculate_time_in_building(attendance.clock_in, attendance.clock_out)
+                    attend.append([employee_name, clock_in, clock_out, time_spent])
+                    
+                    print(f"Employee: {employee_name}, Arrived: {clock_in}, Left: {clock_out}, Time in Building: {time_spent}")
+            else:
+                print("No employees were present.")
         
         return attend
 # @app.post("/recognize")
