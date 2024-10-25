@@ -100,3 +100,9 @@ class AttendanceType:
 class DayAttendanceType:
     date: datetime
     attendance: List[AttendanceType]
+
+
+
+@starwberry.type
+class DataType:
+    data: DayAttendanceType

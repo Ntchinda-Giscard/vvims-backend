@@ -13,7 +13,7 @@ from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, Updat
     AddVisitorBrowserInputType, AttendanceInpuType
 from src import logger
 from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
-    UpdatePasswordOutputType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
+    UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 
 # Custom context to hold the user info
@@ -56,7 +56,7 @@ class Query:
     @strawberry.field
     def get_report_attandance(self, input: AttendanceInpuType) -> DayAttendanceType:
         date_range = list(generate_date_range(input.start_date, input.end_date))
-
+        result = []
         with next(get_db()) as db:
             for date in date_range:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
@@ -90,11 +90,11 @@ class Query:
                 
                 else:
                     print("No employees were present.")
-                    
-            return DayAttendanceType(
+                result.append(DayAttendanceType(
                         date= f"\nDate: {date.strftime('%Y-%m-%d')}",
                         attendance = attend
-                    )
+                    ))   
+            return DataType(data: result)
 
 
 @strawberry.type
