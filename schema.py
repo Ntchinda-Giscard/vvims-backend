@@ -73,7 +73,7 @@ class Query:
                     ) for att in attendances
                 ]
 
-                result.append(DayAttendanceType(date=date, attendances=attendance_list))
+                result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
                 
 
