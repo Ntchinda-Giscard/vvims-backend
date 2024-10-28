@@ -63,7 +63,7 @@ class Query:
             if clock_out is None:
                 return None
             if clock_in.strftime(fmt) > clock_out.strftime(fmt):
-                return datetime.strftime("15:00:00" , fmt)
+                return "15:00:00"
             return clock_out
         with next(get_db()) as db:
             for date in date_range:
