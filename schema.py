@@ -93,8 +93,8 @@ class Subscription:
                 for att in attendances:
                     if att.clock_in_time() > att.clock_out_time():
                         print(f"{att.employee.firstname} - {att.employee.lastname}")
-                    esle:
-                    print("Not founded")
+                    else:
+                        print("Not founded")
                     attendance_list.append(
                         AttendanceType(
                             employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
