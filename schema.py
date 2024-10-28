@@ -94,7 +94,7 @@ class Subscription:
                     AttendanceType(
                         employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
                         clock_in=att.clock_in_time,
-                        clock_out=  datetime.strptime("15:00:00", fmt) if att.clock_in_time.strtime() > att.clock_out_time.strtime() else att.clock_out_time ,
+                        clock_out=  "15:00:00" if att.clock_in_time() > att.clock_out_time() else att.clock_out_time ,
                         time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
                     ) for att in attendances
                 ]
