@@ -91,6 +91,8 @@ class Subscription:
                 
                 attendances = get_attendance_for_day(db, date)
                 for att in attendances:
+                    if att.clock_in_time() > att.clock_out_time():
+                        print(f"{att.employee.firstname} - {att.employee.lastname}")
                     attendance_list.append(
                         AttendanceType(
                             employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
