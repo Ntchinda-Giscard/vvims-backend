@@ -84,20 +84,21 @@ class Subscription:
         date_range = list(generate_date_range(input.start_date, input.end_date))
         result = []
         fmt = "%H:%M:%S"
+        attendance_list= []
         with next(get_db()) as db:
             for date in date_range:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
                 
                 attendances = get_attendance_for_day(db, date)
-
-                attendance_list = [
-                    AttendanceType(
-                        employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
-                        clock_in=att.clock_in_time,
-                        clock_out=  "15:00:00" if att.clock_in_time() > att.clock_out_time() else att.clock_out_time ,
-                        time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
-                    ) for att in attendances
-                ]
+                for att in attendances:
+                    attendance_list.append(
+                        AttendanceType(
+                            employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
+                            clock_in=att.clock_in_time,
+                            clock_out=  "15:00:00" if att.clock_in_time() > att.clock_out_time() else att.clock_out_time ,
+                            time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
+                        ) 
+                    )
 
                 result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
