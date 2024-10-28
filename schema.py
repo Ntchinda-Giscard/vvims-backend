@@ -59,6 +59,12 @@ class Query:
         date_range = list(generate_date_range(input.start_date, input.end_date))
         result = []
         fmt = "%H:%M:%S"
+        def time_check(clock_in, clock_out):
+            if clock_out is None:
+                return None
+            if clock_in.strftime(fmt) > clock_out.strftime(fmt):
+                return datetime.strftime("15:00:00" , fmt)
+            retunr clock_out
         with next(get_db()) as db:
             for date in date_range:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
@@ -69,7 +75,7 @@ class Query:
                     AttendanceType(
                         employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
                         clock_in=att.clock_in_time,
-                        clock_out= datetime.strftime("15:00:00" , fmt) if att.clock_in_time.strftime(fmt) > att.clock_out_time.strftime(fmt) else att.clock_out_time ,
+                        clock_out= time_check(att.clock_in_time , att.clock_out_time)
                         time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
                     ) for att in attendances
                 ]
