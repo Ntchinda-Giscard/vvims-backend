@@ -83,6 +83,7 @@ class Subscription:
     async def get_report_attandance(self, input: AttendanceInpuType) -> List[DayAttendanceType]:
         date_range = list(generate_date_range(input.start_date, input.end_date))
         result = []
+        fmt = "%H:%M:%S"
         with next(get_db()) as db:
             for date in date_range:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
@@ -93,7 +94,7 @@ class Subscription:
                     AttendanceType(
                         employee=EmployeeAttendatceType(id=att.employee.id, firstname=att.employee.firstname, lastname=att.employee.lastname),
                         clock_in=att.clock_in_time,
-                        clock_out=  att.clock_out_time if att.clock_in_time > att.clock_out_time else "15:00:00" ,
+                        clock_out=  datetime.strptime("15:00:00", fmt) if att.clock_in_time.strtime() > att.clock_out_time.strtime() else att.clock_out_time ,
                         time_in_building = calculate_time_in_building(att.clock_in_time.strftime("%H:%M:%S"), att.clock_out_time.strftime("%H:%M:%S") if att.clock_out_time else None)
                     ) for att in attendances
                 ]
