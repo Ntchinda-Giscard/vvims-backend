@@ -64,7 +64,7 @@ class Query:
                 return None
             if clock_in.strftime(fmt) > clock_out.strftime(fmt):
                 return datetime.strftime("15:00:00" , fmt)
-            retunr clock_out
+            return clock_out
         with next(get_db()) as db:
             for date in date_range:
                 print(f"\nDate: {date.strftime('%Y-%m-%d')}")
