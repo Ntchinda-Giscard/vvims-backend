@@ -76,7 +76,7 @@ def calculate_time_in_building(clock_in, clock_out):
         if clock_out > clock_in:
             return clock_out - clock_in
         elif clock_in > clock_out:
-            return datetime.strptim("15:00:00", fmt) - clock_in
+            return datetime.strptime("15:00:00", fmt) - clock_in
     return None
 
 def get_attendance_for_day(db, date):
