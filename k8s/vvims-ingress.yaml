@@ -1,0 +1,48 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: vvims-ingress
+  labels:
+    name: vvims-ingress
+spec:
+  rules:
+  - host: dashboard.vvims.app
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: vvims-dashboard
+            port: 
+              number: 3000
+  - host: hasura.vvims.app
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: hasura
+            port: 
+              number: 8080
+  - host: backend.vvims.app
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: vvims-service
+            port: 
+              number: 7860
+  - host: ai.vvims.app
+    http:
+      paths:
+      - pathType: Prefix
+        path: "/"
+        backend:
+          service:
+            name: ai-service
+            port: 
+              number: 7860
