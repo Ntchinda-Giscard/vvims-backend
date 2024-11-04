@@ -31,10 +31,11 @@ s3 = boto3.client(
     aws_secret_access_key= os.getenv('AWS_SECRET_KEY'),
     region_name='eu-north-1'  # Optional
 )
+origins= ["172.17.15.42"]
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["*, 172.17.15.42"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
