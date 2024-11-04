@@ -9,6 +9,7 @@ from datetime import datetime
 class CreateEmployeeRole(Enum):
     ADMIN = 'ADMIN'
     EMPLOYEE = 'EMPLOYEE'
+    GUARD = 'GUARD'
 
 @strawberry.input
 class CreateEmployeeInput:

@@ -126,7 +126,6 @@ class Mutation:
         """
         with next(get_db()) as db:
             hashed_pwd = pwd_context.hash(employee.password)
-            print("Plain password:", employee.password)
             print("Hashed password:", hashed_pwd)
             db_employee = Employee(
                 firstname=employee.firstname,
@@ -162,6 +161,12 @@ class Mutation:
                     db.add_all([employee_role_1, employee_role_2])
                     db.commit()
                     print("Employee added role for admin and employee")
+                
+                elif employee.roles == CreateEmployeeRole.GUARD:
+                    guard_role = db.query(Role).filter_by(role_name="GUARD").one()
+                    employee_role_3 = EmployeeRole(employee_id=db_employee.id, role_id=guard_role.id)
+                    db.add_all([employee_role_1, employee_role_3])
+                    db.commit()
                 else:
                     db.add(employee_role_1)
                     db.commit()
