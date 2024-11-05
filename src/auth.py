@@ -24,7 +24,7 @@ def check_role(role_array, is_admin):
 
 def create_token(employee: Employee) -> str:
     is_admin = any(role.role.role_name =="ADMIN" for  role in employee.roles)
-    role_array = [role.role.role_name for role in employee.roles]
+    role_array = [role.role.role_name.lower() for role in employee.roles]
     print("Roles: ", role_array)
     data = {
         "sub": str(employee.id),
