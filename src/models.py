@@ -273,13 +273,25 @@ class Leave(Base):
     employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'))
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
-    leave_type = Column(Enum(LeaveType), nullable=False)
+    types = Column(UUID(as_true=True), ForeignKey('leave_types.id'))
     status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING, nullable=False)
     comment = Column(String)
+    start_time = Column(Time)
+    end_time = Column(Time)
 
     employee = relationship('Employee', back_populates='leaves')
     approval = relationship('LeaveApproval', back_populates='leave', cascade='all, delete-orphan')
+    leave_types = relationship("LeaveType", back_populates='leave')
 
+class LeaveType(Base):
+    __tablename__= 'leave_types'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    types = Column(String)
+
+    #relationships
+    leave = relationship("Leave", back_populates='leave_types')
 
 class LeaveApproval(Base):
     __tablename__ = 'leave_approval'
