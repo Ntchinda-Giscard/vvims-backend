@@ -339,6 +339,7 @@ class Shift(Base):
     name = Column(String, nullable=False)
     start_time = Column(Time, nullable=False)
     end_time = Column(Time, nullable=False)
+    working_days = Column(ARRAY(Integer), nullable=True)
 
     employee_shifts = relationship('EmployeeShift', back_populates='shift')
     attendance = relationship('Attendance', back_populates='shift')
