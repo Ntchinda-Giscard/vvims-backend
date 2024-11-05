@@ -46,6 +46,7 @@ class Company(Base):
     neighborhood = Column(String)
     po_box = Column(String, nullable=True)
     phone_number = Column(String, nullable=True, unique=True)
+    abbrev = Column(String, nullable=True, unique=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     # relationships
@@ -83,6 +84,7 @@ class Service(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     chief_service = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
 
     # Relationships
     department = relationship('Department', back_populates='services')
@@ -155,6 +157,8 @@ class Department(Base):
     chief_department = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    abrev_code= Column(String)
+    status = Column(String)
 
     # Relationships
     agency = relationship('Agency', back_populates='departments')
