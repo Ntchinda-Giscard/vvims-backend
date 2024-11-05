@@ -17,9 +17,9 @@ def check_role(role_array, is_admin):
     # For demonstration purposes, return True for admin users
     if is_admin:
         return "admin"
-    if "GUARD" in role_array:
+    if "guard" in role_array:
         return "guard"
-    elif "EMPLOYEE" in role_array:
+    elif "employee" in role_array:
         return "employee"
 
 def create_token(employee: Employee) -> str:
