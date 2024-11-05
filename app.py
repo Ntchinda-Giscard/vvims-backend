@@ -32,10 +32,13 @@ s3 = boto3.client(
     region_name='eu-north-1'  # Optional
 )
 origins= ["172.17.15.42"]
-app = FastAPI()
+app = FastAPI(
+    swagger_ui_init_oauth=None,  # Disables the online CDN for OAuth2 redirect URL
+    swagger_ui_parameters={"useBaseUrl": True}  # Forces using local base URL for assets
+)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*, 172.17.15.42"],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"]
