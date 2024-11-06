@@ -283,6 +283,7 @@ class Leave(Base):
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
     file= Column(UUID(as_uuid=True), ForeignKey('files.id'))
     status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING, nullable=False)
+    other_description = Column(String)
     comment = Column(String)
     start_time = Column(Time)
     end_time = Column(Time)
