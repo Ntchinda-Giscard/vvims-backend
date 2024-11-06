@@ -197,13 +197,10 @@ class UploadedFile(Base):
     file_url = Column(String, nullable=True)
     mime_type = Column(String, nullable=True)
     file_size = Column(Float, nullable=True)
-    
-    # ForeignKey for Leave relationship
-    leave_id = Column(UUID(as_uuid=True), ForeignKey('leaves.id'), nullable=True)
 
     # Relationships
     employee = relationship('Employee', back_populates='files')
-    leave = relationship('Leave', back_populates='files')
+    leaves = relationship('Leave', back_populates='files')
 
 
 class Visitor(Base):
@@ -252,8 +249,6 @@ class Visit(Base):
     visitors = relationship('Visitor', back_populates='visit')
 
 
-
-
 class Vehicle(Base):
     __tablename__ = 'vehicles'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
@@ -262,7 +257,6 @@ class Vehicle(Base):
     license = Column(String, unique=True)
     make = Column(String, nullable=True)
     color = Column(String, nullable=True)
-    
 
 
 class LeaveApprovalStatus(Base):
@@ -284,7 +278,7 @@ class Leave(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
-    file= Column(UUID(as_uuid=True), ForeignKey('files.id'))
+    file = Column(UUID(as_uuid=True), ForeignKey('files.id'))
     status = Column(String)
     other_description = Column(String)
     comment = Column(String)
@@ -295,7 +289,7 @@ class Leave(Base):
     leave_approval_status = relationship('LeaveApprovalStatus', back_populates='leaves')
     approval = relationship('LeaveApproval', back_populates='leave', cascade='all, delete-orphan')
     leave_types = relationship("LeaveType", back_populates='leave')
-    files = relationship('UploadedFile', back_populates='leave')
+    files = relationship('UploadedFile', back_populates='leaves')
 
 
 class LeaveType(Base):
