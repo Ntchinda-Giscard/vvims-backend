@@ -197,9 +197,13 @@ class UploadedFile(Base):
     file_url = Column(String, nullable=True)
     mime_type = Column(String, nullable=True)
     file_size = Column(Float, nullable=True)
+    
+    # ForeignKey for Leave relationship
+    leave_id = Column(UUID(as_uuid=True), ForeignKey('leaves.id'), nullable=True)
 
+    # Relationships
     employee = relationship('Employee', back_populates='files')
-    leave = relationship('UploadedFile', back_populates='files')
+    leave = relationship('Leave', back_populates='files')
 
 
 class Visitor(Base):
@@ -291,7 +295,7 @@ class Leave(Base):
     leave_approval_status = relationship('LeaveApprovalStatus', back_populates='leaves')
     approval = relationship('LeaveApproval', back_populates='leave', cascade='all, delete-orphan')
     leave_types = relationship("LeaveType", back_populates='leave')
-    files = relationship('File', back_populates='leave')
+    files = relationship('UploadedFile', back_populates='leave')
 
 class LeaveType(Base):
     __tablename__= 'leave_types'
