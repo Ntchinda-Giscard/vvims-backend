@@ -447,7 +447,7 @@ async def upload_app(file: UploadFile = File(...)):
     try:
         file_name = str(uuid.uuid4())
         file_url = upload_to_s3(
-            s3_file=file_name,
+            s3_file=str(files.filename),
             s3=s3,
             local_file=file_path,
             bucket_name='vvims-visitor'
