@@ -261,9 +261,10 @@ class Vehicle(Base):
 
 
 class LeaveStatus(PyEnum):
-    PENDING = 'PENDING'
-    APPROVED = 'APPROVED'
-    REJECTED = 'REJECTED'
+    __tablename__ = 'leave_status'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    status= Column(String)
+    reason = Column(String)
 
 
 class LeaveType(PyEnum):
@@ -282,7 +283,7 @@ class Leave(Base):
     end_date = Column(Date, nullable=False)
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
     file= Column(UUID(as_uuid=True), ForeignKey('files.id'))
-    status = Column(Enum(LeaveStatus), default=LeaveStatus.PENDING, nullable=False)
+    status = Column(UUID(as_uiud=True), ForeignKey('leave_status.id'))
     other_description = Column(String)
     comment = Column(String)
     start_time = Column(Time)
