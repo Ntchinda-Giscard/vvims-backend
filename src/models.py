@@ -258,20 +258,18 @@ class Vehicle(Base):
     license = Column(String, unique=True)
     make = Column(String, nullable=True)
     color = Column(String, nullable=True)
+    
 
 
-class LeaveStatus(Base):
-    __tablename__ = 'leave_status'
+class LeaveApprovalStatus(Base):
+    __tablename__='leave_approval_status'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    status= Column(String)
     reason = Column(String)
+    leave_id = Column(UUID(as_uuid=True), ForeignKey('leaves.id'))
+    leave_status = Column(String)
 
-
-class LeaveType(PyEnum):
-    SICK = "SICK"
-    VACATION = "VACATION"
-    PERSONAL = "PERSONAL"
-
+    #relationships
+    leaves = relationship('Leave', back_populates='leave_approval_status')
 
 class Leave(Base):
     __tablename__ = 'leaves'
@@ -283,13 +281,14 @@ class Leave(Base):
     end_date = Column(Date, nullable=False)
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
     file= Column(UUID(as_uuid=True), ForeignKey('files.id'))
-    status = Column(UUID(as_uuid=True), ForeignKey('leave_status.id'))
+    status = Column(String)
     other_description = Column(String)
     comment = Column(String)
     start_time = Column(Time)
     end_time = Column(Time)
 
     employee = relationship('Employee', back_populates='leaves')
+    leave_approval_status = relationship('LeaveApprovalStatus', back_populates='leaves')
     approval = relationship('LeaveApproval', back_populates='leave', cascade='all, delete-orphan')
     leave_types = relationship("LeaveType", back_populates='leave')
     files = relationship('File', back_populates='leave')
@@ -311,7 +310,7 @@ class LeaveApproval(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     leave_id = Column(UUID(as_uuid=True), ForeignKey('leaves.id'))
     approver_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'))
-    approval_status = Column(UUID(as_uuid=True), ForeignKey('leave_status.id'))
+    approval_status = Column(String)
     comments = Column(String, nullable=True)
 
     leave = relationship("Leave", back_populates='approval')
