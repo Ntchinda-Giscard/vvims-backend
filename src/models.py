@@ -311,7 +311,7 @@ class LeaveApproval(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     leave_id = Column(UUID(as_uuid=True), ForeignKey('leaves.id'))
     approver_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'))
-    approval_status = Column(Enum(LeaveStatus), nullable=False)
+    approval_status = Column(UUID(as_uuid=True), ForeignKey('leave_status.id'))
     comments = Column(String, nullable=True)
 
     leave = relationship("Leave", back_populates='approval')
