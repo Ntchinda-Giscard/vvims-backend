@@ -85,6 +85,7 @@ class Service(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     chief_service = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
+    agency_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
 
     # Relationships
     department = relationship('Department', back_populates='services')
@@ -101,6 +102,7 @@ class Position(Base):
     level = Column(Integer)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'))
 
     employee = relationship('Employee', back_populates='position')
 
