@@ -297,6 +297,7 @@ class Leave(Base):
     leave_types = relationship("LeaveType", back_populates='leave')
     files = relationship('UploadedFile', back_populates='leave')
 
+
 class LeaveType(Base):
     __tablename__= 'leave_types'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
