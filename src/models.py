@@ -280,6 +280,7 @@ class Leave(Base):
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
     file = Column(UUID(as_uuid=True), ForeignKey('files.id'))
     status = Column(String)
+    leave_type = Column(String)
     other_description = Column(String)
     comment = Column(String)
     start_time = Column(Time)
