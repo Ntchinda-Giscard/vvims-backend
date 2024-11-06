@@ -260,7 +260,7 @@ class Vehicle(Base):
     color = Column(String, nullable=True)
 
 
-class LeaveStatus(PyEnum):
+class LeaveStatus(Base):
     __tablename__ = 'leave_status'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     status= Column(String)
