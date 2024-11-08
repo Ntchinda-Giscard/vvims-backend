@@ -11,7 +11,7 @@ import strawberry
 from fastapi import FastAPI, status, HTTPException, File, UploadFile, Depends, Body, Form
 from fastapi.middleware.cors import CORSMiddleware
 from strawberry.fastapi import GraphQLRouter
-from schema import Mutation, Query
+from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
@@ -20,7 +20,7 @@ from src.models import Employee, CompanySettings, Attendance, AttendanceState, A
     EmployeeNotification, Visit, Visitor
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
-# from deepface import DeepFace
+
 import boto3
 
 models.Base.metadata.create_all(bind=engine)
@@ -43,7 +43,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"]
 )
-schema = strawberry.Schema(mutation=Mutation, query=Query)
+schema = strawberry.Schema(mutation=Mutation, query=Query, subscription=Subscription)
 pinecone_client = PineconeSigleton()
 graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
@@ -482,24 +482,6 @@ async def get_attendance_by_date_range(start_date, end_date):
                 print("No employees were present.")
             result[date] = attend
         return result
-# @app.post("/recognize")
-# async def recognize(
-#     embedding: List[float],
-#     ):
-#
-#     matches = pinecone_client.query(embedding)
-#
-#     serialized_vectors = []
-#     for vec in matches:
-#         serialized_vectors.append({
-#             "id": vec.get("id"),
-#             "score": vec.get("score"),
-#             "metadata" : vec.get("metadata")
-#         })
-#     print(serialized_vectors)
-#     if(serialized_vectors[0]["score"] >= 0.79):
-#         return JSONResponse(status_code=status.HTTP_200_OK, content={"matches": serialized_vectors[0]})
-#     return JSONResponse(status_code=status.HTTP_400_NOT_FOUND, content={"matches": [], "message": "Intruder visitor did not regidter today"})
 
 if __name__ == "__main__":
     import uvicorn

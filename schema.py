@@ -127,7 +127,18 @@ class Subscription:
 
                 result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
-   
+    
+    @strawberry.subscription
+    async def get_attendance_percentage() -> AttendnacePercentage:
+        with next(get_db()) as db:
+            try:
+                result  = count_attendance_percentage(db)
+                return result
+            except Exception as e:
+                logger.error(f"Error while calculating attendance percentage: {e}")
+                raise e
+            finally:
+                db.close()
 
 @strawberry.type
 class Mutation:
