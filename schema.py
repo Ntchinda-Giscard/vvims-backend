@@ -83,7 +83,7 @@ class Query:
                 result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
 
-    @starwberry.field
+    @strawberry.field
     def get_attendance_percentage() -> AttendnacePercentage:
         with next(get_db()) as db:
            return count_attendace_percentage(db)
