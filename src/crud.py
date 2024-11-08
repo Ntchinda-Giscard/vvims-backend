@@ -99,6 +99,6 @@ def total_employee_on_leave(db: Session) -> EmployeeOnLeave:
     :return: A list of dictionaries, each containing the month, day, week of the year, number of on-time, late, and abscent employees.
     """
     
-    leave_count = db.query(Employee).join(Leave, Employee.id == Leave.employee_id).filter(Leave.status="ACCEPTED").count()
+    leave_count = db.query(Employee).join(Leave, Employee.id == Leave.employee_id).filter(Leave.status =="ACCEPTED").count()
 
     return EmployeeOnLeave(total= leave_count)
