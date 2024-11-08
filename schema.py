@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime, timedelta, timezone
 import base64
 from typing import List
@@ -132,14 +133,16 @@ class Subscription:
     @strawberry.subscription
     async def get_attendance_percentage() -> AsyncGenerator[AttendnacePercentage, None]:
         with next(get_db()) as db:
-            try:
-                result  = count_attendance_percentage(db)
-                return result
-            except Exception as e:
-                logger.error(f"Error while calculating attendance percentage: {e}")
-                raise e
-            finally:
-                db.close()
+            while True:
+                try:
+                    result  = count_attendance_percentage(db)
+                    yield result
+                    await asyncio.sleep(5)
+                except Exception as e:
+                    logger.error(f"Error while calculating attendance percentage: {e}")
+                    raise e
+                finally:
+                    db.close()
 
 @strawberry.type
 class Mutation:
