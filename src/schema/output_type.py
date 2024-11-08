@@ -106,7 +106,7 @@ class DataType:
     data: List[DayAttendanceType]
 
 
-@starwberry.type
+@strawberry.type
 class AttendnacePercentage:
     total_employee: int
     attendance_percentage: float
