@@ -7,6 +7,7 @@ from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance
 from src.schema.output_type import EmployeeType, AttendnacePercentage
 from datetime import timedelta, datetime
+imprt math
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
