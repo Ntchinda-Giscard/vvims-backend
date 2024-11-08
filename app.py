@@ -489,6 +489,7 @@ async def get_leaves_employee():
     with next(get_db()) as db:
         try:
             leaves_employee = on_leave_number(db)
+            return leaves_employee
         except Exception as e:
             logger.exception(e)
             raise e
