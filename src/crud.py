@@ -81,8 +81,8 @@ def count_attendance_percentage(db: Session) -> AttendnacePercentage:
 
     attendance_percentage = (attendance_count / total_employees) * 100
     return AttendnacePercentage(
-        total_employees=total_employees,
-        attendance_percentage=attendance_percentage
+        total_employee =total_employees,
+        attendance_percentage =attendance_percentage
     )
 
     # {

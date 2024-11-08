@@ -86,7 +86,17 @@ class Query:
     @strawberry.field
     def get_attendance_percentage() -> AttendnacePercentage:
         with next(get_db()) as db:
-           return count_attendance_percentage(db)
+            try:
+                result  = count_attendance_percentage(db)
+
+            except Exception as e:
+                logger.error(f"Error while calculating attendance percentage: {e}")
+                raise e
+            finally:
+                db.close()
+
+
+           return 
 
 @strawberry.type
 class Subscription:
