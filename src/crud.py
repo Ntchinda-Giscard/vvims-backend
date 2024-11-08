@@ -2,10 +2,11 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
+from sqlalchemy import func
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance
-from src.schema.output_type import EmployeeType
-from datetime import timedelta
+from src.schema.output_type import EmployeeType, AttendnacePercentage
+from datetime import timedelta, datetime
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -59,3 +60,37 @@ def authenticate_employee(db: Session, phone_number: str, password: str):
     if not employee or not pwd_context.verify(password, employee.password):
         return False
     return  employee
+
+
+def count_attendace_percentage(db: Session) -> AttendnacePercentage:
+    """
+    Counts the total number of employees, and the percentage of employees who have logged in within the last 24 hours.
+    :param db: A database session instance used to interact with the database.
+    :return: A dictionary containing the total number of employees and the percentage of employees who have logged in within the last 24 hours.
+    """
+    try:
+        total_employees = db.query(Employee).count()
+        last_24_hours = datetime.now() - timedelta(days=1)
+        attendance_count = db.query(Attendance).filter(Attendance.clock_in_time >= last_24_hours).count()
+        return AttendnacePercentage(
+            total_employee=total_employees,
+            attendance_percentage=(attendance_count / total_employees) * 100 if total_employees else 0
+        )
+    except Exception as e:
+        logger.exception(e)
+        db.rollback()
+        raise e
+    finally:
+        db.close()
+        
+    # {
+    #     "total_employees": total_employees,
+    #     "attendance_percentage": (attendance_count / total_employees) * 100 if total_employees else 0
+    # }
+def count_attendace_percentage(db: Session):
+    """
+    Groups the attendance records by month, day, week of the year, and calculates the number of on-time, late, and abscent employees.
+    :param db: A database session instance used to interact with the database.
+    :return: A list of dictionaries, each containing the month, day, week of the year, number of on-time, late, and abscent employees.
+    """
+    result = []

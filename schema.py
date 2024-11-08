@@ -7,13 +7,13 @@ from fastapi import Depends
 from sqlalchemy.sql.coercions import expect
 from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
-from src.crud import pwd_context, authenticate_employee
+from src.crud import pwd_context, authenticate_employee, count_attendace_percentage
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     AddVisitorBrowserInputType, AttendanceInpuType
 from src import logger
-from src.schema.output_type import EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
+from src.schema.output_type import AttendnacePercentage, EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 
@@ -82,7 +82,12 @@ class Query:
 
                 result.append(DayAttendanceType(date=date, attendance=attendance_list))
             return result
-                
+
+    @starwberry.field
+    def get_attendance_percentage() -> AttendnacePercentage:
+        with next(get_db()) as db:
+           return count_attendace_percentage(db)
+
 @strawberry.type
 class Subscription:
 
