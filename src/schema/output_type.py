@@ -110,3 +110,8 @@ class DataType:
 class AttendnacePercentage:
     total_employee: int
     attendance_percentage: float
+
+
+@strawberry.type
+class EmployeeOnLeave:
+    total: int

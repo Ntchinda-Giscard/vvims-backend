@@ -5,7 +5,7 @@ from sqlalchemy import and_
 from sqlalchemy import func
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave
-from src.schema.output_type import EmployeeType, AttendnacePercentage
+from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave
 from datetime import timedelta, datetime
 import math
 
@@ -92,7 +92,7 @@ def count_attendance_percentage(db: Session) -> AttendnacePercentage:
     # }
 
 
-def on_leave_number(db: Session):
+def total_employee_on_leave(db: Session) -> EmployeeOnLeave:
     """
     Groups the attendance records by month, day, week of the year, and calculates the number of on-time, late, and abscent employees.
     :param db: A database session instance used to interact with the database.
@@ -100,7 +100,5 @@ def on_leave_number(db: Session):
     """
     
     leave_count = db.query(Employee).join(Leave, Employee.id == Leave.employee_id).filter(Leave.status="ACCEPTED").count()
-    print("LEave count", leave_count)
 
-
-    return leave_count
+    return EmployeeOnLeave(total= leave_count)

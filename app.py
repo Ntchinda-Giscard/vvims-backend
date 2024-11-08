@@ -14,7 +14,7 @@ from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
-from src.crud import authenticate_employee, on_leave_number
+from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor
@@ -483,18 +483,6 @@ async def get_attendance_by_date_range(start_date, end_date):
         return result
 
 
-@app.get("/api/v1/get-leaves")
-async def get_leaves_employee():
-
-    with next(get_db()) as db:
-        try:
-            leaves_employee = on_leave_number(db)
-            return leaves_employee
-        except Exception as e:
-            logger.exception(e)
-            raise e
-        finally:
-            db.close()
 
 if __name__ == "__main__":
     import uvicorn
