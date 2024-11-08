@@ -82,7 +82,7 @@ def count_attendance_percentage(db: Session) -> AttendnacePercentage:
     attendance_percentage = (attendance_count / total_employees) * 100
     return AttendnacePercentage(
         total_employee =total_employees,
-        attendance_percentage =attendance_percentage
+        attendance_percentage = math.ceil(attendance_percentage)
     )
 
     # {

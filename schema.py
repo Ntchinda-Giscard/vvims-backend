@@ -88,10 +88,7 @@ class Query:
         with next(get_db()) as db:
             try:
                 result  = count_attendance_percentage(db)
-                return AttendnacePercentage(
-                    total_employee = result.total_employee,
-                    attendance_percentage = result.attendance_percentage
-                )
+                return result
             except Exception as e:
                 logger.error(f"Error while calculating attendance percentage: {e}")
                 raise e
