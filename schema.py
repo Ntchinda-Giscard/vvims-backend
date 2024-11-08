@@ -16,6 +16,7 @@ from src import logger
 from src.schema.output_type import AttendnacePercentage, EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
+from typing import AsyncGenerator
 
 # Custom context to hold the user info
 class Context:
@@ -129,7 +130,7 @@ class Subscription:
             return result
     
     @strawberry.subscription
-    async def get_attendance_percentage() -> AttendnacePercentage:
+    async def get_attendance_percentage() -> AsyncGenerator[AttendnacePercentage]:
         with next(get_db()) as db:
             try:
                 result  = count_attendance_percentage(db)
