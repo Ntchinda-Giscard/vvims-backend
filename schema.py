@@ -7,7 +7,7 @@ from fastapi import Depends
 from sqlalchemy.sql.coercions import expect
 from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
-from src.crud import pwd_context, authenticate_employee, count_attendace_percentage
+from src.crud import pwd_context, authenticate_employee, count_attendance_percentage
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
@@ -86,7 +86,7 @@ class Query:
     @strawberry.field
     def get_attendance_percentage() -> AttendnacePercentage:
         with next(get_db()) as db:
-           return count_attendace_percentage(db)
+           return count_attendance_percentage(db)
 
 @strawberry.type
 class Subscription:

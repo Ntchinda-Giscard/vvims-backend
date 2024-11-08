@@ -62,27 +62,29 @@ def authenticate_employee(db: Session, phone_number: str, password: str):
     return  employee
 
 
-def count_attendace_percentage(db: Session) -> AttendnacePercentage:
+
+def count_attendance_percentage(db: Session) -> AttendnacePercentage:
     """
-    Counts the total number of employees, and the percentage of employees who have logged in within the last 24 hours.
+    Counts the total number of employees, and calculates the percentage of employees
+    who have logged in within the last 24 hours.
+    
     :param db: A database session instance used to interact with the database.
-    :return: A dictionary containing the total number of employees and the percentage of employees who have logged in within the last 24 hours.
+    :return: An instance of AttendanceStats containing the total number of employees and attendance percentage.
     """
-    try:
-        total_employees = db.query(Employee).count()
-        last_24_hours = datetime.now() - timedelta(days=1)
-        attendance_count = db.query(Attendance).filter(Attendance.clock_in_time >= last_24_hours).count()
-        return AttendnacePercentage(
-            total_employee=total_employees,
-            attendance_percentage=(attendance_count / total_employees) * 100 if total_employees else 0
-        )
-    except Exception as e:
-        logger.exception(e)
-        db.rollback()
-        raise e
-    finally:
-        db.close()
-        
+    total_employees = db.query(Employee).count()
+    
+    if total_employees == 0:
+        return AttendanceStats(total_employees=0, attendance_percentage=0.0)
+
+    last_24_hours = datetime.now() - timedelta(hours=24)
+    attendance_count = db.query(Attendance).filter(Attendance.clock_in_time >= last_24_hours).count()
+
+    attendance_percentage = (attendance_count / total_employees) * 100
+    return AttendnacePercentage(
+        total_employees=total_employees,
+        attendance_percentage=attendance_percentage
+    )
+
     # {
     #     "total_employees": total_employees,
     #     "attendance_percentage": (attendance_count / total_employees) * 100 if total_employees else 0
