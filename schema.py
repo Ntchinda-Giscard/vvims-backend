@@ -130,7 +130,7 @@ class Subscription:
             return result
     
     @strawberry.subscription
-    async def get_attendance_percentage() -> AsyncGenerator[AttendnacePercentage]:
+    async def get_attendance_percentage() -> AsyncGenerator[AttendnacePercentage, None]:
         with next(get_db()) as db:
             try:
                 result  = count_attendance_percentage(db)
