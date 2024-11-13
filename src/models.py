@@ -153,6 +153,7 @@ class Employee(Base):
     task_status = relationship("TaskStatus", back_populates='employee')
     event_notifications = relationship("EventNotification", back_populates='employee')
     alarms = relationship("Alarm", back_populates="employee")
+    tasks = relationship("Task", back_populates="assigned_to_user")
 
 
 
