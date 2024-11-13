@@ -115,3 +115,7 @@ class AttendnacePercentage:
 @strawberry.type
 class EmployeeOnLeave:
     total: int
+
+@strawberry.type
+class TaskCompletionPercentage:
+    percentage: float

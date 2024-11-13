@@ -4,8 +4,8 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from sqlalchemy import func
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave
-from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave
+from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum
+from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage
 from datetime import timedelta, datetime
 import math
 
@@ -102,3 +102,18 @@ def total_employee_on_leave(db: Session) -> EmployeeOnLeave:
     leave_count = db.query(Employee).join(Leave, Employee.id == Leave.employee_id).filter(Leave.status =="ACCEPTED").count()
 
     return EmployeeOnLeave(total= leave_count)
+
+
+def get_task_completion_percentage(db: Session) -> TaskCompletionPercentage:
+    percentage = 0
+    total_task_assigned = db.query(Employee).join(Task, Employee.id == Task.assigned_to).count()
+
+    total_completed_task = (db.query(Employee).join(Task, Task.assigned_to == Employee.id)
+                                               .join(TaskStatus, Task.id == TaskStatus.task_id)
+                                               .filter(TaskStatus.status == TaskStatusEnum.COMPLETED)
+                                               .count()
+                                               )
+    if total_completed_task == 0:
+        return TaskCompletionPercentage(percentage = 0)
+    percentage = (total_completed_task / total_task_assigned) * 100
+    return TaskCompletionPercentage(percentage = percentage)
