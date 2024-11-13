@@ -452,7 +452,7 @@ class Event(Base):
     #relationships
     employee = relationship("Employee", back_populates="event")
     participants = relationship("EventParticipant", back_populates="event")
-    task = relationship("Task", back_populates="event")
+    tasks = relationship("Task", back_populates="event")
 
 class ParticipantStatus(PyEnum):
     PENDING = "pending"
