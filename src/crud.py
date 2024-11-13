@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from sqlalchemy import func
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum
+from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     EmployeeId
