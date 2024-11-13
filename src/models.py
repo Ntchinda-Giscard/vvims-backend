@@ -154,7 +154,7 @@ class Employee(Base):
     event_notifications = relationship("EventNotification", back_populates='employee')
     alarms = relationship("Alarm", back_populates="employee")
     tasks_assigned_to = relationship("Task", foreign_keys=[Task.assigned_to], back_populates="assigned_to_user")
-    tasks_assigned_by = relationship("Task", foreign_keys=[Task.assigned_by] back_populates="assigned_by_user")
+    tasks_assigned_by = relationship("Task", foreign_keys=[Task.assigned_by], back_populates="assigned_by_user")
 
 
 
