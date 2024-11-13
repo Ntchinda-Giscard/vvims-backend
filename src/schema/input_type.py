@@ -121,3 +121,8 @@ class AddVisitorBrowserInputType:
 class AttendanceInpuType:
     start_date: datetime
     end_date: datetime
+
+
+@strawberry.input
+class EmployeeId:
+    id: uuid.UUID

@@ -6,6 +6,8 @@ from sqlalchemy import func
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage
+from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
+    EmployeeId
 from datetime import timedelta, datetime
 import math
 
@@ -104,11 +106,14 @@ def total_employee_on_leave(db: Session) -> EmployeeOnLeave:
     return EmployeeOnLeave(total= leave_count)
 
 
-def get_task_completion_percentage(db: Session) -> TaskCompletionPercentage:
+def get_task_completion_percentage(db: Session, id) -> TaskCompletionPercentage:
     percentage = 0
-    total_task_assigned = db.query(Employee).join(Task, Employee.id == Task.assigned_to).count()
+    total_task_assigned = (db.query(Employee).join(Task, Employee.id == Task.assigned_to).count())
 
-    total_completed_task = (db.query(Employee).join(Task, Task.assigned_to == Employee.id)
+    total_completed_task = (
+        db.query(Employee)
+        .filter(Employee.id == id)
+        .join(Task, Task.assigned_to == Employee.id)
                                                .join(TaskStatus, Task.id == TaskStatus.task_id)
                                                .filter(TaskStatus.status == TaskStatusEnum.COMPLETED)
                                                .count()

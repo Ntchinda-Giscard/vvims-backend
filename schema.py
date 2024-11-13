@@ -13,7 +13,7 @@ from src.crud import pwd_context, authenticate_employee, count_attendance_percen
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    AddVisitorBrowserInputType, AttendanceInpuType
+    AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType, \
@@ -107,13 +107,13 @@ class Query:
                 return leaves_employee
             except Exception as e:
                 logger.exception(e)
-                raise Exeption("Something went wrong: Internal server error")
+                raise Exception("Something went wrong: Internal server error")
             finally:
                 db.close()
 
 
     @strawberry.field
-    def get_percentage_task() -> TaskCompletionPercentage:
+    def get_percentage_task(id: EmployeeId) -> TaskCompletionPercentage:
 
         with next(get_db()) as db:
             try:
@@ -121,7 +121,7 @@ class Query:
                 return task_percentage
             except Exception as e:
                 logger.exception(e)
-                raise Exeption("Something went wrong: Internal server error")
+                raise Exception("Something went wrong: Internal server error")
             finally:
                 db.close()
 
