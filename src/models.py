@@ -153,7 +153,8 @@ class Employee(Base):
     task_status = relationship("TaskStatus", back_populates='employee')
     event_notifications = relationship("EventNotification", back_populates='employee')
     alarms = relationship("Alarm", back_populates="employee")
-    tasks = relationship("Task", back_populates="assigned_to_user")
+    tasks_assigned_to = relationship("Task", back_populates="assigned_to_user")
+    tasks_assigned_by = relationship("Task", back_populates="assigned_by_user")
 
 
 
@@ -491,8 +492,8 @@ class Task(Base):
 
     #relationships
     event = relationship("Event", back_populates="tasks")
-    assigned_to_user = relationship("Employee", foreign_keys=[assigned_to], back_populates="tasks")
-    assigned_by_user = relationship("Employee", foreign_keys=[assigned_by], back_populates="tasks")
+    assigned_to_user = relationship("Employee", foreign_keys=[assigned_to], back_populates="tasks_assigned_to")
+    assigned_by_user = relationship("Employee", foreign_keys=[assigned_by], back_populates="tasks_assigned_by")
 
 
 class TaskStatusEnum(PyEnum):
