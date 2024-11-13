@@ -8,14 +8,16 @@ from fastapi import Depends
 from sqlalchemy.sql.coercions import expect
 from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
-from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave
+from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
+    get_task_completion_percentage
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     AddVisitorBrowserInputType, AttendanceInpuType
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
-    UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType
+    UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType, \
+        TaskCompletionPercentage
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 from typing import AsyncGenerator
 
@@ -108,6 +110,22 @@ class Query:
                 raise Exeption("Something went wrong: Internal server error")
             finally:
                 db.close()
+
+
+    @strawberry.field
+    def get_percentage_task() -> TaskCompletionPercentage:
+
+        with next(get_db()) as db:
+            try:
+                task_percentage = get_task_completion_percentage(db)
+                return task_percentage
+            except Exception as e:
+                logger.exception(e)
+                raise Exeption("Something went wrong: Internal server error")
+            finally:
+                db.close()
+
+
 
 
 @strawberry.type
