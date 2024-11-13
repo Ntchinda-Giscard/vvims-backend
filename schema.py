@@ -117,7 +117,7 @@ class Query:
 
         with next(get_db()) as db:
             try:
-                task_percentage = get_task_completion_percentage(db)
+                task_percentage = get_task_completion_percentage(db, id.id)
                 return task_percentage
             except Exception as e:
                 logger.exception(e)
