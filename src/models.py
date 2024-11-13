@@ -106,6 +106,23 @@ class Position(Base):
 
     employee = relationship('Employee', back_populates='position')
 
+class Task(Base):
+    __tablename__= 'tasks'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    assigned_by = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    assigned_to = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    due_date = Column(Date)
+
+    #relationships
+    event = relationship("Event", back_populates="tasks")
+    assigned_to_user = relationship("Employee", foreign_keys=[assigned_to], back_populates="tasks_assigned_to")
+    assigned_by_user = relationship("Employee", foreign_keys=[assigned_by], back_populates="tasks_assigned_by")
 
 class Employee(Base):
     __tablename__ = 'employees'
@@ -476,24 +493,6 @@ class EventParticipant(Base):
     event = relationship("Event", back_populates="participants")
     employee = relationship("Employee", back_populates="participants")
 
-
-class Task(Base):
-    __tablename__= 'tasks'
-    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
-    created_at = Column(DateTime(timezone=True), server_default=func.now())
-    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
-
-    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
-    assigned_by = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
-    assigned_to = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
-    title = Column(String(255), nullable=False)
-    description = Column(Text)
-    due_date = Column(Date)
-
-    #relationships
-    event = relationship("Event", back_populates="tasks")
-    assigned_to_user = relationship("Employee", foreign_keys=[assigned_to], back_populates="tasks_assigned_to")
-    assigned_by_user = relationship("Employee", foreign_keys=[assigned_by], back_populates="tasks_assigned_by")
 
 
 class TaskStatusEnum(PyEnum):
