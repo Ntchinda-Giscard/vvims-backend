@@ -273,7 +273,7 @@ class Visit(Base):
     department = relationship('Department', back_populates='visit')
     service = relationship('Service', back_populates='visit')
     visitors = relationship('Visitor', back_populates='visit')
-    vehicle = relationship('Vehicle', back_populates = 'visit')
+    # vehicle = relationship('Vehicle', back_populates = 'visit')
 
 
 class Vehicle(Base):
@@ -287,7 +287,7 @@ class Vehicle(Base):
     flagged = Column(Boolean, default=False)
     color = Column(String, nullable=True)
 
-    visit = relationship('Visit', back_populates = 'vehicle')
+    # visit = relationship('Visit', back_populates = 'vehicle')
 
 
 class LeaveApprovalStatus(Base):
