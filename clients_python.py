@@ -71,7 +71,7 @@ qr_with_logo_buffer.seek(0)
 qr_image_for_pdf = ImageReader(qr_with_logo_buffer)
 
 # Create a PDF file and insert the QR code with logo
-pdf_filename = 'vvims-fodecc-annexe.pdf'
+pdf_filename = 'vvims-cnps-hippodorme.pdf'
 c = canvas.Canvas(pdf_filename, pagesize=A4)
 
 # Set the dimensions and position for the image on the PDF (center it on the page)

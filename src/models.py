@@ -1,7 +1,7 @@
 from datetime import timezone
 
 from sqlalchemy import Column, Integer, String, ForeignKey, Enum, func, DateTime, UUID, Float, Enum, Date, Time, \
-    Interval, ARRAY, Boolean
+    Interval, ARRAY, Boolean, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
 from src.database import Base
@@ -147,6 +147,13 @@ class Employee(Base):
     employee_notifications = relationship("EmployeeNotification", back_populates='employee')
     visit = relationship('Visit', back_populates='employee')
     appointments = relationship("Appointment", back_populates='employees')
+
+    participants = relationship("EventParticipant", back_populates="employee")
+    event = relationship("Event", back_populates="employee")
+    task_status = relationship("TaskStatus", back_populates='employee')
+    event_notifications = relationship("EventNotification", back_populates='employee')
+    alarms = relationship("Alarm", back_populates="employee")
+
 
 
 class Department(Base):
@@ -426,3 +433,114 @@ class Location(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     location = Column(Geometry(geometry_type="POLYGON", srid=4326), nullable=True)
     buidling_id = Column(UUID(as_uuid=True), nullable=True)
+
+
+class Event(Base):
+    __tablename__="events"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    title= Column(String(255), nullable=False)
+    description = Column(Text)
+    start_date = Column(Date)
+    end_date = Column(Date)
+    start_time = Column(Time)
+    end_time = Column(Time)
+    orgenizer_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+
+    #relationships
+    employee = relationship("Employee", back_populates="event")
+    participants = relationship("EventParticipant", back_populates="event")
+    task = relationship("Task", back_populates="event")
+
+class ParticipantStatus(PyEnum):
+    PENDING = "pending"
+    ON_GOING = "accepted"
+    COMPLETED = "declined"
+
+class EventParticipant(Base):
+    __tablename__ = 'event_participants'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    status = Column(Enum(ParticipantStatus), default=ParticipantStatus.PENDING)
+
+    #RELATIONSHIPS
+
+    event = relationship("Event", back_populates="participants")
+    employee = relationship("Employee", back_populates="participants")
+
+
+class Task(Base):
+    __tablename__= 'tasks'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    assigned_by = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    assigned_to = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    title = Column(String(255), nullable=False)
+    description = Column(Text)
+    due_date = Column(Date)
+
+    #relationships
+    event = relationship("Event", back_populates="tasks")
+    assigned_to_user = relationship("Employee", foreign_keys=[assigned_to], back_populates="tasks")
+    assigned_by_user = relationship("Employee", foreign_keys=[assigned_by], back_populates="tasks")
+
+
+class TaskStatusEnum(PyEnum):
+    PENDING = "PENDIING"
+    ONGOING = "ONGOING"
+    REVIEWING = "REVIEWING"
+    COMPLETED = "COMPLETED"
+
+
+class TaskStatus(Base):
+    __tablename__ = 'task_status'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    status = Column(Enum(TaskStatusEnum), default=TaskStatusEnum.PENDING)
+    task_id = Column(UUID(as_uuid=True), ForeignKey('tasks.id'), nullable=False)
+    updated_by = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    comment = Column(Text)
+
+    #relationships
+    tasks = relationship("Task")
+    employee = relationship("Employee", back_populates='task_status')
+
+
+class EventNotification(Base):
+    __tablename__ = 'event_notification'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    message = Column(Text)
+    read = Column(Boolean, default=False)
+
+    #relationship
+    employee = relationship("Employee", back_populates='event_notifications')
+    event = relationship("Event")
+
+
+class Alarm(Base):
+    __tablename__ = 'alarms'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    alarm_time = Column(DateTime)
+
+    employee = relationship("Employee", back_populates="alarms")
+    event = relationship("Event")
