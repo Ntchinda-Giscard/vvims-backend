@@ -273,6 +273,7 @@ class Visit(Base):
     department = relationship('Department', back_populates='visit')
     service = relationship('Service', back_populates='visit')
     visitors = relationship('Visitor', back_populates='visit')
+    vehicle = relationship('Vehicle', back_populates = 'visitor')
 
 
 class Vehicle(Base):
@@ -282,7 +283,11 @@ class Vehicle(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     license = Column(String, unique=True)
     make = Column(String, nullable=True)
+    brand = Column(String, nullable=True)
+    flagged = Column(Boolean, default=False)
     color = Column(String, nullable=True)
+
+    visitor = relationship('Visit', back_populates = 'vehicle')
 
 
 class LeaveApprovalStatus(Base):
