@@ -244,8 +244,8 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
         session.query(
             func.date_part('dow', Attendance.clock_in_date).label('weekday'),  # Day of the week (0=Monday, 6=Sunday)
             func.count(Attendance.id).label('present_count'),  # Employees with entries (present)
-            func.count(case([(AttendanceState.is_late == False, 1)])).label('on_time_count'),  # Employees on time
-            func.count(case([(AttendanceState.is_late == True, 1)])).label('late_count')  # Employees who are late
+            func.count(case((AttendanceState.is_late == False, 1), else_=None)).label('on_time_count'),  # Employees on time
+            func.count(case((AttendanceState.is_late == True, 1), else_=None)).label('late_count')  # Employees who are late
         )
         .join(AttendanceState, AttendanceState.attendance_id == Attendance.id, isouter=True)
         .filter(Attendance.clock_in_date >= start_of_week, Attendance.clock_in_date <= end_of_week)
