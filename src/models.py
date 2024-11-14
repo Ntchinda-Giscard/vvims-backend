@@ -226,7 +226,7 @@ class UploadedFile(Base):
 
     # Relationships
     employee = relationship('Employee', back_populates='files')
-    leaves = relationship('Leave', back_populates='files')
+    # leaves = relationship('Leave', back_populates='files')
 
 
 class Visitor(Base):
@@ -309,7 +309,8 @@ class Leave(Base):
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     types = Column(UUID(as_uuid=True), ForeignKey('leave_types.id'))
-    file = Column(UUID(as_uuid=True), ForeignKey('files.id'))
+    # file = Column(UUID(as_uuid=True), ForeignKey('files.id'))
+    file = Column(String)
     status = Column(String)
     leave_type = Column(String)
     other_description = Column(String)
@@ -321,7 +322,7 @@ class Leave(Base):
     leave_approval_status = relationship('LeaveApprovalStatus', back_populates='leaves')
     approval = relationship('LeaveApproval', back_populates='leave', cascade='all, delete-orphan')
     leave_types = relationship("LeaveType", back_populates='leave')
-    files = relationship('UploadedFile', back_populates='leaves')
+    # files = relationship('UploadedFile', back_populates='leaves')
 
 
 class LeaveType(Base):
