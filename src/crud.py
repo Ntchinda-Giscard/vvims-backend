@@ -145,7 +145,7 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
 
     # Step 1: Query the visitor data and group by day, ignoring the time part
     visitor_data = (
-        session.query(
+        db.query(
             func.date(Visit.date).label("visit_day"),  # Stripping the time part
             func.count(Visit.id).label("visitor_count")
         )
