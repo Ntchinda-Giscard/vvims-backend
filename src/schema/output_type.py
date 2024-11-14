@@ -124,5 +124,5 @@ class TaskCompletionPercentage:
 
 @strawberry.type
 class VisitsCountByDay:
-    visit_day: date
+    visit_day: str
     visitor_count: int
