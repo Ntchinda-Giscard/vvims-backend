@@ -164,7 +164,7 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
 
     # Step 3: Generate the full week with default visitor count of 0 for missing days
     full_week = [
-        VisitorCountByDay(
+        VisitsCountByDay(
             visit_day=start_of_week + timedelta(days=i),
             visitor_count=visitor_counts_by_day.get(start_of_week + timedelta(days=i), 0)
         )
