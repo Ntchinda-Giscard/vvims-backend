@@ -132,3 +132,11 @@ class VisitsCountByDay:
 class VehicleCountByDay:
     visit_day: str
     visitor_count: int
+
+
+@strawberry.type
+class AttendanceCountByWeek:
+    day: int
+    late_employees: int
+    on_time_employees: int
+    present_employees: int

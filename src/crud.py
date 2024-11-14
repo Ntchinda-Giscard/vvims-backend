@@ -2,11 +2,11 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
-from sqlalchemy import func
+from sqlalchemy import func, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit, Vehicle
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
-    VisitsCountByDay, VehicleCountByDay
+    VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     EmployeeId
 from datetime import timedelta, datetime
@@ -230,3 +230,59 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
     ]
 
     return full_week
+
+
+
+def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
+    # Calculate the start and end of the current week (Monday to Sunday)
+    today = datetime.now()
+    start_of_week = today - timedelta(days=today.weekday())
+    end_of_week = start_of_week + timedelta(days=6)
+
+    # Query to group by day of the week
+    attendance_summary = (
+        session.query(
+            func.date_part('dow', Attendance.clock_in_date).label('weekday'),  # Day of the week (0=Monday, 6=Sunday)
+            func.count(Attendance.id).label('present_count'),  # Employees with entries (present)
+            func.count(case([(AttendanceState.is_late == False, 1)])).label('on_time_count'),  # Employees on time
+            func.count(case([(AttendanceState.is_late == True, 1)])).label('late_count')  # Employees who are late
+        )
+        .join(AttendanceState, AttendanceState.attendance_id == Attendance.id, isouter=True)
+        .filter(Attendance.clock_in_date >= start_of_week, Attendance.clock_in_date <= end_of_week)
+        .group_by('weekday')
+        .order_by('weekday')
+        .all()
+    )
+
+     b_result = [
+       
+        {
+            'weekday': day.weekday,  # Convert to integer (0=Monday)
+            'present_count': day.present_count,
+            'on_time_count': day.on_time_count,
+            'late_count': day.late_count,
+        }
+        for day in attendance_summary
+    ]
+
+    print(b_result)
+
+    # Format result for easier use
+    result = [
+         AttendanceCountByWeek(
+            day = int(day.weekday),
+            late_employees = day.present_count,
+            on_time_employees = day.on_time_count,
+            present_employees = day.late_count,
+        )
+        # {
+        #     'weekday': int(day.weekday),  # Convert to integer (0=Monday)
+        #     'present_count': day.present_count,
+        #     'on_time_count': day.on_time_count,
+        #     'late_count': day.late_count,
+        # }
+        for day in attendance_summary
+    ]
+
+    
+    return result
