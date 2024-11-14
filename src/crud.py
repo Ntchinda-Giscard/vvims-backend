@@ -139,7 +139,10 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
     
     today = datetime.now()
     start_week = today - timedelta(days=today.weekday())
-    end_week = start_week + timedelta(days=6)
+    end_week = start_week + timedelta(days=5)
+
+    print(f"Start date : {start_week}" )
+    print(f"End date : {end_week}" )
 
     visits_data = (
         db.query(
