@@ -232,6 +232,9 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
     return full_week
 
 
+# from typing import List
+# from sqlalchemy import func, case
+# from datetime import datetime, timedelta
 
 def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     # Calculate the start and end of the current week (Monday to Sunday)
@@ -254,35 +257,26 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
         .all()
     )
 
-    b_result = [
-       
-        {
-            'weekday': day.weekday,  # Convert to integer (0=Monday)
-            'present_count': day.present_count,
-            'on_time_count': day.on_time_count,
-            'late_count': day.late_count,
+    # Initialize a dictionary with zero values for each day of the week (0=Monday, 6=Sunday)
+    week_data = {i: {"present_count": 0, "on_time_count": 0, "late_count": 0} for i in range(7)}
+
+    # Populate the dictionary with actual query results
+    for day in attendance_summary:
+        week_data[int(day.weekday)] = {
+            "present_count": day.present_count,
+            "on_time_count": day.on_time_count,
+            "late_count": day.late_count,
         }
-        for day in attendance_summary
-    ]
 
-    print(b_result)
-
-    # Format result for easier use
+    # Format the result for the final output
     result = [
         AttendanceCountByWeek(
-            day = int(day.weekday),
-            late_employees = day.present_count,
-            on_time_employees = day.on_time_count,
-            present_employees = day.late_count,
+            day=weekday,
+            present_employees=week_data[weekday]["present_count"],
+            on_time_employees=week_data[weekday]["on_time_count"],
+            late_employees=week_data[weekday]["late_count"],
         )
-        # {
-        #     'weekday': int(day.weekday),  # Convert to integer (0=Monday)
-        #     'present_count': day.present_count,
-        #     'on_time_count': day.on_time_count,
-        #     'late_count': day.late_count,
-        # }
-        for day in attendance_summary
+        for weekday in range(7)
     ]
-
     
     return result
