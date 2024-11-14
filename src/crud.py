@@ -171,7 +171,7 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
     print(week)
     full_week = [
         VisitsCountByDay(
-            visit_day=(start_of_week + timedelta(days=i)).strftime("%Y-%m-%d"),
+            visit_day=(start_of_week + timedelta(days=i)).strftime("%A"),
             visitor_count=visitor_counts_by_day.get((start_of_week + timedelta(days=i)).date(), 0)
         )
         for i in range(7)  # 7 days in a week
