@@ -156,7 +156,7 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
         .group_by(func.date(Visit.date))
         .all()
     )
-
+    print(visitor_data)
     # Step 2: Convert query results to a dictionary with date as key
     visitor_counts_by_day = {
         day.visit_day: day.visitor_count for day in visitor_data
