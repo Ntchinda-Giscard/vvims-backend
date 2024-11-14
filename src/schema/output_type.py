@@ -136,7 +136,7 @@ class VehicleCountByDay:
 
 @strawberry.type
 class AttendanceCountByWeek:
-    day: int
+    day: str
     late_employees: int
     on_time_employees: int
     present_employees: int
