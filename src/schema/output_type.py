@@ -3,6 +3,7 @@ from datetime import datetime
 import strawberry
 import uuid
 from typing import Optional, List, ByteString, AnyStr, Any
+from datetime import date
 
 
 @strawberry.type
@@ -119,3 +120,9 @@ class EmployeeOnLeave:
 @strawberry.type
 class TaskCompletionPercentage:
     percentage: float
+
+
+@strawberry.type
+class VisitsCountByDay:
+    visit_day: date
+    visitor_count: int

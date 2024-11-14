@@ -4,12 +4,14 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from sqlalchemy import func
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus
-from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage
+from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit
+from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
+    VisitsCountByDay
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     EmployeeId
 from datetime import timedelta, datetime
 import math
+from typing import List
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -122,3 +124,34 @@ def get_task_completion_percentage(db: Session, id) -> TaskCompletionPercentage:
         return TaskCompletionPercentage(percentage = 0)
     percentage = (total_completed_task / total_task_assigned) * 100
     return TaskCompletionPercentage(percentage = percentage)
+
+
+
+
+
+
+def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
+    """
+    Counts the number of visits made by employees in each weekday group (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday).
+    :param db: A database session instance used to interact with the database.
+    :return: A list of dictionaries, each containing the weekday group name and the number of visits made by employees in that group.
+    """
+    
+    today = datetime.now()
+    start_week = today - timedelta(days=today.weekday())
+    end_week = start_week + timedelta(days=6)
+
+    visits_data = (
+        db.query(
+            func.date(Visit.date).label("visit_day"),
+            func.count(Visit.id).label("visit_count")
+        )
+        .filter(
+            Visit.date >= start_week,
+            Visit.date <= end_week
+        )
+        .group_by(func.date(Visit.date))
+        .all()
+    )
+
+    return [VisitsCountByDay(visit_day=day.visit_day, visitor_count=day.visit_count) for day in visits_data]
