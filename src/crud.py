@@ -1,3 +1,4 @@
+import calendar
 from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
@@ -236,6 +237,9 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
 # from sqlalchemy import func, case
 # from datetime import datetime, timedelta
 
+
+
+
 def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     # Calculate the start and end of the current week (Monday to Sunday)
     today = datetime.now()
@@ -268,10 +272,10 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
             "late_count": day.late_count,
         }
 
-    # Format the result for the final output
+    # Format the result with day names
     result = [
         AttendanceCountByWeek(
-            day=weekday,
+            day=calendar.day_name[weekday],  # Get the name of the day (e.g., "Monday")
             present_employees=week_data[weekday]["present_count"],
             on_time_employees=week_data[weekday]["on_time_count"],
             late_employees=week_data[weekday]["late_count"],
