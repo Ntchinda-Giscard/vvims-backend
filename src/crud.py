@@ -138,23 +138,37 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
     """
     
     today = datetime.now()
-    start_week = today - timedelta(days=today.weekday())
-    end_week = start_week + timedelta(days=5)
 
-    print(f"Start date : {start_week}" )
-    print(f"End date : {end_week}" )
+    # Calculate the start of the week (Monday) and end of the week (Sunday)
+    start_of_week = today - timedelta(days=today.weekday())  # Monday of this week
+    end_of_week = start_of_week + timedelta(days=6)          # Sunday of this week
 
-    visits_data = (
-        db.query(
-            func.date(Visit.date).label("visit_day"),
-            func.count(Visit.id).label("visit_count")
+    # Step 1: Query the visitor data and group by day, ignoring the time part
+    visitor_data = (
+        session.query(
+            func.date(Visit.date).label("visit_day"),  # Stripping the time part
+            func.count(Visit.id).label("visitor_count")
         )
         .filter(
-            Visit.date >= start_week,
-            Visit.date <= end_week
+            func.date(Visit.date) >= start_of_week.date(),  # Ensure both sides are date-only
+            func.date(Visit.date) <= end_of_week.date()
         )
         .group_by(func.date(Visit.date))
         .all()
     )
 
-    return [VisitsCountByDay(visit_day=day.visit_day, visitor_count=day.visit_count) for day in visits_data]
+    # Step 2: Convert query results to a dictionary with date as key
+    visitor_counts_by_day = {
+        day.visit_day: day.visitor_count for day in visitor_data
+    }
+
+    # Step 3: Generate the full week with default visitor count of 0 for missing days
+    full_week = [
+        VisitorCountByDay(
+            visit_day=start_of_week + timedelta(days=i),
+            visitor_count=visitor_counts_by_day.get(start_of_week + timedelta(days=i), 0)
+        )
+        for i in range(7)  # 7 days in a week
+    ]
+
+    return full_week
