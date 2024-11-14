@@ -254,7 +254,7 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
         .all()
     )
 
-     b_result = [
+    b_result = [
        
         {
             'weekday': day.weekday,  # Convert to integer (0=Monday)
@@ -269,7 +269,7 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
 
     # Format result for easier use
     result = [
-         AttendanceCountByWeek(
+        AttendanceCountByWeek(
             day = int(day.weekday),
             late_employees = day.present_count,
             on_time_employees = day.on_time_count,
