@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from sqlalchemy import func
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit
+from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit, Vehicle, VehicleCountByDay
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
@@ -173,6 +173,58 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
         VisitsCountByDay(
             visit_day=(start_of_week + timedelta(days=i)).strftime("%A"),
             visitor_count=visitor_counts_by_day.get((start_of_week + timedelta(days=i)).date(), 0)
+        )
+        for i in range(7)  # 7 days in a week
+    ]
+
+    return full_week
+
+
+
+
+def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
+    """
+    Counts the number of visits made by employees in each weekday group (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday).
+    :param db: A database session instance used to interact with the database.
+    :return: A list of dictionaries, each containing the weekday group name and the number of visits made by employees in that group.
+    """
+    
+    today = datetime.now()
+
+    # Calculate the start of the week (Monday) and end of the week (Sunday)
+    start_of_week = today - timedelta(days=today.weekday())  # Monday of this week
+    end_of_week = start_of_week + timedelta(days=6)          # Sunday of this week
+
+    # Step 1: Query the visitor data and group by day, ignoring the time part
+    vehicle_data = (
+        db.query(
+            func.date(Vehicle.created_at).label("vehicle_day"),  # Stripping the time part
+            func.count(Vehicle.id).label("vehicle_count")
+        )
+        .filter(
+            func.date(Vehicle.created_at) >= start_of_week.date(),  # Ensure both sides are date-only
+            func.date(Vehicle.created_at) <= end_of_week.date()
+        )
+        .group_by(func.date(Visit.date))
+        .all()
+    )
+    print(vehicle_data)
+    # Step 2: Convert query results to a dictionary with date as key
+    vehicle_counts_by_day = {
+        day.vehicle_day: day.vehicle_count for day in vehicle_data
+    }
+    print(vehicle_counts_by_day)
+
+    # Step 3: Generate the full week with default visitor count of 0 for missing days
+    week = [ (start_of_week + timedelta(days=i)).date()
+        for i in range(7)  # 7 days in a week
+    ]
+
+    print(week)
+    full_week = [
+        VehicleCountByDay(
+            visit_day=(start_of_week + timedelta(days=i)).strftime("%A"),
+            visitor_count=vehicle_counts_by_day.get((start_of_week + timedelta(days=i)).date(), 0)
         )
         for i in range(7)  # 7 days in a week
     ]

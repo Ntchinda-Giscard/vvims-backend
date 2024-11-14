@@ -126,3 +126,9 @@ class TaskCompletionPercentage:
 class VisitsCountByDay:
     visit_day: str
     visitor_count: int
+
+
+@strawberry.type
+class VehicleCountByDay:
+    visit_day: str
+    visitor_count: int
