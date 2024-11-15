@@ -82,8 +82,11 @@ def count_attendance_percentage(db: Session) -> AttendnacePercentage:
     if total_employees == 0:
         return AttendanceStats(total_employees=0, attendance_percentage=0.0)
 
-    last_24_hours = datetime.now() - timedelta(hours=24)
-    attendance_count = db.query(Attendance).filter(Attendance.clock_in_time >= last_24_hours).count()
+    today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+
+    last_24_hours = datetime.now() - timedelta(hours=24)#
+    attendance_count = db.query(Attendance).filter(Attendance.clock_in_time >= today_start).count()
+
 
     attendance_percentage = (attendance_count / total_employees) * 100
     return AttendnacePercentage(
