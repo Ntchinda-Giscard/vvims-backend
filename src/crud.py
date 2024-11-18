@@ -262,7 +262,7 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     .group_by((func.extract('dow', Attendance.clock_in_date) + 6) % 7)
     .order_by((func.extract('dow', Attendance.clock_in_date) + 6) % 7)
     .all()
-)
+    )
 
     # Initialize a dictionary with zero values for each day of the week (0=Monday, 6=Sunday)
     week_data = {i: {"present_count": 0, "on_time_count": 0, "late_count": 0} for i in range(7)}
