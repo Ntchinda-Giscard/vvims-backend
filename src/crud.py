@@ -141,7 +141,7 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
     :return: A list of dictionaries, each containing the weekday group name and the number of visits made by employees in that group.
     """
     
-    today = datetime.now()
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     # Calculate the start of the week (Monday) and end of the week (Sunday)
     start_of_week = today - timedelta(days=today.weekday())  # Monday of this week
@@ -193,7 +193,7 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
     :return: A list of dictionaries, each containing the weekday group name and the number of visits made by employees in that group.
     """
     
-    today = datetime.now()
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
     # Calculate the start of the week (Monday) and end of the week (Sunday)
     start_of_week = today - timedelta(days=today.weekday())  # Monday of this week
