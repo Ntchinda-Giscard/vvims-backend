@@ -245,7 +245,7 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
 
 def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     # Calculate the start and end of the current week (Monday to Sunday)
-    today = datetime.now()
+    today = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
     start_of_week = today - timedelta(days=today.weekday())
     end_of_week = start_of_week + timedelta(days=6)
 
