@@ -9,15 +9,15 @@ from sqlalchemy.sql.coercions import expect
 from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
-    get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, get_weekly_attendance_summary
+    get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, get_weekly_attendance_summary, create_conversation
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId
+    AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId, CreateConvInput
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, DayAttendanceType, \
-        TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek
+        TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 from typing import AsyncGenerator
 
@@ -387,4 +387,10 @@ class Mutation:
                 finally:
                     db.close()
 
+    @strawberry.mutation
+    def create_conversation(self, conversation: CreateConvInput) -> CreateConvOutput:
 
+        with next(get_db()) as db:
+            result = create_conversation(db, conversation)
+
+            return result

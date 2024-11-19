@@ -140,3 +140,8 @@ class AttendanceCountByWeek:
     late_employees: int
     on_time_employees: int
     present_employees: int
+
+
+@strawberry.type
+class CreateConvOutput:
+    id: uuid.UUID

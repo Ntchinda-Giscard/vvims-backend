@@ -126,3 +126,11 @@ class AttendanceInpuType:
 @strawberry.input
 class EmployeeId:
     id: uuid.UUID
+
+
+@strawberry.input
+class CreateConvInput:
+    is_group: bool
+    name: Optional[str] = None
+    first_participant: uuid.UUID
+    second_participants: uuid.UUID

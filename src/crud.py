@@ -7,9 +7,9 @@ from sqlalchemy import func, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit, Vehicle, AttendanceState
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
-    VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek
+    VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId
+    EmployeeId, CreateConvInput
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -289,4 +289,42 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     ]
     
     return result
-    
+
+
+def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvOutput:
+    try:
+
+        conv = Conversation(
+            name = conv_input.name,
+            is_group = conv_input.is_group
+        )
+
+        print("Conversation id", conv.id)
+
+        db.add(conv)
+        db.commit()
+
+        f_participants = EmployeeConversation(
+            employee_id= conv_input.first_participant,
+            conversation_id = conv.id
+        )
+
+        db.add(f_participants)
+
+        s_participants = EmployeeConversation(
+            employee_id= conv_input.second_participants,
+            conversation_id = conv.id
+        )
+
+        db.add(s_participants)
+
+        db.commit()
+
+        return CreateConvOutput(id=conv.id)
+    except Exception as e:
+        logger.exception(e)
+        db.rollback()
+        db.close()
+        raise Exception(f'{e}')
+    finally:
+        db.close()

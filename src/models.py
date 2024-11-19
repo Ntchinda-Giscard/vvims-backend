@@ -150,6 +150,11 @@ class Employee(Base):
     license = Column(String, nullable=True)
     address = Column(String, nullable=True)
     password_change_at = Column(DateTime(timezone=True))
+    messages = relationship('Message', back_populates='employee')
+    message_status = relationship('MessageStatus', back_populates='employee')
+    typing_status = relationship('TypingStatus', back_populates='employee')
+    employee_conv = relationship('EmployeeConversation', back_populates='employees')
+
 
     # Relationships
     roles = relationship('EmployeeRole', back_populates='employee')
@@ -551,3 +556,80 @@ class Alarm(Base):
 
     employee = relationship("Employee", back_populates="alarms")
     event = relationship("Event")
+
+
+class Conversation(Base):
+    __tablename__= 'conversations'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    name = Column(String)
+    is_group = Column(Boolean, default=False)
+
+    #relationship
+    messages = relationship('Message', back_populates='conversation')
+    employee_conv = relationship('EmployeeConversation', back_populates='conversation')
+
+class EmployeeConversation(Base):
+    __tablename__ = 'employee_conversation'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey('conversations.id'), nullable=False)
+
+    #relationship
+    employees = relationship('Employee', back_populates='employee_conv')
+    conversation = relationship('Conversation', back_populates='employee_conv')
+
+class Message(Base):
+    __tablename__ = 'messages'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    sender_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    conversation_id = Column(UUID(as_uuid=True), ForeignKey('conversations.id'), nullable=False)
+    content = Column(Text, nullable=False)
+    is_read = Column(Boolean, default=False)
+    #relations
+    employee = relationship('Employee', back_populates='messages')
+    conversation = relationship('Conversation', back_populates='messages')
+    attachment = relationship('Attachment', back_populates='message')
+
+class MessageStatuses(PyEnum):
+    SENT = "sent"
+    DELIVERED = "delivered"
+    SEEN = "seen"
+
+class MessageStatus(Base):
+    __tablename__ = 'message_statuses'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    status = Column(Enum(MessageStatuses), default=MessageStatuses.SENT)
+
+    employee = relationship('Employee', back_populates='message_status')
+
+class Attachment(Base):
+    __tablename__ = 'attachments'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+
+    message_id = Column(UUID(as_uuid=True), ForeignKey('messages.id'), nullable=False)
+    file_path = Column(String, nullable=False)
+    file_type = Column(String, nullable=False)
+
+    #relationship
+    message = relationship('Message', back_populates='attachment')
+
+
+class TypingStatus(Base):
+    __tablename__ = 'typing_statuses'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    is_typing = Column(Boolean, default=False)
+
+    employee = relationship('Employee', back_populates='typing_status')

@@ -43,10 +43,10 @@ app.add_middleware(
     allow_headers=["*"]
 )
 schema = strawberry.Schema(mutation=Mutation, query=Query, subscription=Subscription)
-pinecone_client = PineconeSigleton()
 graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
 
+pinecone_client = PineconeSigleton()
 os.makedirs('uploads', exist_ok=True)
 
 @app.get("/")
