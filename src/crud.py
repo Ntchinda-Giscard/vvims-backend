@@ -294,6 +294,21 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
 def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvOutput:
     try:
 
+        existing_conversation = (
+            db.query(Conversation)
+            .join(EmployeeConversation, EmployeeConversation.conversation_id == Conversation.id)
+            .filter(
+                Conversation.is_group == False,
+                EmployeeConversation.employee_id.in_([conv_input.first_participant, conv_input.second_participants])
+            )
+            .group_by(Conversation.id)
+            .having(func.count(EmployeeConversation.employee_id) == 2)  # Ensure both participants are present
+            .first()
+        )
+
+        if existing_conversation:
+            raise Exception("A conversation between these participants already exists.")
+
         conv = Conversation(
             name = conv_input.name,
             is_group = conv_input.is_group
