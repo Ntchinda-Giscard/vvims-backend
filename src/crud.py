@@ -253,17 +253,17 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
 
     # Query to group by day of the week
     attendance_summary = (
-    session.query(
-        (func.extract('dow', Attendance.clock_in_date) + 6) % 7,  # Adjust for PostgreSQL's 0=Sunday convention
-        func.count(Attendance.id).label('present_count'),
-        func.count(case((AttendanceState.is_late == False, 1), else_=None)).label('on_time_count'),
-        func.count(case((AttendanceState.is_late == True, 1), else_=None)).label('late_count'),
-    )
-    .join(AttendanceState, AttendanceState.attendance_id == Attendance.id, isouter=True)
-    .filter(Attendance.clock_in_date >= start_of_week, Attendance.clock_in_date <= end_of_week)
-    .group_by((func.extract('dow', Attendance.clock_in_date) + 6) % 7)
-    .order_by((func.extract('dow', Attendance.clock_in_date) + 6) % 7)
-    .all()
+        session.query(
+            ((func.extract('dow', Attendance.clock_in_date) + 6) % 7).label('weekday'),  # Alias as 'weekday'
+            func.count(Attendance.id).label('present_count'),
+            func.count(case((AttendanceState.is_late == False, 1), else_=None)).label('on_time_count'),
+            func.count(case((AttendanceState.is_late == True, 1), else_=None)).label('late_count'),
+        )
+        .join(AttendanceState, AttendanceState.attendance_id == Attendance.id, isouter=True)
+        .filter(Attendance.clock_in_date >= start_of_week, Attendance.clock_in_date <= end_of_week)
+        .group_by('weekday')  # Use the alias here
+        .order_by('weekday')  # Use the alias here
+        .all()
     )
 
     # Initialize a dictionary with zero values for each day of the week (0=Monday, 6=Sunday)
@@ -289,3 +289,4 @@ def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
     ]
     
     return result
+    
