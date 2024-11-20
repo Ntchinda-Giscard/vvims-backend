@@ -17,7 +17,7 @@ from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
-    EmployeeNotification, Visit, Visitor, EmployeeNotificationType
+    EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -152,7 +152,12 @@ async def events_trigger(body: Dict):
 
     print(body['event']['data']['new'])
 
+    id = body['event']['data']['new']
+
     with next(get_db()) as db:
+
+        events_participants = db.query(EventParticipant).filter(EventParticipant.event_id == id).all()
+        print("events participants", events_participants)
 
         try:
             db_notif = EmployeeNotification(
