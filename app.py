@@ -153,26 +153,33 @@ async def events_trigger(body: Dict):
     print(body['event']['data']['new'])
 
     id = body['event']['data']['new']['id']
+    events = body['event']['data']['new']
     print("events id", id)
     with next(get_db()) as db:
 
         events_participants = db.query(EventParticipant).filter(EventParticipant.event_id == id).all()
         print("events participants", events_participants)
 
-        try:
-            db_notif = EmployeeNotification(
-                action="ADD Events",
-                title="New Visitor Alert !",
-                message="A new visitor has been! Click here to see more details",
-                is_read=False,
-                type = EmployeeNotificationType.EVENTS
-            )
-        except Exception as e:
-            db.rollback()
-            db.close()
-            logger.exception(e)
-        finally:
-            db.close()
+        for participants in events_participants:
+
+            try:
+                db_notif = EmployeeNotification(
+                    action="Add Events",
+                    title= events.events,
+                    message= events.events,
+                    is_read=False,
+                    type = EmployeeNotificationType.EVENTS,
+                    employee_id = participants.employee_id
+                )
+
+                db.add(db_notif)
+                db.commit()
+            except Exception as e:
+                db.rollback()
+                db.close()
+                logger.exception(e)
+            finally:
+                db.close()
 
 
 @app.post("/api/v1/profile")
