@@ -153,11 +153,11 @@ async def events_trigger(body: Dict):
     print(body['event']['data']['new'])
 
     id = body['event']['data']['new']
-
+    print("events participants", id)
     with next(get_db()) as db:
 
         # events_participants = db.query(EventParticipant).filter(EventParticipant.event_id == id).all()
-        print("events participants", id)
+
 
         try:
             db_notif = EmployeeNotification(
