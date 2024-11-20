@@ -165,7 +165,7 @@ async def events_trigger(body: Dict):
             # Process each participant
             for participant in event_participants:
                 db_notif = EmployeeNotification(
-                    action="Add Events",
+                    action="New visitor alert !",
                     title=event_data['title'],
                     message=event_data['description'],
                     is_read=False,
