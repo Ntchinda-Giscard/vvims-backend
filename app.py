@@ -152,7 +152,7 @@ async def events_trigger(body: Dict):
 
     print(body['event']['data']['new'])
 
-    id = body['event']['data']['new']
+    id = body['event']['data']['new']['id']
     print("events participants", id)
     with next(get_db()) as db:
 
