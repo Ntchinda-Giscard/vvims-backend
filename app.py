@@ -17,7 +17,7 @@ from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
-    EmployeeNotification, Visit, Visitor
+    EmployeeNotification, Visit, Visitor, EmployeeNotificationType
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -145,6 +145,29 @@ async def visits_trigger(body: Dict):
         finally:
             db.close()
     return {"message": "Event triggered"}
+
+
+@app.post("/api/v1/events-trigger")
+async def events_trigger(body: Dict):
+
+    print(body)
+
+    with next(get_db()) as db:
+
+        try:
+            db_notif = EmployeeNotification(
+                action="ADD Events",
+                title="New Visitor Alert !",
+                message="A new visitor has been! Click here to see more details",
+                is_read=False,
+                type = EmployeeNotificationType.EVENTS
+            )
+        except Exception as e:
+            db.rollback()
+            db.close()
+            logger.exception(e)
+        finally:
+            db.close()
 
 
 @app.post("/api/v1/profile")

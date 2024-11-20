@@ -424,12 +424,17 @@ class AppVersions(Base):
     url = Column(String, nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
+class EmployeeNotificationType(PyEnum):
+    EVENTS = 'events'
+    MESSAGES = 'messages'
+    VISITS  = 'visits'
 
 class EmployeeNotification(Base):
     __tablename__ = 'employee_notifications'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
     employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     action = Column(String, nullable=False)
+    type = Column(Enum(EmployeeNotificationType))
     title = Column(String, nullable=False)
     message = Column(String, nullable=False)
     is_read = Column(Boolean, default=False)
