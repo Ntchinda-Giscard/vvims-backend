@@ -149,38 +149,41 @@ async def visits_trigger(body: Dict):
 
 @app.post("/api/v1/events-trigger")
 async def events_trigger(body: Dict):
-
     print(body['event']['data']['new'])
 
-    id = body['event']['data']['new']['id']
-    events = body['event']['data']['new']
-    print("events id", id)
+    event_id = body['event']['data']['new']['id']
+    event_data = body['event']['data']['new']
+    print("event id", event_id)
+
+    # Open the session once
     with next(get_db()) as db:
+        try:
+            # Query participants of the event
+            event_participants = db.query(EventParticipant).filter(EventParticipant.event_id == event_id).all()
+            print("event participants", event_participants)
 
-        events_participants = db.query(EventParticipant).filter(EventParticipant.event_id == id).all()
-        print("events participants", events_participants)
-
-        for participants in events_participants:
-
-            try:
+            # Process each participant
+            for participant in event_participants:
                 db_notif = EmployeeNotification(
                     action="Add Events",
-                    title= events['title'],
-                    message= events['description'],
+                    title=event_data['title'],
+                    message=event_data['description'],
                     is_read=False,
-                    type = EmployeeNotificationType.EVENTS,
-                    employee_id = participants.employee_id
+                    type=EmployeeNotificationType.EVENTS,
+                    employee_id=participant.employee_id
                 )
 
                 db.add(db_notif)
-                db.commit()
-            except Exception as e:
-                db.rollback()
-                db.close()
-                logger.exception(e)
-            finally:
-                db.close()
 
+            # Commit all notifications in one transaction
+            db.commit()
+        except Exception as e:
+            # Rollback on error
+            db.rollback()
+            logger.exception(e)
+        finally:
+            # Close the session at the end
+            db.close()
 
 @app.post("/api/v1/profile")
 async def insert_face(
