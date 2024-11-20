@@ -150,7 +150,7 @@ async def visits_trigger(body: Dict):
 @app.post("/api/v1/events-trigger")
 async def events_trigger(body: Dict):
 
-    print(body)
+    print(body['event']['data']['new'])
 
     with next(get_db()) as db:
 
