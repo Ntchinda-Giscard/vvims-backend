@@ -17,7 +17,7 @@ from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
-    EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant
+    EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -356,7 +356,14 @@ async def add_visit_with_visitor(
         raise HTTPException(status_code=400, detail="Bad request. Missing one of these: Department, service and employee") 
     if face:
         # Use 'await' to call the asynchronous 'uploads_save' function
-        mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
+        mime_type = ''
+        file_size = ''
+        face_file_url = ''
+        face_file_name = ''
+        try:
+            mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
+        except Exception as e:
+            pass
         print(mime_type, file_size, face_file_url, face_file_name)
     # Database operations (rest of the logic stays the same)
     with next(get_db()) as db:
@@ -375,7 +382,7 @@ async def add_visit_with_visitor(
                 logger.exception(e)
                 db.rollback()
                 raise HTTPException(status_code=500, detail=str(e))
-        
+
         if front_id:
             try:
                 db_front = UploadedFile(
@@ -390,7 +397,7 @@ async def add_visit_with_visitor(
                 logger.exception(e)
                 db.rollback()
                 raise HTTPException(status_code=500, detail=str(e))
-        
+
         if back_id:
             try:
                 db_back = UploadedFile(
