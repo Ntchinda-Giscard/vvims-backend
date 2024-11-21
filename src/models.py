@@ -495,9 +495,9 @@ class Event(Base):
     employee_notifications = relationship('EmployeeNotification', back_populates='event')
 
 class ParticipantStatus(PyEnum):
-    PENDING = "pending"
-    ACCEPTED = "accepted"
-    DECLINED = "declined"
+    PENDING = "PENDING"
+    ACCEPTED = "ACCEPTED"
+    DECLINED = "DECLINED"
 
 class EventParticipant(Base):
     __tablename__ = 'event_participants'
