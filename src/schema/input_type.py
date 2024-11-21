@@ -134,3 +134,7 @@ class CreateConvInput:
     name: Optional[str] = None
     first_participant: uuid.UUID
     second_participants: uuid.UUID
+
+@strawberry.input
+class ParticipantInput:
+    id: uuid.UUID

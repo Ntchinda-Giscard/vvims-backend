@@ -145,3 +145,11 @@ class AttendanceCountByWeek:
 @strawberry.type
 class CreateConvOutput:
     id: uuid.UUID
+
+@strawberry.type
+class AcceptParcipateEvent:
+    id: uuid.UUID
+
+@strawberry.type
+class DenyParcipateEvent:
+    id: uuid.UUID

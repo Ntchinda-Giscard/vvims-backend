@@ -166,7 +166,7 @@ async def events_trigger(body: Dict):
             for participant in event_participants:
                 participant.status = ParticipantStatus.PENDING
                 db_notif = EmployeeNotification(
-                    action="New visitor alert !",
+                    action="New events alert !",
                     title=event_data['title'],
                     message=event_data['description'],
                     is_read=False,

@@ -5,11 +5,13 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
 from sqlalchemy import func, case
 from src import logger
-from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation
+from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
+    Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
-    VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput
+    VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
+    DenyParcipateEvent
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId, CreateConvInput
+    EmployeeId, CreateConvInput, ParticipantInput
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -341,5 +343,34 @@ def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvO
         db.rollback()
         db.close()
         raise Exception(f'{e}')
+    finally:
+        db.close()
+
+
+
+def accept_participate_event(db: Session, participant: ParticipantInput) -> AcceptParcipateEvent:
+
+    try:
+        participant = db.query(ParticipantInput).filter(ParticipantInput.id == participant.id).first()
+        participant.status = ParticipantStatus.ACCEPTED
+        db.commit()
+
+        return AcceptParcipateEvent(id = participant.id)
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f'Internal server error: {e}')
+    finally:
+        db.close()
+
+def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyParcipateEvent:
+    try:
+        participant = db.query(ParticipantInput).filter(ParticipantInput.id == participant.id).first()
+        participant.status = ParticipantStatus.DECLINED
+        db.commit()
+
+        return DenyParcipateEvent(id=participant.id)
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f'Internal server error: {e}')
     finally:
         db.close()
