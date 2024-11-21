@@ -438,10 +438,12 @@ class EmployeeNotification(Base):
     title = Column(String, nullable=False)
     message = Column(String, nullable=False)
     is_read = Column(Boolean, default=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee", back_populates='employee_notifications')
+    event = relationship('Event', back_populates='employee_notifications')
 
 
 class Appointment(Base):
@@ -488,6 +490,7 @@ class Event(Base):
     employee = relationship("Employee", back_populates="event")
     participants = relationship("EventParticipant", back_populates="event")
     tasks = relationship("Task", back_populates="event")
+    employee_notifications = relationship('EmployeeNotification', back_populates='event')
 
 class ParticipantStatus(PyEnum):
     PENDING = "pending"
