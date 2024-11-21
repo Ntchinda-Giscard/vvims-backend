@@ -351,7 +351,7 @@ def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvO
 def accept_participate_event(db: Session, participant: ParticipantInput) -> AcceptParcipateEvent:
 
     try:
-        participant = db.query(EventParticipant).filter(ParticipantInput.id == participant.id).first()
+        participant = db.query(EventParticipant).filter(EventParticipant.id == participant.id).first()
         participant.status = ParticipantStatus.ACCEPTED
         db.commit()
 
@@ -364,7 +364,7 @@ def accept_participate_event(db: Session, participant: ParticipantInput) -> Acce
 
 def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyParcipateEvent:
     try:
-        participant = db.query(EventParticipant).filter(ParticipantInput.id == participant.id).first()
+        participant = db.query(EventParticipant).filter(EventParticipant.id == participant.id).first()
         participant.status = ParticipantStatus.DECLINED
         db.commit()
 
