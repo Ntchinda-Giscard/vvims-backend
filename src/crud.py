@@ -352,7 +352,7 @@ def accept_participate_event(db: Session, participant: ParticipantInput) -> Acce
 
     try:
         participant = db.query(EventParticipant).filter(EventParticipant.id == participant.id).first()
-        participant.status = ParticipantStatus.ACCEPTED
+        participant.status = 'accepted'  # Use the correct case that matches the database
         db.commit()
 
         return AcceptParcipateEvent(id = participant.id)
