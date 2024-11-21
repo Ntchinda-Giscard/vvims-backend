@@ -171,7 +171,8 @@ async def events_trigger(body: Dict):
                     message=event_data['description'],
                     is_read=False,
                     type=EmployeeNotificationType.EVENTS,
-                    employee_id=participant.employee_id
+                    employee_id=participant.employee_id,
+                    event_id = event_participants.event_id
                 )
 
                 db.add(db_notif)
