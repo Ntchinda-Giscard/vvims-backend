@@ -278,7 +278,7 @@ class Visit(Base):
     department = relationship('Department', back_populates='visit')
     service = relationship('Service', back_populates='visit')
     visitors = relationship('Visitor', back_populates='visit')
-    # vehicle = relationship('Vehicle', back_populates = 'visit')
+    employee_notifications = relationship('EmployeeNotification', back_populates='visits')
 
 
 class Vehicle(Base):
@@ -438,12 +438,14 @@ class EmployeeNotification(Base):
     title = Column(String, nullable=False)
     message = Column(String, nullable=False)
     is_read = Column(Boolean, default=False)
-    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=False)
+    event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=True)
+    visits_id = Column(UUID(as_uuid=True), ForeignKey('visits.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee", back_populates='employee_notifications')
     event = relationship('Event', back_populates='employee_notifications')
+    visits = relationship('Visit', back_populates='employee_notifications')
 
 
 class Appointment(Base):
