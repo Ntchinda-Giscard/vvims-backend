@@ -172,7 +172,7 @@ async def events_trigger(body: Dict):
                     is_read=False,
                     type=EmployeeNotificationType.EVENTS,
                     employee_id=participant.employee_id,
-                    event_id = event_participants.event_id
+                    event_id = participant.event_id
                 )
 
                 db.add(db_notif)
