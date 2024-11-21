@@ -6,7 +6,7 @@ from sqlalchemy import and_
 from sqlalchemy import func, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
-    Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus
+    Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
     DenyParcipateEvent
@@ -351,7 +351,7 @@ def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvO
 def accept_participate_event(db: Session, participant: ParticipantInput) -> AcceptParcipateEvent:
 
     try:
-        participant = db.query(ParticipantInput).filter(ParticipantInput.id == participant.id).first()
+        participant = db.query(EventParticipant).filter(ParticipantInput.id == participant.id).first()
         participant.status = ParticipantStatus.ACCEPTED
         db.commit()
 
@@ -364,7 +364,7 @@ def accept_participate_event(db: Session, participant: ParticipantInput) -> Acce
 
 def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyParcipateEvent:
     try:
-        participant = db.query(ParticipantInput).filter(ParticipantInput.id == participant.id).first()
+        participant = db.query(EventParticipant).filter(ParticipantInput.id == participant.id).first()
         participant.status = ParticipantStatus.DECLINED
         db.commit()
 
