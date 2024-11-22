@@ -352,7 +352,7 @@ def accept_participate_event(db: Session, participant: ParticipantInput) -> Acce
 
     try:
         participant = db.query(EventParticipant).filter(EventParticipant.id == participant.id).first()
-        participant.status = ParticipantStatus.ACCEPTED
+        participant.status = ParticipantStatus.COMPLETED
         db.commit()
 
         return AcceptParcipateEvent(id = participant.id)
@@ -365,7 +365,7 @@ def accept_participate_event(db: Session, participant: ParticipantInput) -> Acce
 def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyParcipateEvent:
     try:
         participant = db.query(EventParticipant).filter(EventParticipant.id == participant.id).first()
-        participant.status = ParticipantStatus.DECLINED
+        participant.status = ParticipantStatus.ON_GOING
         db.commit()
 
         return DenyParcipateEvent(id=participant.id)

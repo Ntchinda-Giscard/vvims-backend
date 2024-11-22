@@ -496,8 +496,8 @@ class Event(Base):
 
 class ParticipantStatus(PyEnum):
     PENDING = "PENDING"
-    ACCEPTED = "COMPLETED"
-    DECLINED = "ON_GOING"
+    COMPLETED = "ACCEPTED"
+    ON_GOING = "DECLINED"
 
 class EventParticipant(Base):
     __tablename__ = 'event_participants'
@@ -607,6 +607,7 @@ class Message(Base):
     conversation = relationship('Conversation', back_populates='messages')
     attachment = relationship('Attachment', back_populates='message')
 
+
 class MessageStatuses(PyEnum):
     SENT = "sent"
     DELIVERED = "delivered"
@@ -641,6 +642,9 @@ class Attachment(Base):
     extension = Column(String(5), nullable=True)
     file_size = Column(BigInteger, nullable=True)
     mime_type = Column(String(50))
+    height = Column(Float, nullable=True)
+    width = Column(Float, nullable=True)
+    length = Column(Integer, nullable=True)
 
 
     #relationship
