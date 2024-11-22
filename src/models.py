@@ -496,8 +496,8 @@ class Event(Base):
 
 class ParticipantStatus(PyEnum):
     PENDING = "PENDING"
-    ACCEPTED = "ACCEPTED"
-    DECLINED = "DECLINED"
+    ACCEPTED = "COMPLETED"
+    DECLINED = "ON_GOING"
 
 class EventParticipant(Base):
     __tablename__ = 'event_participants'
