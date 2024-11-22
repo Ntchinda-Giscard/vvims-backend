@@ -1,6 +1,6 @@
 from datetime import timezone
 
-from sqlalchemy import Column, Integer, String, ForeignKey, Enum, func, DateTime, UUID, Float, Enum, Date, Time, \
+from sqlalchemy import BigInteger, Column, Integer, String, ForeignKey, Enum, func, DateTime, UUID, Float, Enum, Date, Time, \
     Interval, ARRAY, Boolean, Text
 from sqlalchemy.orm import relationship
 from sqlalchemy import ForeignKey
@@ -622,6 +622,13 @@ class MessageStatus(Base):
 
     employee = relationship('Employee', back_populates='message_status')
 
+class FileTypeEnum(PyEnum):
+    image= 'image'
+    pdf = 'pdf'
+    audio = 'audio'
+    video = 'video'
+    other = 'other'
+
 class Attachment(Base):
     __tablename__ = 'attachments'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
@@ -630,7 +637,11 @@ class Attachment(Base):
 
     message_id = Column(UUID(as_uuid=True), ForeignKey('messages.id'), nullable=False)
     file_path = Column(String, nullable=False)
-    file_type = Column(String, nullable=False)
+    file_type = Column(Enum(FileTypeEnum), nullable=False)
+    extension = Column(String(5), nullable=True)
+    file_size = Column(BigInteger, nullable=True)
+    mime_type = Column(String(50))
+
 
     #relationship
     message = relationship('Message', back_populates='attachment')
