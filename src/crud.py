@@ -386,10 +386,16 @@ def insert_message(db: Session, message: MessageInput) -> InsertMesaageOuput:
             content = message.content
         )
 
+        db.add(message_input)
+
         message_status = MessageStatus(
             employee_id = message.employee_id,
             message_id = message_input.id
         )
+
+        db.add(message_status)
+
+        db.commit()
 
         return InsertMesaageOuput(
             id = message_input.id
