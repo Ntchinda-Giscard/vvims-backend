@@ -666,7 +666,6 @@ class TypingStatus(Base):
 
     employee = relationship('Employee', back_populates='typing_status')
 
-
 class Group(Base):
     __tablename__ = 'groups'
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
@@ -676,9 +675,10 @@ class Group(Base):
     creator_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
     group_description = Column(String(255), nullable=True)
 
+    # Relationships
     employee = relationship('Employee', back_populates='group')
     group_members = relationship('GroupMembers', back_populates='group')
-    group_messages = relationship('Group', back_populates='group')
+    group_messages = relationship('GroupMessages', back_populates='group')  # FIXED
 
 class GroupMembers(Base):
     __tablename__ = 'group_members'
@@ -689,6 +689,7 @@ class GroupMembers(Base):
     member_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
     is_admin = Column(Boolean, default=False)
 
+    # Relationships
     employee = relationship('Employee', back_populates='group_members')
     group = relationship('Group', back_populates='group_members')
 
@@ -701,6 +702,8 @@ class GroupMessages(Base):
     content = Column(String, nullable=True)
     attachment = Column(UUID(as_uuid=True), ForeignKey('attachments.id'), nullable=False)
 
+    # Relationships
     group = relationship('Group', back_populates='group_messages')
+
 
 
