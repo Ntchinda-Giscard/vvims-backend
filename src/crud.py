@@ -7,12 +7,12 @@ from sqlalchemy import func, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
-    MessageStatus
+    MessageStatus, Event
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
-    DenyParcipateEvent, InsertMesaageOuput
+    DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId, CreateConvInput, ParticipantInput, MessageInput
+    EmployeeId, CreateConvInput, ParticipantInput, MessageInput, EventByUserInput
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -405,3 +405,52 @@ def insert_message(db: Session, message: MessageInput) -> InsertMesaageOuput:
         raise Exception(f'Internal server error {e}')
     finally:
         db.close()
+
+
+def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUserParticipant]:
+    user_events_query = (
+        db.query(Event.id)
+        .join(EventParticipant, Event.id == EventParticipant.event_id)
+        .filter(
+            Event.date == inputs.date,
+            EventParticipant.employee_id == inputs.employee_id,
+            EventParticipant.status == ParticipantStatus.COMPLETED
+        )
+    )
+
+    events_ids = [event.id for event in user_events_query.all()]
+
+    query_participants = (
+        db.query(Event, EventParticipant, Employee)
+        .join(EventParticipant, Event.id == EventParticipant.event_id)
+        .join(Employee, EventParticipant.employee_id == Employee.id)
+        .filter(
+            Event.id.in_(events_ids),
+            EventParticipant.status == ParticipantStatus.COMPLETED
+        )
+    )
+
+    results = query_participants.all()
+
+    events_with_participants = {}
+
+    for event, participant, employee in results:
+        if event.id not in events_with_participants:
+            events_with_participants[event.id] = {
+                'event': EventType(title=event.title, start_time=f'{event.start_time}', end_time= f'{event.end_time}', description= f'{event.description}'),
+                'participants': []
+            }
+
+        events_with_participants[event.id]['participants'].append(
+            ParticipantType(
+                firstname= employee.firstname,
+                lastname= employee.lastname
+            )
+        )
+
+    return [
+        EventWithUserParticipant(
+            event = data['event'],
+            participant = data['participants']
+        ) for data in events_with_participants.values()
+    ]

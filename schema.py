@@ -10,18 +10,20 @@ from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
     get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, \
-    get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, insert_message
+    get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, \
+    insert_message, get_event_by_user
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId, CreateConvInput, ParticipantInput, MessageInput
+    AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId, CreateConvInput, ParticipantInput, MessageInput, \
+    EventByUserInput
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, \
     LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, \
     DayAttendanceType, \
     TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, \
-    AcceptParcipateEvent, DenyParcipateEvent, InsertMesaageOuput
+    AcceptParcipateEvent, DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 from typing import AsyncGenerator
 
@@ -140,7 +142,7 @@ class Query:
                 db.close()
 
     @strawberry.field
-    def get_percentage_task(id: EmployeeId) -> TaskCompletionPercentage:
+    def get_percentage_task(self, id: EmployeeId) -> TaskCompletionPercentage:
 
         with next(get_db()) as db:
             try:
@@ -151,6 +153,20 @@ class Query:
                 raise Exception("Something went wrong: Internal server error")
             finally:
                 db.close()
+
+    @strawberry.field
+    def get_events_by_user(self, inputs: EventByUserInput) -> List[EventWithUserParticipant]:
+
+        with next(get_db()) as db:
+            try:
+                result = get_event_by_user(db, inputs)
+                return resutl
+            except Exception as e:
+                logger.exception(e)
+                raise Exception(f'Internal server error {e}')
+            finally:
+                db.close()
+
 
 
 
@@ -186,7 +202,7 @@ class Subscription:
             return result
     
     @strawberry.subscription
-    async def get_attendance_percentage() -> AsyncGenerator[AttendnacePercentage, None]:
+    async def get_attendance_percentage(self) -> AsyncGenerator[AttendnacePercentage, None]:
         with next(get_db()) as db:
             while True:
                 try:

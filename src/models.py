@@ -611,6 +611,7 @@ class Message(Base):
     conversation = relationship('Conversation', back_populates='messages')
     attachment = relationship('Attachment', back_populates='message')
     message_status = relationship('MessageStatus', back_populates='message')
+    message_mobile_id = Column(String(50))
 
 
 class MessageStatuses(PyEnum):
@@ -652,6 +653,7 @@ class Attachment(Base):
     height = Column(Float, nullable=True)
     width = Column(Float, nullable=True)
     length = Column(Integer, nullable=True)
+    filename= Column(String(50), nullable=False)
 
 
     #relationship

@@ -157,3 +157,23 @@ class DenyParcipateEvent:
 @strawberry.type
 class InsertMesaageOuput:
     id: uuid.UUID
+
+
+@strawberry.type
+class ParticipantType:
+    firstname: str
+    lastname: str
+
+@strawberry.type
+class EventType:
+    title: str
+    start_time:  str
+    end_time: str
+    description: str
+    date: str
+
+
+@strawberry.type
+class EventWithUserParticipant:
+    event: EventType
+    participant: List[ParticipantType]

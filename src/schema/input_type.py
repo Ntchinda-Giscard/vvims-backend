@@ -4,7 +4,7 @@ import strawberry
 import uuid
 from enum import Enum
 from datetime import datetime
-
+from strawberry.types import Date
 @strawberry.enum
 class CreateEmployeeRole(Enum):
     ADMIN = 'ADMIN'
@@ -144,4 +144,10 @@ class ParticipantInput:
 class MessageInput:
     conversation_id: uuid.UUID
     content: str
+    employee_id: uuid.UUID
+
+
+@strawberry.input
+class EventByUserInput:
+    date: Date
     employee_id: uuid.UUID
