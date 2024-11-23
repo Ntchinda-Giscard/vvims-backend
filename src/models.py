@@ -177,6 +177,10 @@ class Employee(Base):
     alarms = relationship("Alarm", back_populates="employee")
     tasks_assigned_to = relationship("Task", foreign_keys=[Task.assigned_to], back_populates="assigned_to_user")
     tasks_assigned_by = relationship("Task", foreign_keys=[Task.assigned_by], back_populates="assigned_by_user")
+    group = relationship('Group', back_populates='employee')
+    group_members = relationship('GroupMembers', back_populates='employee')
+    # employee = relationship('Employee', back_populates='group_members')
+    # employee = relationship('Employee', back_populates='group')
 
 
 
@@ -606,6 +610,7 @@ class Message(Base):
     employee = relationship('Employee', back_populates='messages')
     conversation = relationship('Conversation', back_populates='messages')
     attachment = relationship('Attachment', back_populates='message')
+    message_status = relationship('MessageStatus', back_populates='message')
 
 
 class MessageStatuses(PyEnum):
@@ -620,8 +625,10 @@ class MessageStatus(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
     status = Column(Enum(MessageStatuses), default=MessageStatuses.SENT)
+    message_id = Column(UUID(as_uuid=True), ForeignKey('messages.id'), nullable=False)
 
     employee = relationship('Employee', back_populates='message_status')
+    message = relationship('Message', back_populates='message_status')
 
 class FileTypeEnum(PyEnum):
     image= 'image'
@@ -658,3 +665,41 @@ class TypingStatus(Base):
     is_typing = Column(Boolean, default=False)
 
     employee = relationship('Employee', back_populates='typing_status')
+
+
+class Group(Base):
+    __tablename__ = 'groups'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    name = Column(String(50), nullable=False)
+    creator_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    group_description = Column(String(255), nullable=True)
+
+    employee = relationship('Employee', back_populates='group')
+    group_members = relationship('GroupMembers', back_populates='group')
+    group_messages = relationship('Group', back_populates='group')
+
+class GroupMembers(Base):
+    __tablename__ = 'group_members'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    group_id = Column(UUID(as_uuid=True), ForeignKey('groups.id'), nullable=False)
+    member_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
+    is_admin = Column(Boolean, default=False)
+
+    employee = relationship('Employee', back_populates='group_members')
+    group = relationship('Group', back_populates='group_members')
+
+class GroupMessages(Base):
+    __tablename__ = 'group_members'
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4, nullable=False)
+    created_at = Column(DateTime(timezone=True), server_default=func.now())
+    updated_at = Column(DateTime(timezone=True), onupdate=func.now())
+    group_id = Column(UUID(as_uuid=True), ForeignKey('groups.id'), nullable=False)
+    content = Column(String, nullable=True)
+    attachment = Column(UUID(as_uuid=True), ForeignKey('attachments.id'), nullable=False)
+
+    group = relationship('GroupMessages', back_populates='group_messages')
+

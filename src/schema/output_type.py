@@ -153,3 +153,7 @@ class AcceptParcipateEvent:
 @strawberry.type
 class DenyParcipateEvent:
     id: uuid.UUID
+
+@strawberry.type
+class InsertMesaageOuput:
+    id: uuid.UUID

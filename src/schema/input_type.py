@@ -138,3 +138,10 @@ class CreateConvInput:
 @strawberry.input
 class ParticipantInput:
     id: uuid.UUID
+
+
+@strawberry.input
+class MessageInput:
+    conversation_id: uuid.UUID
+    content: str
+    employee_id: uuid.UUID

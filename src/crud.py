@@ -6,12 +6,13 @@ from sqlalchemy import and_
 from sqlalchemy import func, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
-    Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant
+    Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
+    MessageStatus
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
-    DenyParcipateEvent
+    DenyParcipateEvent, InsertMesaageOuput
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId, CreateConvInput, ParticipantInput
+    EmployeeId, CreateConvInput, ParticipantInput, MessageInput
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -372,5 +373,29 @@ def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyPa
     except Exception as e:
         logger.exception(e)
         raise Exception(f'Internal server error: {e}')
+    finally:
+        db.close()
+
+
+
+def insert_message(db: Session, message: MessageInput) -> InsertMesaageOuput:
+    try:
+        message_input = Message(
+            sender_id = message.employee_id,
+            conversation_id = message.conversation_id,
+            content = message.content
+        )
+
+        message_status = MessageStatus(
+            employee_id = message.employee_id,
+            message_id = message_input.id
+        )
+
+        return InsertMesaageOuput(
+            id = message_input.id
+        )
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f'Internal server error {e}')
     finally:
         db.close()
