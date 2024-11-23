@@ -701,5 +701,5 @@ class GroupMessages(Base):
     content = Column(String, nullable=True)
     attachment = Column(UUID(as_uuid=True), ForeignKey('attachments.id'), nullable=False)
 
-    group = relationship('GroupMessages', back_populates='group_messages')
+    group = relationship('Group', back_populates='group_messages')
 
