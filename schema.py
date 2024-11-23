@@ -417,7 +417,7 @@ class Mutation:
             return result
 
     @strawberry.mutation
-    def create_message(self, input: MessageInput) -> InsertMesaageOuput:
+    def add_message(self, input: MessageInput) -> InsertMesaageOuput:
         with next(get_db()) as db:
             result = insert_message(db, input)
 
