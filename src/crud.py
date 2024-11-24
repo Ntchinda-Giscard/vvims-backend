@@ -3,7 +3,7 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
-from sqlalchemy import func, case
+from sqlalchemy import func, case, desc
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
@@ -428,6 +428,7 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
             Event.id.in_(events_ids),
             EventParticipant.status == ParticipantStatus.COMPLETED
         )
+        .order_by(desc(Event.start_date))
     )
 
     results = query_participants.all()
