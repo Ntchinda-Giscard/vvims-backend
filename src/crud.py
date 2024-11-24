@@ -437,7 +437,7 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
     for event, participant, employee in results:
         if event.id not in events_with_participants:
             events_with_participants[event.id] = {
-                'event': EventType( dat=f'{event.start_date}', title=event.title, start_time=f'{event.start_time}', end_time= f'{event.end_time}', description= f'{event.description}'),
+                'event': EventType( date=f'{event.start_date}', title=event.title, start_time=f'{event.start_time}', end_time= f'{event.end_time}', description= f'{event.description}'),
                 'participants': []
             }
 
