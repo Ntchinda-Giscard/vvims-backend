@@ -648,11 +648,11 @@ class Attachment(Base):
     file_path = Column(String, nullable=False)
     file_type = Column(Enum(FileTypeEnum), nullable=False)
     extension = Column(String(5), nullable=True)
-    file_size = Column(BigInteger, nullable=True)
+    file_size = Column(String, nullable=True)
     mime_type = Column(String(50))
-    height = Column(Float, nullable=True)
-    width = Column(Float, nullable=True)
-    length = Column(Integer, nullable=True)
+    height = Column(String, nullable=True)
+    width = Column(String, nullable=True)
+    length = Column(String, nullable=True)
     filename= Column(String(50), nullable=False)
 
 
