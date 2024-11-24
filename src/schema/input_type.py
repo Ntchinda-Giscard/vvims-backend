@@ -4,7 +4,7 @@ import strawberry
 import uuid
 from enum import Enum
 from datetime import datetime
-form datetime import date
+from datetime import date
 @strawberry.enum
 class CreateEmployeeRole(Enum):
     ADMIN = 'ADMIN'
