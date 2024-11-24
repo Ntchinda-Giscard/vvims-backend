@@ -94,7 +94,7 @@ class Query:
             return result
 
     @strawberry.field
-    def get_attendance_percentage() -> AttendnacePercentage:
+    def get_attendance_percentage(self) -> AttendnacePercentage:
         with next(get_db()) as db:
             try:
                 result  = count_attendance_percentage(db)
@@ -106,7 +106,7 @@ class Query:
                 db.close()
 
     @strawberry.field
-    def get_total_employee_on_leave() -> EmployeeOnLeave:
+    def get_total_employee_on_leave(self) -> EmployeeOnLeave:
         with next(get_db()) as db:
             try:
                 leaves_employee = total_employee_on_leave(db)
@@ -118,7 +118,7 @@ class Query:
                 db.close()
 
     @strawberry.field
-    def get_visits_by_day() -> List[VisitsCountByDay]:
+    def get_visits_by_day(self) -> List[VisitsCountByDay]:
         with next(get_db()) as db:
             try:
                 visits_by_day = get_visits_group_by_week_day(db)
@@ -130,7 +130,7 @@ class Query:
                 db.close()
     
     @strawberry.field
-    def get_attendance_by_day() -> List[AttendanceCountByWeek]:
+    def get_attendance_by_day(self) -> List[AttendanceCountByWeek]:
         with next(get_db()) as db:
             try:
                 vehicle_by_day = get_weekly_attendance_summary(db)
@@ -160,7 +160,7 @@ class Query:
         with next(get_db()) as db:
             try:
                 result = get_event_by_user(db, inputs)
-                return resutl
+                return result
             except Exception as e:
                 logger.exception(e)
                 raise Exception(f'Internal server error {e}')
