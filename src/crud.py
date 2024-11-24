@@ -433,7 +433,6 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
     results = query_participants.all()
 
     events_with_participants = {}
-
     for event, participant, employee in results:
         if event.id not in events_with_participants:
             events_with_participants[event.id] = {
