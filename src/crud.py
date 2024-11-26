@@ -310,7 +310,7 @@ def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvO
         )
 
         if existing_conversation:
-            raise Exception("A conversation between these participants already exists.")
+            return CreateConvOutput(id=existing_conversation.id)
 
         conv = Conversation(
             name = conv_input.name,

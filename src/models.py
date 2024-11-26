@@ -646,7 +646,7 @@ class Attachment(Base):
 
     message_id = Column(UUID(as_uuid=True), ForeignKey('messages.id'), nullable=False)
     file_path = Column(String, nullable=False)
-    file_type = Column(Enum(FileTypeEnum), nullable=False)
+    file_type = Column(String, nullable=True)
     extension = Column(String(5), nullable=True)
     file_size = Column(String, nullable=True)
     mime_type = Column(String(50))
