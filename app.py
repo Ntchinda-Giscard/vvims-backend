@@ -211,7 +211,7 @@ async def message_trigger(body: Dict):
             )
             notification = EmployeeNotification(
                 action="New message!",
-                title= f'{sender.firstname} {sender.lastname}',
+                title= f"{sender.firstname} {sender.lastname}",
                 message=message_data['content'],
                 is_read=False,
                 type=EmployeeNotificationType.MESSAGES,
