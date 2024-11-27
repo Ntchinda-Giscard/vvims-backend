@@ -223,7 +223,9 @@ async def message_trigger(body: Dict):
 
             if attachment:
                 if len(message_data['content']) > 0 or message_data['content'] != None:
-                    message = f"{icon_attachment[f"{attachment.file_type}"]} {message_data['content']}"
+                    icon = f"{attachment.file_type}"
+                    content = message_data['content']
+                    message = f"{icon_attachment[icon]} {content}"
                 else:
                     message = f"{icon_attachment[f"{attachment.file_type}"]} {attachment.file_type.capitalize()}"
             else:
