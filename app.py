@@ -228,6 +228,7 @@ async def message_trigger(body: Dict):
                 else:
                     icon = f"{attachment.file_type}"
                     content = attachment.file_type.capitalize()
+                    print('content messages with no content  ======>', content)
                     message = f"{icon_attachment[icon]} {content}"
             else:
                 message = message_data['content']
