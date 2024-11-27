@@ -216,7 +216,7 @@ async def message_trigger(body: Dict):
                 is_read=False,
                 type=EmployeeNotificationType.MESSAGES,
                 employee_id = receiver_id,
-                event_id= message_id
+                message_id= message_id
             )
 
             db.add(notification)
