@@ -220,7 +220,6 @@ async def message_trigger(body: Dict):
                 .filter(Employee.id == message_data['sender_id'])
                 .first()
             )
-
             if attachment:
                 if len(message_data['content']) > 0 or message_data['content'] != None:
                     icon = f"{attachment.file_type}"
