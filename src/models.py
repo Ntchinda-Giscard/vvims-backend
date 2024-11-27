@@ -444,12 +444,14 @@ class EmployeeNotification(Base):
     is_read = Column(Boolean, default=False)
     event_id = Column(UUID(as_uuid=True), ForeignKey('events.id'), nullable=True)
     visits_id = Column(UUID(as_uuid=True), ForeignKey('visits.id'), nullable=True)
+    message_id = Column(UUID(as_uuid=True), ForeignKey('messages.id'), nullable=True)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
 
     employee = relationship("Employee", back_populates='employee_notifications')
     event = relationship('Event', back_populates='employee_notifications')
     visits = relationship('Visit', back_populates='employee_notifications')
+    messages = relationship('Message', back_populates='employee_notifications')
 
 
 class Appointment(Base):
@@ -606,12 +608,14 @@ class Message(Base):
     conversation_id = Column(UUID(as_uuid=True), ForeignKey('conversations.id'), nullable=False)
     content = Column(Text, nullable=False)
     is_read = Column(Boolean, default=False)
+    message_mobile_id = Column(String(50))
     #relations
     employee = relationship('Employee', back_populates='messages')
     conversation = relationship('Conversation', back_populates='messages')
     attachment = relationship('Attachment', back_populates='message')
     message_status = relationship('MessageStatus', back_populates='message')
-    message_mobile_id = Column(String(50))
+    employee_notifications = relationship('EmployeeNotification', back_populates='messages')
+
 
 
 class MessageStatuses(PyEnum):
