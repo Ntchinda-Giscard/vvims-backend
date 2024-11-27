@@ -226,7 +226,9 @@ async def message_trigger(body: Dict):
                     content = message_data['content']
                     message = f"{icon_attachment[icon]} {content}"
                 else:
-                    message = f"{icon_attachment[f"{attachment.file_type}"]} {attachment.file_type.capitalize()}"
+                    icon = f"{attachment.file_type}"
+                    content = attachment.file_type.capitalize()
+                    message = f"{icon_attachment[icon]} {content}"
             else:
                 message = message_data['content']
 
