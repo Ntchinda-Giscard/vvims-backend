@@ -18,7 +18,7 @@ from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
-    EmployeeConversation
+    EmployeeConversation, Attachment, Message
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -191,11 +191,17 @@ async def events_trigger(body: Dict):
 
 @app.post("/api/v1/message-trigger")
 async def message_trigger(body: Dict):
-
+    icon_attachment = {
+        'DOCUMENT' : '📄',
+        'VOICE' : '🎤',
+        'IMAGE' : '🏞',
+        'AUDIO' : '🎵',
+        'VIDEO' : '🎥'
+    }
     message_id = body['event']['data']['new']['id']
     message_data = body['event']['data']['new']
     conv_id = message_data['conversation_id']
-    print('message id', message_id)
+    print('message id', message_data)
 
     with next(get_db()) as db:
         try:
@@ -204,15 +210,29 @@ async def message_trigger(body: Dict):
                 .filter((EmployeeConversation.conversation_id == conv_id) & (EmployeeConversation.employee_id != message_data['sender_id']))
                 .scalar()
             )
+            attachment = (
+                db.query(Attachment)
+                .join(Message, Attachment.message_id == message_id)
+                .first()
+            )
             sender = (
                 db.query(Employee)
                 .filter(Employee.id == message_data['sender_id'])
                 .first()
             )
+
+            if attachment:
+                if len(message_data['content']) > 0 or message_data['content'] != None:
+                    message = f"{icon_attachment[f"{attachment.file_type}"]} {message_data['content']}"
+                else:
+                    message = f"{icon_attachment[f"{attachment.file_type}"]} {attachment.file_type.capitalize()}"
+            else:
+                message = message_data['content']
+
             notification = EmployeeNotification(
                 action="New message!",
                 title= f"{sender.firstname} {sender.lastname}",
-                message=message_data['content'],
+                message= message,
                 is_read=False,
                 type=EmployeeNotificationType.MESSAGES,
                 employee_id = receiver_id,
