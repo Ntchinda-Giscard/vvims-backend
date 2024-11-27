@@ -1,5 +1,5 @@
 import os
-from typing import Optional
+from typing import Optional, Any
 import json
 import uuid
 import mimetypes
@@ -226,6 +226,33 @@ async def message_trigger(body: Dict):
             raise Exception(f'Internal server error: {e}')
         finally:
             db.close()
+
+@app.post("/api/v1/visits-trigger")
+async def visit_trigger(body: Any):
+    print('Body', body)
+
+    with next(get_db()) as db:
+        try:
+            print('Body', body)
+            # visitor = (
+            #     db.query(Visitor)
+            # )
+            # notification = EmployeeNotification(
+            #     action="Alert new visit!",
+            #     title= f'{sender.firstname} {sender.lastname}',
+            #     message=message_data['content'],
+            #     is_read=False,
+            #     type=EmployeeNotificationType.MESSAGES,
+            #     employee_id = receiver_id,
+            #     message_id= message_id
+            # )
+        except Exception as e:
+            logger.exception(e)
+            raise Exception(f"Internal server error: {e}")
+        finally:
+            db.close()
+
+
 
 @app.post("/api/v1/profile")
 async def insert_face(
