@@ -225,12 +225,12 @@ async def message_trigger(body: Dict):
                     icon = f"{attachment.file_type}"
                     content = message_data['content']
                     print('content messages with no content  ======>', content)
-                    message = f"{icon_attachment[icon]} With content"
+                    message = f"{icon_attachment[icon]} {content}"
                 else:
                     icon = f"{attachment.file_type}"
                     content = attachment.file_type.capitalize()
                     print('content messages with no content  ======>', content)
-                    message = f"{icon_attachment[icon]} No content"
+                    message = f"{icon_attachment[icon]} {content}"
             else:
                 message = message_data['content']
 
