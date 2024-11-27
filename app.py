@@ -17,7 +17,8 @@ from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
-    EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus
+    EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
+    EmployeeConversation
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -185,6 +186,45 @@ async def events_trigger(body: Dict):
             logger.exception(e)
         finally:
             # Close the session at the end
+            db.close()
+
+
+@app.post("/api/v1/message-trigger")
+async def message_trigger(body: Dict):
+
+    message_id = body['event']['data']['new']['id']
+    message_data = body['event']['data']['new']
+    conv_id = message_data['conversation_id']
+    print('message id', message_id)
+
+    with next(get_db()) as db:
+        try:
+            receiver_id = (
+                db.query(EmployeeConversation.employee_id)
+                .filter((EmployeeConversation.conversation_id == conv_id) and (EmployeeConversation.employee_id != message_data['sender_id']))
+                .first()
+            )
+            sender = (
+                db.query(Employee)
+                .filter(Employee.id == message_data['sender_id'])
+                .first()
+            )
+            notification = EmployeeNotification(
+                action="New message!",
+                title= f'{sender.firstname} {sender.lastname}',
+                message=message_data['content'],
+                is_read=False,
+                type=EmployeeNotificationType.MESSAGES,
+                employee_id = receiver_id,
+                event_id= message_id
+            )
+
+            db.add(notification)
+            db.commit()
+        except Exception as e:
+            logger.exception(e)
+            raise Exception(f'Internal server error: {e}')
+        finally:
             db.close()
 
 @app.post("/api/v1/profile")
