@@ -18,7 +18,7 @@ from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
-    EmployeeConversation, Attachment, Message
+    EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses
 from src.schema.input_type import LoginInput, CreatVisitWithVisitor
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
@@ -220,6 +220,13 @@ async def message_trigger(body: Dict):
                 .filter(Employee.id == message_data['sender_id'])
                 .first()
             )
+
+            message_status = MessageStatus(
+                employee_id = message_data['sender_id'],
+                status = MessageStatuses.SENT,
+                message_id = message_data['id'],
+            )
+            db.add(message_status)
             if attachment:
                 if message_data['content'] != None:
                     icon = f"{attachment.file_type}"
@@ -251,6 +258,7 @@ async def message_trigger(body: Dict):
             raise Exception(f'Internal server error: {e}')
         finally:
             db.close()
+
 
 @app.post("/api/v1/visits-trigger")
 async def visit_trigger(body: Any):
