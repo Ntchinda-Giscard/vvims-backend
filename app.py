@@ -201,8 +201,8 @@ async def message_trigger(body: Dict):
         try:
             receiver_id = (
                 db.query(EmployeeConversation.employee_id)
-                .filter((EmployeeConversation.conversation_id == conv_id) and (EmployeeConversation.employee_id != message_data['sender_id']))
-                .first()
+                .filter((EmployeeConversation.conversation_id == conv_id) & (EmployeeConversation.employee_id != message_data['sender_id']))
+
             )
             sender = (
                 db.query(Employee)
