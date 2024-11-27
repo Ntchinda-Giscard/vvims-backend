@@ -606,7 +606,7 @@ class Message(Base):
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     sender_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=False)
     conversation_id = Column(UUID(as_uuid=True), ForeignKey('conversations.id'), nullable=False)
-    content = Column(Text, nullable=False)
+    content = Column(Text, nullable=True)
     is_read = Column(Boolean, default=False)
     message_mobile_id = Column(String(50))
     #relations

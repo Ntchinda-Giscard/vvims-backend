@@ -221,7 +221,7 @@ async def message_trigger(body: Dict):
                 .first()
             )
             if attachment:
-                if len(message_data['content']) > 1 or message_data['content'] != None:
+                if message_data['content'] != None:
                     icon = f"{attachment.file_type}"
                     content = message_data['content']
                     print('content messages with no content  ======>', content)
