@@ -249,7 +249,7 @@ class Visitor(Base):
     front_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     back_id = Column(UUID(as_uuid=True), ForeignKey('files.id'), nullable=True)
     company_id = Column(UUID(as_uuid=True), ForeignKey('companies.id'), nullable=True)
-    id_number = Column(String, unique=False)
+    id_number = Column(String, unique=True)
     phone_number = Column(String, nullable=True)
 
     # relationship
@@ -462,7 +462,7 @@ class Appointment(Base):
     visitor_id = Column(UUID(as_uuid=True), ForeignKey('visitors.id'), nullable=True)
     employee_id = Column(UUID(as_uuid=True), ForeignKey('employees.id'), nullable=True)
     start_time = Column(Time)
-    end_time = Column(Time)
+    end_time = Column(Time, nullable=True)
     description = Column(String)
     date = Column(Date)
     status=Column(String)

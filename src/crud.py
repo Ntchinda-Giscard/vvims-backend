@@ -7,12 +7,14 @@ from sqlalchemy import func, case, desc
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
-    MessageStatus, Event, MessageStatuses
+    MessageStatus, Event, MessageStatuses, Appointment
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
-    DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType, MessageStatusOutput
+    DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType, MessageStatusOutput, \
+    AppointmentTodayPercentage
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId, CreateConvInput, ParticipantInput, MessageInput, EventByUserInput, MessageStatusInput
+    EmployeeId, CreateConvInput, ParticipantInput, MessageInput, EventByUserInput, MessageStatusInput, \
+    EmployeeAppointmentId
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -83,7 +85,7 @@ def count_attendance_percentage(db: Session) -> AttendnacePercentage:
     total_employees = db.query(Employee).count()
     
     if total_employees == 0:
-        return AttendanceStats(total_employees=0, attendance_percentage=0.0)
+        return AttendnacePercentage(total_employees=0, attendance_percentage=0.0)
 
     today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
 
@@ -131,10 +133,6 @@ def get_task_completion_percentage(db: Session, id) -> TaskCompletionPercentage:
         return TaskCompletionPercentage(percentage = 0)
     percentage = (total_completed_task / total_task_assigned) * 100
     return TaskCompletionPercentage(percentage = percentage)
-
-
-
-
 
 
 def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
@@ -187,8 +185,6 @@ def get_visits_group_by_week_day(db: Session) -> List[VisitsCountByDay]:
     return full_week
 
 
-
-
 def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
     """
     Counts the number of visits made by employees in each weekday group (Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday).
@@ -237,13 +233,6 @@ def get_vehicle_group_by_week_day(db: Session) -> List[VehicleCountByDay]:
     ]
 
     return full_week
-
-
-# from typing import List
-# from sqlalchemy import func, case
-# from datetime import datetime, timedelta
-
-
 
 
 def get_weekly_attendance_summary(session) -> List[AttendanceCountByWeek]:
@@ -348,7 +337,6 @@ def create_conversation(db: Session, conv_input: CreateConvInput) -> CreateConvO
         db.close()
 
 
-
 def accept_participate_event(db: Session, participant: ParticipantInput) -> AcceptParcipateEvent:
 
     try:
@@ -375,7 +363,6 @@ def deny_participate_event(db: Session, participant: ParticipantInput) -> DenyPa
         raise Exception(f'Internal server error: {e}')
     finally:
         db.close()
-
 
 
 def insert_message(db: Session, message: MessageInput) -> InsertMesaageOuput:
@@ -479,3 +466,38 @@ def update_message_status(db: Session, message_ids: MessageStatusInput) -> Messa
         raise Exception(f"Internal server error: {e}")
     finally:
         db.close()
+
+
+
+def get_appointment_today_percentage(db: Session, employee_id: EmployeeAppointmentId) -> AppointmentTodayPercentage:
+
+    try:
+        today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
+        tomorrow_starts = today_start + timedelta(days=1)
+        tomorrow_end = tomorrow_starts + timedelta(days=1)
+
+        todays_count = (
+            db.query(func.count(Appointment.id))
+            .filter(Appointment.date >= today_start, Appointment.date < tomorrow_starts)
+            .scalar()
+        )
+
+        tomorrow_count = (
+            db.query(func.count(Appointment.id))
+            .filter(Appointment.date >= tomorrow_starts, Appointment.date < tomorrow_end)
+        )
+
+        if todays_count == 0:
+            return AppointmentTodayPercentage(today_count=0, tomorrow_count=tomorrow_count, percent=None)
+        percentage = ((tomorrow_count - todays_count)/todays_count)*100
+        return AppointmentTodayPercentage(today_count=todays_count, tomorrow_count=tomorrow_count, percent= round(percentage, 1))
+
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f"Internal server error {e}")
+    finally:
+        db.close()
+
+
+
+

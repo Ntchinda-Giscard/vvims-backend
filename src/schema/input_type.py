@@ -156,3 +156,7 @@ class EventByUserInput:
 class MessageStatusInput:
     id: List[uuid.UUID]
     status: str
+
+@strawberry.input
+class EmployeeAppointmentId:
+    id: uuid.UUID

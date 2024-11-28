@@ -182,3 +182,9 @@ class EventWithUserParticipant:
 @strawberry.type
 class MessageStatusOutput:
     state: str
+
+@strawberry.type
+class AppointmentTodayPercentage:
+    today_count: int
+    tomorrow_count: int
+    percent: int
