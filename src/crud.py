@@ -457,6 +457,7 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
 
 
 def update_message_status(db: Session, message_ids: MessageStatusInput) -> MessageStatusOutput:
+
     statuses = {
         'DELIVERED': MessageStatuses.DELIVERED,
         'SEEN': MessageStatuses.SEEN
@@ -468,7 +469,8 @@ def update_message_status(db: Session, message_ids: MessageStatusInput) -> Messa
                 .filter(MessageStatus.message_id == message_id)
                 .first()
             )
-
+            print("Current message status ======>", message_status.status)
+            print("Updated message status ======>", message_ids.status)
             message_status.status = statuses[message_ids.status]
         db.commit()
         return MessageStatusOutput(state=message_ids.status)
