@@ -12,7 +12,7 @@ from src.crud import pwd_context, authenticate_employee, count_attendance_percen
     get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, \
     get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, \
     insert_message, get_event_by_user, \
-    update_message_status
+    update_message_status, get_appointment_today_percentage
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
@@ -167,6 +167,12 @@ class Query:
                 raise Exception(f'Internal server error {e}')
             finally:
                 db.close()
+
+    @strawberry.field
+    def get_appointment_today_percent(self, employee: EmployeeAppointmentId) -> :
+
+        with next(get_db()) as db:
+            result = get_appointment_today_percentage()
 
 
 

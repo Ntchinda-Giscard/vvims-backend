@@ -469,7 +469,7 @@ def update_message_status(db: Session, message_ids: MessageStatusInput) -> Messa
 
 
 
-def get_appointment_today_percentage(db: Session, employee_id: EmployeeAppointmentId) -> AppointmentTodayPercentage:
+def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentId) -> AppointmentTodayPercentage:
 
     try:
         today_start = datetime.now().replace(hour=0, minute=0, second=0, microsecond=0)
@@ -478,7 +478,7 @@ def get_appointment_today_percentage(db: Session, employee_id: EmployeeAppointme
 
         todays_count = (
             db.query(func.count(Appointment.id))
-            .filter(Appointment.date >= today_start, Appointment.date < tomorrow_starts)
+            .filter(Appointment.employee_id==employee.id, Appointment.date >= today_start, Appointment.date < tomorrow_starts)
             .scalar()
         )
 
