@@ -456,35 +456,20 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
     ]
 
 
-def update_message_status_delivered(db: Session, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+def update_message_status(db: Session, message_ids: MessageStatusInput) -> MessageStatusOutput:
+    statuses = {
+        'DELIVERED': MessageStatuses.DELIVERED,
+        'SEEN': MessageStatuses.SEEN
+    }
     try:
-        for message_id in message_ids:
+        for message_id in message_ids.id:
             message_status = (
                 db.query(MessageStatus)
                 .filter(MessageStatus.message_id == message_id)
                 .first()
             )
 
-            message_status.status = MessageStatuses.DELIVERED
-        db.commit()
-        return MessageStatusOutput(state='success')
-    except Exception as e:
-        logger.exception(e)
-        raise Exception(f"Internal server error: {e}")
-    finally:
-        db.close()
-
-
-def update_message_status_seen(db: Session, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
-    try:
-        for message_id in message_ids:
-            message_status = (
-                db.query(MessageStatus)
-                .filter(MessageStatus.message_id == message_id)
-                .first()
-            )
-
-            message_status.status = MessageStatuses.SEEN
+            message_status.status = statuses[message_ids.status]
         db.commit()
         return MessageStatusOutput(state='success')
     except Exception as e:

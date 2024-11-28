@@ -154,4 +154,5 @@ class EventByUserInput:
 
 @strawberry.input
 class MessageStatusInput:
-    id: uuid.UUID
+    id: List[uuid.UUID]
+    status: str
