@@ -471,7 +471,7 @@ def update_message_status(db: Session, message_ids: MessageStatusInput) -> Messa
 
             message_status.status = statuses[message_ids.status]
         db.commit()
-        return MessageStatusOutput(state='success')
+        return MessageStatusOutput(state=message_ids.status)
     except Exception as e:
         logger.exception(e)
         raise Exception(f"Internal server error: {e}")
