@@ -151,3 +151,7 @@ class MessageInput:
 class EventByUserInput:
     date: date
     employee_id: uuid.UUID
+
+@strawberry.input
+class MessageStatusInput:
+    id: uuid.UUID

@@ -7,12 +7,12 @@ from sqlalchemy import func, case, desc
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
-    MessageStatus, Event
+    MessageStatus, Event, MessageStatuses
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
-    DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType
+    DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType, MessageStatusOutput
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
-    EmployeeId, CreateConvInput, ParticipantInput, MessageInput, EventByUserInput
+    EmployeeId, CreateConvInput, ParticipantInput, MessageInput, EventByUserInput, MessageStatusInput
 from datetime import timedelta, datetime
 import math
 from typing import List
@@ -454,3 +454,41 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
             participant = data['participants']
         ) for data in events_with_participants.values()
     ]
+
+
+def update_message_status_delivered(db: Session, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+    try:
+        for message_id in message_ids:
+            message_status = (
+                db.query(MessageStatus)
+                .filter(MessageStatus.message_id == message_id)
+                .first()
+            )
+
+            message_status.status = MessageStatuses.DELIVERED
+        db.commit()
+        return MessageStatusOutput(state='success')
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f"Internal server error: {e}")
+    finally:
+        db.close()
+
+
+def update_message_status_seen(db: Session, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+    try:
+        for message_id in message_ids:
+            message_status = (
+                db.query(MessageStatus)
+                .filter(MessageStatus.message_id == message_id)
+                .first()
+            )
+
+            message_status.status = MessageStatuses.SEEN
+        db.commit()
+        return MessageStatusOutput(state='success')
+    except Exception as e:
+        logger.exception(e)
+        raise Exception(f"Internal server error: {e}")
+    finally:
+        db.close()

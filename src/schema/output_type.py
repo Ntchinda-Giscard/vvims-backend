@@ -177,3 +177,8 @@ class EventType:
 class EventWithUserParticipant:
     event: EventType
     participant: List[ParticipantType]
+
+
+@strawberry.type
+class MessageStatusOutput:
+    state: str
