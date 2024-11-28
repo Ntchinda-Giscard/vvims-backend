@@ -173,7 +173,7 @@ class Query:
     def get_appointment_today_percent(self, employee: EmployeeAppointmentId) -> AppointmentTodayPercentage:
 
         with next(get_db()) as db:
-            result = get_appointment_today_percentage()
+            result = get_appointment_today_percentage(db, employee)
 
             return result
 
