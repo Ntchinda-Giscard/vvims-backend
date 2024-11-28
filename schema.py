@@ -11,7 +11,7 @@ from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
     get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, \
     get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, \
-    insert_message, get_event_by_user, update_message_status_delivered, update_message_status_seen, \
+    insert_message, get_event_by_user, \
     update_message_status
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
@@ -441,7 +441,7 @@ class Mutation:
             return result
 
     @strawberry.mutation
-    def update_message_status(self, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+    def update_message_status(self, message_ids: MessageStatusInput) -> MessageStatusOutput:
 
         with next(get_db()) as db:
             result = update_message_status(db, message_ids)
