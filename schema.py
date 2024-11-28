@@ -11,19 +11,19 @@ from src.auth import create_token, get_current_user, oauth2_scheme
 from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
     get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, \
     get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, \
-    insert_message, get_event_by_user
+    insert_message, get_event_by_user, update_message_status_delivered, update_message_status_seen
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
 from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
     AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId, CreateConvInput, ParticipantInput, MessageInput, \
-    EventByUserInput
+    EventByUserInput, MessageStatusInput
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, \
     LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, \
     DayAttendanceType, \
     TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, \
-    AcceptParcipateEvent, DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant
+    AcceptParcipateEvent, DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, MessageStatusOutput
 from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 from typing import AsyncGenerator
 
@@ -436,5 +436,21 @@ class Mutation:
     def add_message(self, inputs: MessageInput) -> InsertMesaageOuput:
         with next(get_db()) as db:
             result = insert_message(db, inputs)
+
+            return result
+
+    @strawberry.mutation
+    def delivered_message_status(self, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+
+        with next(get_db()) as db:
+            result = update_message_status_delivered(db, message_ids)
+
+            return result
+
+    @strawberry.mutation
+    def seen_message_status(self, message_ids: List[MessageStatusInput]) -> MessageStatusOutput:
+
+        with next(get_db()) as db:
+            result = update_message_status_seen(db, message_ids)
 
             return result
