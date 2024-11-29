@@ -487,6 +487,7 @@ def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentI
         tomorrow_count = (
             db.query(func.count(Appointment.id))
             .filter(Appointment.date >= tomorrow_starts, Appointment.date < tomorrow_end)
+            .scalar()
         )
 
         print("Tomorrow's count ====>:", tomorrow_count)
