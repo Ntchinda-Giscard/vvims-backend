@@ -187,4 +187,4 @@ class MessageStatusOutput:
 class AppointmentTodayPercentage:
     today_count: int
     tomorrow_count: int
-    percent: int
+    percent: Optional[float] = None
