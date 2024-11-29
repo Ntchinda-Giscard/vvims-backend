@@ -494,7 +494,7 @@ def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentI
 
         if todays_count == 0:
             return AppointmentTodayPercentage(today_count=0, tomorrow_count=tomorrow_count, percent=None)
-        percentage = ((tomorrow_count - todays_count)/todays_count)*100
+        percentage = ((todays_count - tomorrow_count)/todays_count)*100
         return AppointmentTodayPercentage(today_count=todays_count, tomorrow_count=tomorrow_count, percent= round(percentage, 1))
 
     except Exception as e:
