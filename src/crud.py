@@ -68,8 +68,11 @@ def authenticate_employee(db: Session, phone_number: str, password: str):
         print("Same password")
 
 
-    if not employee or not pwd_context.verify(password, employee.password):
-        return False
+    if not employee:
+        raise Exception(f'Employee not found with phone number {phone_number}')
+    if not pwd_context.verify(password, employee.password):
+        raise Exception('Incorrect password')
+
     return  employee
 
 
