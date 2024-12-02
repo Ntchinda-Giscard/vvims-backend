@@ -347,9 +347,11 @@ class Mutation:
                     success = "Password successfully updated"
                 )
             except Exception as e:
+
                 db.rollback()
                 db.close()
                 logger.exception(e)
+                raise Exception(f"Internal error: {e}")
             finally:
                 db.close()
 
