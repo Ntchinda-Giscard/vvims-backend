@@ -25,6 +25,9 @@ import boto3
 
 models.Base.metadata.create_all(bind=engine)
 
+print("Amazon aws access key: ", os.getenv('AWS_ACCESS_KEY'))
+print("Amazon aws secret key: ", os.getenv('AWS_SECRET_KEY'))
+
 s3 = boto3.client(
     's3',
     aws_access_key_id= os.getenv('AWS_ACCESS_KEY'),
@@ -131,9 +134,9 @@ async def visits_trigger(body: Dict):
         try:
 
             db_notif = EmployeeNotification(
-                action = "ADD VISITOR",
+                action = "New Visitor",
                 title = "New Visitor Alert !",
-                message="A new visitor has been! Click here to see more details",
+                message="A new visitor has been added! Click here to see more details",
                 is_read = False
             )
             db.add(db_notif)
