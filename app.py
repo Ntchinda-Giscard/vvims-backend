@@ -25,9 +25,6 @@ import boto3
 
 models.Base.metadata.create_all(bind=engine)
 
-print("Amazon aws access key: ", os.getenv('AWS_ACCESS_KEY'))
-print("Amazon aws secret key: ", os.getenv('AWS_SECRET_KEY'))
-
 s3 = boto3.client(
     's3',
     aws_access_key_id= os.getenv('AWS_ACCESS_KEY'),

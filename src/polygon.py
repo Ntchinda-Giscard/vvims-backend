@@ -1,3 +1,3 @@
-y = ("python"*0) + "is amazing !"
+import base64
 
-print(y)
+
