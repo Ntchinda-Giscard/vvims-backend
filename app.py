@@ -19,8 +19,8 @@ from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses
-from src.schema.input_type import LoginInput, CreatVisitWithVisitor
-from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
+from src.schema.input_type import LoginInput,
+from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
 import boto3
 
 models.Base.metadata.create_all(bind=engine)
