@@ -24,6 +24,7 @@ from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate
     calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies
 import boto3
 from pathlib import Path
+from fastapi.staticfiles import StaticFiles
 
 models.Base.metadata.create_all(bind=engine)
 
