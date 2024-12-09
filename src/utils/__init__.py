@@ -191,7 +191,7 @@ def upload_to_s3(local_file, bucket_name, s3_file, s3, is_apk=False):
 class UploadStrategy(ABC):
 
     @abstractmethod
-    def upload_process(self, file: str) -> str:
+    def upload_process(self, file: UploadFile = File(...)) -> str:
         pass
 
 class S3UploadStrategy(UploadStrategy):
@@ -223,7 +223,7 @@ class S3UploadStrategy(UploadStrategy):
 
 class LocalUploadStrategy(UploadStrategy):
 
-    def upload_process(self, file: str) -> str:
+    def upload_process(self, file: UploadFile = File(...)) -> str:
         return f"Uploaded to Local file: {file}"
 
 
@@ -251,7 +251,7 @@ class UploadProcessor:
     def __init__(self, strategy: UploadStrategies):
         self.strategies = strategy
 
-    def process(self, upload_type: str, file: str) -> str:
+    def process(self, upload_type: str, file: UploadFile=File(...)) -> str:
 
         strategy = self.strategies.get_strategy(upload_type)
 
