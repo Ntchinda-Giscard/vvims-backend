@@ -436,7 +436,7 @@ async def uploads_save(files: UploadFile):
 
     return mime_type, file_size, file_url, files.filename
 
-@app.post("/api/v1/upload-files-strategy")
+@app.post("/api/v1/upload-file")
 async def upload_file_strategy(upload_type:str, file: UploadFile=File(...)):
     strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
 
@@ -444,7 +444,7 @@ async def upload_file_strategy(upload_type:str, file: UploadFile=File(...)):
     result = await processor.process(upload_type, file)
     print(result)
 
-    return "result"
+    return {"file_url" : result}
 
 
 
@@ -597,30 +597,30 @@ async def get_app():
             db.close()
 
 
-@app.post("/api/v1/upload-file")
-async def upload_app(file: UploadFile = File(...)):
-    try:
-        file_path = f"uploads/file"
-        # mime_type, _ = mimetypes.guess_type(file_path)
-        # file_size = os.path.getsize(file_path)
-        with open(file_path, "wb") as f:
-            f.write(await file.read())
-    except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail=f"{str(e)}")
-    try:
-        file_name = str(uuid.uuid4())
-        file_url = upload_to_s3(
-            s3_file=str(file.filename),
-            s3=s3,
-            local_file=file_path,
-            bucket_name='vvims-visitor'
-        )
-        print(file_name)
-
-        return {"file_url" : file_url}
-    except Exception as e:
-        logger.exception(e)
+# @app.post("/api/v1/upload-file")
+# async def upload_app(file: UploadFile = File(...)):
+#     try:
+#         file_path = f"uploads/file"
+#         # mime_type, _ = mimetypes.guess_type(file_path)
+#         # file_size = os.path.getsize(file_path)
+#         with open(file_path, "wb") as f:
+#             f.write(await file.read())
+#     except Exception as e:
+#         logger.exception(e)
+#         raise HTTPException(status_code=500, detail=f"{str(e)}")
+#     try:
+#         file_name = str(uuid.uuid4())
+#         file_url = upload_to_s3(
+#             s3_file=str(file.filename),
+#             s3=s3,
+#             local_file=file_path,
+#             bucket_name='vvims-visitor'
+#         )
+#         print(file_name)
+# 
+#         return {"file_url" : file_url}
+#     except Exception as e:
+#         logger.exception(e)
 
 
 @app.post("/api/v1/get-attendance/")
