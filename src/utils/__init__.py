@@ -233,7 +233,7 @@ class LocalUploadStrategy(UploadStrategy):
             with open(folder, "wb") as f:
                 f.write(await file.read())
 
-            return  f"https://ntchinda-giscard-vvims-backend.hf.space/uploads/{file.filename}"
+            return  f"http://172.17.15.28:30000/uploads/{file.filename}"
         except Exception as e:
             logger.exception(e)
             raise e
