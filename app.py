@@ -441,7 +441,7 @@ async def upload_file_strategy(upload_type:str, file: UploadFile=File(...)):
     strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
 
     processor = UploadProcessor(strategies)
-    result = processor.process(upload_type, file)
+    result = await processor.process(upload_type, file)
     print(result)
 
     return "result"
