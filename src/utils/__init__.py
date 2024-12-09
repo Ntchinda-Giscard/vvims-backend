@@ -15,7 +15,6 @@ import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
 
-from src.configs import UploadStrategies
 from src.models import Attendance, Employee
 
 def auth_firebase_token() -> str:
