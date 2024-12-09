@@ -14,6 +14,7 @@ import google.auth.transport.requests
 from src import logger
 from src.models import Attendance, Employee
 import boto3
+import os
 
 s3 = boto3.client(
     's3',
