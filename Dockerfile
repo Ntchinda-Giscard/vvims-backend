@@ -6,10 +6,13 @@ USER root
 # Step 1: Create the user
 RUN adduser --disabled-password --gecos "" myuser
 
-# Step 2: Change the ownership of the /uploads directory
+# Step 2: Create the /uploads directory
+RUN mkdir /uploads
+
+# Step 3: Change the ownership of the /uploads directory
 RUN chown -R myuser:myuser /uploads
 
-# Step 3: Set the user for running the application
+# Step 4: Set the user to myuser for running the app
 USER myuser
 # Install necessary packages
 RUN apt-get update && \
