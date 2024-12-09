@@ -1,4 +1,5 @@
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Callable
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
@@ -15,6 +16,8 @@ from src import logger
 from src.models import Attendance, Employee
 import boto3
 import os
+
+UPLOAD_DIR = '/app/uploads'
 
 s3 = boto3.client(
     's3',
@@ -224,6 +227,16 @@ class S3UploadStrategy(UploadStrategy):
 class LocalUploadStrategy(UploadStrategy):
 
     async def upload_process(self, file: UploadFile = File(...)) -> str:
+        try:
+            folder = Path(UPLOAD_DIR) / file.filename
+
+            with open(folder, "wb") as f:
+                f.write(await file.read())
+
+            return  f"https://ntchinda-giscard-vvims-backend.hf.space/uploads/{file.filename}"
+        except Exception as e:
+            logger.exception(e)
+            raise e
         return f"Uploaded to Local file: {file}"
 
 
