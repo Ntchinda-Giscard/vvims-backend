@@ -130,7 +130,7 @@ async def attendance_trigger(body: Dict):
     return {"message" : "Received and printed"}
 
 @app.post("/api/v1/visit-trigger")
-async def visits_trigger(body: Any):
+async def visits_trigger(body: Dict):
     print(body)
     with next(get_db()) as db:
         try:
