@@ -442,7 +442,7 @@ async def upload_file_strategy(upload_type:str, file: UploadFile=File(...)):
 
     processor = UploadProcessor(strategies)
     result = processor.process(upload_type, file)
-    # print(result)
+    print(result)
 
     return "result"
 
