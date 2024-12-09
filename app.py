@@ -14,14 +14,17 @@ from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
+from src.configs import UploadStrategies
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses
 from src.schema.input_type import LoginInput
-from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
+from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, \
+    calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor
 import boto3
+from pathlib import Path
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -31,7 +34,7 @@ s3 = boto3.client(
     aws_secret_access_key= os.getenv('AWS_SECRET_KEY'),
     region_name='eu-north-1'
 )
-origins= ["172.17.15.42"]
+
 app = FastAPI(
     swagger_ui_init_oauth=None,  # Disables the online CDN for OAuth2 redirect URL
     swagger_ui_parameters={"useBaseUrl": True}  # Forces using local base URL for assets
@@ -48,7 +51,10 @@ graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
 
 pinecone_client = PineconeSigleton()
-os.makedirs('uploads', exist_ok=True)
+UPLOAD_DIR = '/app/uploads'
+os.makedirs('/uploads', exist_ok=True)
+
+app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 @app.get("/")
 def greet_json():
@@ -125,7 +131,7 @@ async def attendance_trigger(body: Dict):
     return {"message" : "Received and printed"}
 
 @app.post("/api/v1/visit-trigger")
-async def visits_trigger(body: Dict):
+async def visits_trigger(body: Any):
     print(body)
     with next(get_db()) as db:
         try:
@@ -429,6 +435,18 @@ async def uploads_save(files: UploadFile):
         raise HTTPException(status_code=500, detail=f"Failed to upload to S3: {str(e)}")
 
     return mime_type, file_size, file_url, files.filename
+
+@app.post("/api/v1/upload-files-strategy")
+async def upload_file_strategy(file: str, upload_type:str) -> str:
+    strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
+
+    processor = UploadProcessor(strategies)
+    result = processor.process("online", "Test.txt")
+    print(result)
+
+    return result
+
+
 
 def sanitize_none(value: Optional[str]) -> str:
     """Convert None to an empty string to avoid JSON errors."""

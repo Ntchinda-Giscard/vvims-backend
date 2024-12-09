@@ -1,3 +1,5 @@
+from fastapi import UploadFile
+from abc import abstractmethod, ABC
 from sqlalchemy import and_
 import uuid
 from datetime import datetime, timedelta, time, date
@@ -9,6 +11,8 @@ import json
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
+
+from src.configs import Strategies, UploadStrategies
 from src.models import Attendance, Employee
 
 def auth_firebase_token() -> str:
@@ -176,3 +180,31 @@ def upload_to_s3(local_file, bucket_name, s3_file, s3, is_apk=False):
         return None
 
 
+class UploadStrategy(ABC):
+
+    @abstractmethod
+    def upload_process(self, file: str) -> str:
+        pass
+
+class S3UploadStrategy(UploadStrategy):
+
+    def upload_process(self, file: str) -> str:
+        return f"Uploaded to S3 file: {file}"
+
+class LocalUploadStrategy(UploadStrategy):
+
+    def upload_process(self, file: str) -> str:
+        return f"Uploaded to Local file: {file}"
+
+
+
+class UploadProcessor:
+
+    def __init__(self, strategy: UploadStrategies):
+        self.strategies = strategy
+
+    def process(self, upload_type: str, file: str) -> str:
+
+        strategy = self.strategies.get_strategy(upload_type)
+
+        return strategy.upload_process(file=file)
