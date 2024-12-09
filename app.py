@@ -404,40 +404,29 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
         finally:
             db.close()
 
-async def uploads_save(files: UploadFile):
-    try:
-        # Define the file path
-        file_path = f"uploads/{files.filename}"
-        
-        # Asynchronously read and save the file
-        content = await files.read()
-        with open(file_path, "wb") as f:
-            f.write(content)
+async def uploads_save(file: UploadFile, upload_type: Optional[str] = 'online'):
 
-        # Determine the MIME type and file size
-        mime_type, _ = mimetypes.guess_type(file_path)
-        file_size = os.path.getsize(file_path)
-        
-    except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail=f"{str(e)}")
+    file_path = f"uploads/{file.filename}"
 
-    try:
-        # Upload to S3
-        file_url = upload_to_s3(
-            s3_file=str(uuid.uuid4()),
-            s3=s3,
-            local_file=file_path,
-            bucket_name='vvims-visitor'
-        )
-    except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail=f"Failed to upload to S3: {str(e)}")
+    # Asynchronously read and save the file
+    content = await file.read()
+    with open(file_path, "wb") as f:
+        f.write(content)
 
-    return mime_type, file_size, file_url, files.filename
+    strategies = UploadStrategies(local=LocalUploadStrategy, online=S3UploadStrategy)
+
+    processor = UploadProcessor(strategies)
+    file_url = await processor.process(upload_type, file)
+
+    # Determine the MIME type and file size
+    mime_type, _ = mimetypes.guess_type(file_path)
+    file_size = os.path.getsize(file_path)
+
+
+    return mime_type, file_size, file_url, file.filename
 
 @app.post("/api/v1/upload-file")
-async def upload_file_strategy(upload_type:str, file: UploadFile=File(...)):
+async def upload_file_strategy(upload_type: Optional[str]='online', file: UploadFile=File(...)):
     strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
 
     processor = UploadProcessor(strategies)
@@ -470,7 +459,8 @@ async def add_visit_with_visitor(
         face: UploadFile = File(None),
         front_id: Optional[str] = Form(None),
         back_id: Optional[str] = Form(None),
-        user: str = Depends(get_current_user)
+        user: str = Depends(get_current_user),
+        upload_type: Optional[str] = 'online'
     ):
     if not host_employee and not host_service and not host_department:
         raise HTTPException(status_code=400, detail="Bad request. Missing one of these: Department, service and employee") 
@@ -481,7 +471,7 @@ async def add_visit_with_visitor(
         face_file_url = ''
         face_file_name = ''
         try:
-            mime_type, file_size, face_file_url, face_file_name = await uploads_save(face)
+            mime_type, file_size, face_file_url, face_file_name = await uploads_save(face, upload_type=upload_type)
         except Exception as e:
             pass
         print(mime_type, file_size, face_file_url, face_file_name)

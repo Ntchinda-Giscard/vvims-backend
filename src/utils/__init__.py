@@ -237,7 +237,6 @@ class LocalUploadStrategy(UploadStrategy):
         except Exception as e:
             logger.exception(e)
             raise e
-        return f"Uploaded to Local file: {file}"
 
 
 @dataclass
