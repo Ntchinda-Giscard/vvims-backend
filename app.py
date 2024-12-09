@@ -14,7 +14,6 @@ from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
-from src.configs import UploadStrategies
 from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
@@ -22,7 +21,7 @@ from src.models import Employee, CompanySettings, Attendance, AttendanceState, A
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses
 from src.schema.input_type import LoginInput
 from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, \
-    calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor
+    calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies
 import boto3
 from pathlib import Path
 
