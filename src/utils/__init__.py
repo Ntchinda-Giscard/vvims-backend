@@ -11,10 +11,15 @@ from botocore.exceptions import NoCredentialsError
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
-
-from app import s3
 from src import logger
 from src.models import Attendance, Employee
+
+s3 = boto3.client(
+    's3',
+    aws_access_key_id= os.getenv('AWS_ACCESS_KEY'),
+    aws_secret_access_key= os.getenv('AWS_SECRET_KEY'),
+    region_name='eu-north-1'
+)
 
 def auth_firebase_token() -> str:
     SERVICE_ACCOUNT_FILE= './vvims-emplo-firebase-adminsdk-sg73f-d935f36b7e.json'
