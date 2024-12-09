@@ -13,6 +13,7 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 from src import logger
 from src.models import Attendance, Employee
+import boto3
 
 s3 = boto3.client(
     's3',
