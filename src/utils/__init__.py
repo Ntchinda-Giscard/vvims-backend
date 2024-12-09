@@ -1,20 +1,19 @@
 from dataclasses import dataclass
 from typing import Callable
-
-from fastapi import UploadFile
+from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
 from sqlalchemy import and_
 import uuid
 from datetime import datetime, timedelta, time, date
 import requests
 from pinecone import Pinecone
-import boto3
 from botocore.exceptions import NoCredentialsError
-import json
 import google.auth
 from google.oauth2 import service_account
 import google.auth.transport.requests
 
+from app import s3
+from src import logger
 from src.models import Attendance, Employee
 
 def auth_firebase_token() -> str:
@@ -190,8 +189,30 @@ class UploadStrategy(ABC):
 
 class S3UploadStrategy(UploadStrategy):
 
-    def upload_process(self, file: str) -> str:
-        return f"Uploaded to S3 file: {file}"
+    async def upload_process(self, file: UploadFile = File(...)) -> str:
+        try:
+            file_path = f"uploads/file"
+            # mime_type, _ = mimetypes.guess_type(file_path)
+            # file_size = os.path.getsize(file_path)
+            with open(file_path, "wb") as f:
+                f.write(await file.read())
+        except Exception as e:
+            logger.exception(e)
+            raise HTTPException(status_code=500, detail=f"{str(e)}")
+        try:
+            file_name = str(uuid.uuid4())
+            file_url = upload_to_s3(
+                s3_file=str(file.filename),
+                s3=s3,
+                local_file=file_path,
+                bucket_name='vvims-visitor'
+            )
+            print(file_name)
+
+            return f"Uploaded to S3 file: {file_url}"
+        except Exception as e:
+            logger.exception(e)
+
 
 class LocalUploadStrategy(UploadStrategy):
 
