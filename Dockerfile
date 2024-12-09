@@ -3,10 +3,14 @@ FROM python:3.9
 # Switch to root user to install dependencies
 USER root
 
-# Example to set user in Dockerfile
-USER myuser
-# Make the uploads directory writable by the user
+# Step 1: Create the user
+RUN adduser --disabled-password --gecos "" myuser
+
+# Step 2: Change the ownership of the /uploads directory
 RUN chown -R myuser:myuser /uploads
+
+# Step 3: Set the user for running the application
+USER myuser
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-glx && \
