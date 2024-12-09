@@ -11,7 +11,6 @@ RUN chown -R myuser:myuser /uploads
 RUN apt-get update && \
     apt-get install -y libgl1-mesa-glx && \
     rm -rf /var/lib/apt/lists/*
-
 # Create a new user and switch to that user
 RUN useradd -m -u 1000 user
 USER user
