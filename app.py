@@ -437,7 +437,7 @@ async def uploads_save(files: UploadFile):
     return mime_type, file_size, file_url, files.filename
 
 @app.post("/api/v1/upload-files-strategy")
-async def upload_file_strategy(file: str, upload_type:str) -> str:
+async def upload_file_strategy(file: UploadFile=File(...), upload_type:str) -> str:
     strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
 
     processor = UploadProcessor(strategies)
