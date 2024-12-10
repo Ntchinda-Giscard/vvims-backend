@@ -297,6 +297,7 @@ async def visit_trigger(body: Any):
 async def insert_face(
     face: UploadFile = File(...),
     user: str = Depends(get_current_user),
+        upload_type: Optional[str] = 'online'
     ):
     today = date.today()
 
@@ -311,14 +312,11 @@ async def insert_face(
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
-        apk_name = str(uuid.uuid4())
-        file_url = upload_to_s3(
-            s3_file=apk_name,
-            s3=s3,
-            local_file=image_path,
-            bucket_name='vvims-visitor'
-        )
-        print("File url", file_url)
+        strategies = UploadStrategies(local=LocalUploadStrategy, online=S3UploadStrategy)
+
+        processor = UploadProcessor(strategies)
+        result = await processor.process(upload_type, face)
+        print("File url", result)
     except Exception as e:
         logger.exception(e)
 
