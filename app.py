@@ -295,9 +295,10 @@ async def visit_trigger(body: Any):
 
 @app.post("/api/v1/profile")
 async def insert_face(
+    upload_type: Optional[str],
     face: UploadFile = File(...),
-    user: str = Depends(get_current_user),
-        upload_type: Optional[str] = 'online'
+    user: str = Depends(get_current_user)
+
     ):
     today = date.today()
 
@@ -403,7 +404,7 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
         finally:
             db.close()
 
-async def uploads_save(file: UploadFile, upload_type: Optional[str] = 'online'):
+async def uploads_save(file: UploadFile, upload_type: Optional[str]):
 
     file_path = f"uploads/{file.filename}"
 
@@ -443,6 +444,7 @@ def sanitize_none(value: Optional[str]) -> str:
 
 @app.post("/api/v1/add-visits")
 async def add_visit_with_visitor(
+        upload_type: Optional[str],
         firstname: Optional[str] = Form(None),
         lastname: Optional[str] = Form(None),
         phone_number: Optional[str] = Form(None),
@@ -459,7 +461,6 @@ async def add_visit_with_visitor(
         front_id: Optional[str] = Form(None),
         back_id: Optional[str] = Form(None),
         user: str = Depends(get_current_user),
-        upload_type: Optional[str] = 'online'
     ):
     if not host_employee and not host_service and not host_department:
         raise HTTPException(status_code=400, detail="Bad request. Missing one of these: Department, service and employee") 
