@@ -342,7 +342,7 @@ async def insert_face(
         finally:
             db.close()
 
-    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Face image uploaded", "file_url": file_url})
+    return JSONResponse(status_code=status.HTTP_200_OK, content={"message": "Face image uploaded", "file_url": result})
 
     # try:
     #     embeddings = DeepFace.represent(img_path=image_path, model_name="VGG-Face", enforce_detection=False)
