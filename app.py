@@ -335,6 +335,7 @@ async def insert_face(
             employee.profile_picture = file.id
             db.commit()
         except Exception as e:
+
             logger.exception(e)
             db.rollback()
             db.close()
