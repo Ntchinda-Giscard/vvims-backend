@@ -324,8 +324,8 @@ async def insert_face(
         try:
             file = UploadedFile(
                 # file_name = f"{face.filename}",
-                file_name = apk_name,
-                file_url = file_url,
+                file_name = f"{face.filename}",
+                file_url = result,
                 mime_type = f"{mime_type}",
                 file_size = (file_size/1024)
             )
