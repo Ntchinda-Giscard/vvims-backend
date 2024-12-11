@@ -219,7 +219,7 @@ class S3UploadStrategy(UploadStrategy):
             )
             print(file_name)
 
-            return f"Uploaded to S3 file: {file_url}"
+            return f"{file_url}"
         except Exception as e:
             logger.exception(e)
 
