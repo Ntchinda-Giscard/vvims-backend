@@ -318,7 +318,7 @@ async def insert_face(
         strategies = UploadStrategies(local=LocalUploadStrategy, online=S3UploadStrategy)
 
         processor = UploadProcessor(strategies)
-        result = processor.process(upload_type, face)
+        result = await processor.process(upload_type, face)
         print("File url", result)
     except Exception as e:
         logger.exception(e)
