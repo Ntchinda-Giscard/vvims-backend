@@ -293,7 +293,14 @@ async def visit_trigger(body: Any):
         finally:
             db.close()
 
+async def upload_files(upload_type: Optional[str]='online', file: UploadFile=File(...)):
+    strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
 
+    processor = UploadProcessor(strategies)
+    result = await processor.process(upload_type, file)
+    print(result)
+
+    return result
 
 @app.post("/api/v1/profile")
 async def insert_face(
@@ -316,10 +323,8 @@ async def insert_face(
         logger.exception(e)
         raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
-        strategies = UploadStrategies(local=LocalUploadStrategy, online=S3UploadStrategy)
 
-        processor = UploadProcessor(strategies)
-        result = await processor.process(upload_type, face)
+        result = await upload_files(upload_type, face)
         print("File url", result)
     except Exception as e:
         logger.exception(e)
