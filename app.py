@@ -305,8 +305,8 @@ async def insert_face(
     today = date.today()
 
     try:
-        image_path = f"uploads/{face.filename}"
-        
+        image_path = f"/app/uploads/{face.filename}"
+
         with open(image_path, "wb") as f:
             f.write(await face.read())
         mime_type, _ = mimetypes.guess_type(image_path)
