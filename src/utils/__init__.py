@@ -266,5 +266,6 @@ class UploadProcessor:
     def process(self, upload_type: str, file: UploadFile=File(...)) -> str:
 
         strategy = self.strategies.get_strategy(upload_type)
+        result  = strategy.upload_process(file=file)
 
-        return strategy.upload_process(file=file)
+        return result
