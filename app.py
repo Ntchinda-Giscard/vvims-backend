@@ -311,17 +311,17 @@ async def insert_face(
     ):
     today = date.today()
 
-    try:
-        os.makedirs('/uploads/tmp', exist_ok=True)
-        image_path = f"/uploads/tmp/{face.filename}"
-
-        with open(image_path, "wb") as f:
-            f.write(await face.read())
-        mime_type, _ = mimetypes.guess_type(image_path)
-        file_size = os.path.getsize(image_path)
-    except Exception as e:
-        logger.exception(e)
-        raise HTTPException(status_code=500, detail=f"{str(e)}")
+    # try:
+    #     os.makedirs('/uploads/tmp', exist_ok=True)
+    #     image_path = f"/uploads/tmp/{face.filename}"
+    #
+    #     with open(image_path, "wb") as f:
+    #         f.write(await face.read())
+    #     mime_type, _ = mimetypes.guess_type(image_path)
+    #     file_size = os.path.getsize(image_path)
+    # except Exception as e:
+    #     logger.exception(e)
+    #     raise HTTPException(status_code=500, detail=f"{str(e)}")
     try:
 
         result = await upload_files(upload_type, face)
@@ -333,10 +333,10 @@ async def insert_face(
         try:
             file = UploadedFile(
                 # file_name = f"{face.filename}",
-                file_name = f"{face.filename}",
+                file_name = "",
                 file_url = result,
-                mime_type = f"{mime_type}",
-                file_size = (file_size/1024)
+                mime_type = "",
+                file_size = 0
             )
             db.add(file)
             db.commit()
