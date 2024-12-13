@@ -590,7 +590,7 @@ async def get_app():
 @app.get("/api/v1/get-datetime/")
 async def get_datetime():
 
-    return {"datetime": datetime}
+    return {"datetime": datetime.utcnow()}
 
 # @app.post("/api/v1/upload-file")
 # async def upload_app(file: UploadFile = File(...)):
