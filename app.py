@@ -306,7 +306,7 @@ async def insert_face(
 
     try:
         os.makedirs('/uploads/tmp', exist_ok=True)
-        image_path = f"/app/tmp/uploads/{face.filename}"
+        image_path = f"/tmp/uploads/{face.filename}"
 
         with open(image_path, "wb") as f:
             f.write(await face.read())
