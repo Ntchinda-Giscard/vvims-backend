@@ -25,6 +25,8 @@ from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate
 import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
+from zoneinfo import ZoneInfo
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -589,8 +591,9 @@ async def get_app():
 
 @app.get("/api/v1/get-datetime/")
 async def get_datetime():
-
-    return {"datetime": datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")}
+    wat_time = datetime.now(ZoneInfo("Africa/Lagos"))
+    formated_time = wat_time.strftime("%Y-%m-%d %H:%M:%S")
+    return {"datetime": formated_time}
 
 # @app.post("/api/v1/upload-file")
 # async def upload_app(file: UploadFile = File(...)):
