@@ -263,9 +263,9 @@ class UploadProcessor:
     def __init__(self, strategy: UploadStrategies):
         self.strategies = strategy
 
-    def process(self, upload_type: str, file: UploadFile=File(...)) -> str:
+    async def process(self, upload_type: str, file: UploadFile=File(...)) -> str:
 
         strategy = self.strategies.get_strategy(upload_type)
-        result  = strategy.upload_process(file=file)
+        result  = await strategy.upload_process(file=file)
 
         return result
