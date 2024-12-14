@@ -141,6 +141,7 @@ async def visits_trigger(body: Dict):
 
             db_visitor = db.query(Visitor).filter(Visitor.id == data["visitor"]).first()
 
+            print(f"Host employee ========>  {data["host_employee"]}")
             db_notif = EmployeeNotification(
                 employee_id = data["host_employee"],
                 action = "New Visitor",
