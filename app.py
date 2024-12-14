@@ -1,6 +1,5 @@
 import os
 from typing import Optional, Any
-import json
 import uuid
 import mimetypes
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -147,8 +146,11 @@ async def visits_trigger(body: Dict):
                 action = "New Visitor",
                 title = "New Visitor Alert !",
                 message=f"{db_visitor.firstname} {db_visitor.lastname} is paying you visit!",
+                visits_id = data['id'],
                 is_read = False
             )
+
+            print(f"Notification info: Employee: {db_notif.employee_id}, message: {db_notif.message}")
             db.add(db_notif)
             db.commit()
 
@@ -280,18 +282,7 @@ async def visit_trigger(body: Any):
     with next(get_db()) as db:
         try:
             print('Body', body)
-            # visitor = (
-            #     db.query(Visitor)
-            # )
-            # notification = EmployeeNotification(
-            #     action="Alert new visit!",
-            #     title= f'{sender.firstname} {sender.lastname}',
-            #     message=message_data['content'],
-            #     is_read=False,
-            #     type=EmployeeNotificationType.MESSAGES,
-            #     employee_id = receiver_id,
-            #     message_id= message_id
-            # )
+
         except Exception as e:
             logger.exception(e)
             raise Exception(f"Internal server error: {e}")
@@ -316,17 +307,7 @@ async def insert_face(
     ):
     today = date.today()
 
-    # try:
-    #     os.makedirs('/uploads/tmp', exist_ok=True)
-    #     image_path = f"/uploads/tmp/{face.filename}"
-    #
-    #     with open(image_path, "wb") as f:
-    #         f.write(await face.read())
-    #     mime_type, _ = mimetypes.guess_type(image_path)
-    #     file_size = os.path.getsize(image_path)
-    # except Exception as e:
-    #     logger.exception(e)
-    #     raise HTTPException(status_code=500, detail=f"{str(e)}")
+
     try:
 
         result = await upload_files(upload_type, face)
