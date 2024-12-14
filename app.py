@@ -135,13 +135,17 @@ async def attendance_trigger(body: Dict):
 @app.post("/api/v1/visit-trigger")
 async def visits_trigger(body: Dict):
     print(body)
+    data = body['event']['data']['new']
     with next(get_db()) as db:
         try:
 
+            db_visitor = db.query(Visitor).filter(Visitor.id == data["visitor"]).first()
+
             db_notif = EmployeeNotification(
+                employee_id = data["host_employee"],
                 action = "New Visitor",
                 title = "New Visitor Alert !",
-                message="A new visitor has been added! Click here to see more details",
+                message=f"{db_visitor.firstname} {db_visitor.lastname} is paying you another visit!",
                 is_read = False
             )
             db.add(db_notif)
