@@ -145,7 +145,7 @@ async def visits_trigger(body: Dict):
                 employee_id = data["host_employee"],
                 action = "New Visitor",
                 title = "New Visitor Alert !",
-                message=f"{db_visitor.firstname} {db_visitor.lastname} is paying you another visit!",
+                message=f"{db_visitor.firstname} {db_visitor.lastname} is paying you visit!",
                 is_read = False
             )
             db.add(db_notif)
