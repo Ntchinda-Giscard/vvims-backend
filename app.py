@@ -663,6 +663,8 @@ async def get_attendace_pdf_reports():
 
             return {"pdf_url": s3_url}
 
+            
+
             # return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=attendance_report_{now}_{random-number}.pdf"})
 
 
