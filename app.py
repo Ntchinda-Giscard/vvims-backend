@@ -1,4 +1,7 @@
+import random
+from reportlab.pdfgen import canvas
 import os
+import io
 from typing import Optional, Any
 import uuid
 import mimetypes
@@ -637,6 +640,31 @@ async def get_attendance_by_date_range(start_date, end_date):
                 print("No employees were present.")
             result[date] = attend
         return result
+
+
+@app.get("/api/v1/get-attendace-report")
+async def get_attendace_pdf_reports():
+    with next(get_db()) as db:
+        try:
+            pdf_buffer = io.BytesIO()
+            pdf = canvas.Canvas(pdf_buffer)
+            pdf.setTitle("Attendance Report")
+
+            pdf.drawString(100, 800, "Attendance Report")
+            pdf.showPage()
+            pdf.save()
+            pdf_buffer.seek(0)
+
+            now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+            random-number = str(random.randint(1, 99999)).zfill(5)
+
+            s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random-number}.pdf")
+            s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random-number}.pdf"
+
+            return {"pdf_url": s3_url}
+
+            # return StreamingResponse(pdf_buffer, media_type="application/pdf", headers={"Content-Disposition": f"attachment; filename=attendance_report_{now}_{random-number}.pdf"})
+
 
 
 
