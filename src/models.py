@@ -727,3 +727,5 @@ class Report(Base):
     to_date = Column(Date, nullable=False)
     name =Column(String, nullable=False)
     types = Column(Enum(ReportTypes), default=ReportTypes.VISITS)
+
+    
