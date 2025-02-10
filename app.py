@@ -662,6 +662,8 @@ async def get_attendace_pdf_reports():
             s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
 
             return {"pdf_url": s3_url}
+        except Exception as e:
+            raise e
 
 
 
