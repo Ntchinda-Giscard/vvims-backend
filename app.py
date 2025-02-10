@@ -667,7 +667,8 @@ async def get_attendace_pdf_reports():
                 report_link=s3_url,
                 types = types,
                 from_date = datetime.now(),
-                to_date = datetime.now()
+                to_date = datetime.now(),
+                name = "Attendance Report"
             )
 
             db.add(report)

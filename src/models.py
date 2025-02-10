@@ -725,4 +725,5 @@ class Report(Base):
     report_link = Column(String, nullable=False)
     from_date = Column(Date, nullable=False)
     to_date = Column(Date, nullable=False)
+    name =Column(String, nullable=False)
     types = Column(Enum(ReportTypes), default=ReportTypes.VISITS)
