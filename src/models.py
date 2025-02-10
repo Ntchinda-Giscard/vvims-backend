@@ -1,5 +1,5 @@
 from datetime import timezone
-
+from dataclasses import dataclass
 from sqlalchemy import BigInteger, Column, Integer, String, ForeignKey, Enum, func, DateTime, UUID, Float, Enum, Date, Time, \
     Interval, ARRAY, Boolean, Text
 from sqlalchemy.orm import relationship
@@ -711,7 +711,10 @@ class GroupMessages(Base):
     # Relationships
     group = relationship('Group', back_populates='group_messages')
 
-
+class ReportTypes(PyEnum):
+    ATTENDANCE = 'attendance'
+    VISITS = 'visits'
+    TASKS = 'tasks'
 
 class Report(Base):
 
@@ -720,3 +723,4 @@ class Report(Base):
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     updated_at = Column(DateTime(timezone=True), onupdate=func.now())
     report_link = Column(String, nullable=False)
+    types = Column(Enum(ReportTypes), default=ReportTypes.VISITS)
