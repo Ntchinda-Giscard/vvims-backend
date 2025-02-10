@@ -507,12 +507,12 @@ def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentI
         db.close()
 
 
-def generate_report(db: Session, dataRange: DateRangeType) -> ReportsType:
-    """
-    Generates a report of the total number of employees, attendance percentage, and the number of employees on leave.
-    :param db: A database session instance used to interact with the database.
-    :param dataRange: A DateRangeType object containing the start and end dates for the report.
-    """
+# def generate_report(db: Session, dataRange: DateRangeType) -> ReportsType:
+#     """
+#     Generates a report of the total number of employees, attendance percentage, and the number of employees on leave.
+#     :param db: A database session instance used to interact with the database.
+#     :param dataRange: A DateRangeType object containing the start and end dates for the report.
+#     """
 
-    return -1
+#     return -1
 
