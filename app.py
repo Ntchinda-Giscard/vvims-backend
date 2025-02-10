@@ -20,7 +20,8 @@ from src.crud import authenticate_employee
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
-    EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses
+    EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses, \
+    Report, ReportTypes
 from src.schema.input_type import LoginInput
 from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, \
     calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies
@@ -661,9 +662,20 @@ async def get_attendace_pdf_reports():
             s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random_number}.pdf")
             s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
 
+            types = ReportTypes.ATTENDANCE
+            report = Report(
+                report_link=s3_url,
+                types = types
+            )
+
+            db.add(report)
+            db.commit()
+
             return {"pdf_url": s3_url}
         except Exception as e:
             raise e
+        finally:
+            db.close()
 
 
 
