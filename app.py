@@ -656,10 +656,10 @@ async def get_attendace_pdf_reports():
             
             pdf_buffer.seek(0)
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            random-number = str(random.randint(1, 99999)).zfill(5)
+            random_number = str(random.randint(1, 99999)).zfill(5)
 
-            s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random-number}.pdf")
-            s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random-number}.pdf"
+            s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random_number}.pdf")
+            s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
 
             return {"pdf_url": s3_url}
 
