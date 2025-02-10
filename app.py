@@ -665,7 +665,9 @@ async def get_attendace_pdf_reports():
             types = ReportTypes.ATTENDANCE
             report = Report(
                 report_link=s3_url,
-                types = types
+                types = types,
+                from_date = datetime.datetime.now(),
+                to_date = datetime.datetime.now()
             )
 
             db.add(report)
