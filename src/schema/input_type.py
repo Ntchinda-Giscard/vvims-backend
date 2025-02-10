@@ -124,6 +124,11 @@ class AttendanceInpuType:
 
 
 @strawberry.input
+class DateRangeInputType:
+    from_date: datetime
+    to_date: datetime
+
+@strawberry.input
 class EmployeeId:
     id: uuid.UUID
 

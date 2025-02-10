@@ -188,3 +188,8 @@ class AppointmentTodayPercentage:
     today_count: int
     tomorrow_count: int
     percent: Optional[float] = None
+
+
+@strawberry.type
+class ReportsType:
+    link:  str
