@@ -654,7 +654,6 @@ async def get_attendace_pdf_reports():
             pdf.showPage()
             pdf.save()
             pdf_buffer.seek(0)
-
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
             random-number = str(random.randint(1, 99999)).zfill(5)
 
