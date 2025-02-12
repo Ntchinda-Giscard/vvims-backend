@@ -64,22 +64,3 @@ def generate_pdf():
     pdf_bytes = HTML(string=html_content).write_pdf()
     return pdf_bytes
 
-@app.get("/generate-upload-pdf")
-def generate_and_upload_pdf():
-    """Generate the PDF report, upload it to AWS S3, and return the S3 URL."""
-    pdf_bytes = generate_pdf()
-    
-    # Use BytesIO for the PDF file
-    pdf_buffer = BytesIO(pdf_bytes)
-    
-    # Generate a unique S3 key using the current timestamp
-    timestamp = datetime.now().strftime("%Y_%m_%d_%H:%M:%S")
-    s3_key = f"reports/{timestamp}__{str(os.getpid()).zfill(5)}.pdf"
-    
-    # Upload PDF to S3
-    s3_client.upload_fileobj(pdf_buffer, S3_BUCKET, s3_key, ExtraArgs={"ContentType": "application/pdf"})
-    
-    # Construct the S3 URL (adjust if your bucket has a different endpoint or is in a specific region)
-    s3_url = f"https://{S3_BUCKET}.s3.amazonaws.com/{s3_key}"
-    
-    return JSONResponse({"s3_url": s3_url})
