@@ -29,7 +29,7 @@ import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from zoneinfo import ZoneInfo
-from src.utils import generate_chart
+from src.utilities import generate_pdf
 
 
 models.Base.metadata.create_all(bind=engine)
