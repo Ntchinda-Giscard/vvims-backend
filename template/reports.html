@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Attendance Report</title>
+    <style>
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      h1 { text-align: center; color: #2E86C1; }
+      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+      th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
+      th { background-color: #2E86C1; color: white; }
+      .chart { text-align: center; margin-top: 20px; }
+    </style>
+  </head>
+  <body>
+    <h1>Employee Attendance Report</h1>
+    <p>Generated on: {{ date }}</p>
+
+    <h2>Summary Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Employee</th>
+          <th>Present</th>
+          <th>Absent</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in data %}
+        <tr>
+          <td>{{ record.name }}</td>
+          <td>{{ record.present }}</td>
+          <td>{{ record.absent }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <h2>Attendance Chart</h2>
+    <div class="chart">
+      <img src="data:image/png;base64,{{ chart }}" alt="Attendance Chart">
+    </div>
+  </body>
+</html>

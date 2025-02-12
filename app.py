@@ -29,6 +29,7 @@ import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from zoneinfo import ZoneInfo
+from src.utils import generate_chart
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -647,17 +648,8 @@ async def get_attendance_by_date_range(start_date, end_date):
 async def get_attendace_pdf_reports():
     with next(get_db()) as db:
         try:
-            pdf_buffer = io.BytesIO()
-            pdf = canvas.Canvas(pdf_buffer)
-            pdf.setTitle("Attendance Report")
-
-            pdf.drawString(100, 800, "Attendance Report")
-            pdf.showPage()
-            pdf.save()
-            
-            pdf_buffer.seek(0)
-            now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            random_number = str(random.randint(1, 99999)).zfill(5)
+            pdf_bytes = generate_pdf()
+            pdf_buffer = io.BytesIO(pdf_bytes)
 
             s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random_number}.pdf")
             s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
