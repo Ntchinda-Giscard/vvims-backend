@@ -42,7 +42,7 @@ def generate_chart():
 
 def render_html():
     """Render the HTML report using Jinja2 with embedded data and chart."""
-    template = env.get_template("template/reports.html")
+    template = env.get_template("reports.html")
     
     # Sample table data for the report
     report_data = [
