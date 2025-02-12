@@ -10,7 +10,7 @@ from weasyprint import HTML
 
 
 # Set up Jinja2 environment (assuming your templates are in the "templates" folder)
-env = Environment(loader=FileSystemLoader("templates"))
+env = Environment(loader=FileSystemLoader("template"))
 
 def generate_chart():
     """Generate a Matplotlib bar chart and return it as a base64-encoded PNG."""
