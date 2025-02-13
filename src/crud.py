@@ -7,7 +7,7 @@ from sqlalchemy import func, cast, Date, Time, Numeric, select
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
-    MessageStatus, Event, MessageStatuses, Appointment
+    MessageStatus, Event, MessageStatuses, Appointment, Department
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
     DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType, MessageStatusOutput, \
