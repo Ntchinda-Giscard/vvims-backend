@@ -557,24 +557,34 @@ def get_department_attendance_summary(db: Session, dept: Department):
 )
 
 # Define the main query
+    # Define aliases for clarity
+    EmpAlias = aliased(Employee)
+    AttAlias = aliased(Attendance)
+
+# Define the main query
     query = (
-        db.query(
+        session.query(
             Department.id.label('department_id'),
             Department.abrev_code.label('department_name'),
-            func.count(func.distinct(Employee.id)).label('total_employees'),
-            func.count(Attendance.id).label('total_attendances'),
+            func.count(func.distinct(EmpAlias.id)).label('total_employees'),
+            func.count(AttAlias.id).label('total_attendances'),
             case(
-                (func.count(func.distinct(Employee.id)) == 0, 0),
+                [
+                    (
+                        func.count(func.distinct(EmpAlias.id)) == 0,
+                        0
+                    )
+                ],
                 else_=cast(
-                    (func.count(Attendance.id) / (
-                        func.count(func.distinct(Employee.id)) * attendance_subquery
+                    (func.count(AttAlias.id) / (
+                        func.count(func.distinct(EmpAlias.id)) * total_working_days_subquery
                     )) * 100,
                     Numeric(5, 1)
                 )
             ).label('attendance_percentage')
         )
-        .join(Employee, Department.id == Employee.department_id)
-        .outerjoin(Attendance, Employee.id == Attendance.employee_id)
+        .outerjoin(EmpAlias, Department.id == EmpAlias.department_id)
+        .outerjoin(AttAlias, EmpAlias.id == AttAlias.employee_id)
         .group_by(Department.id, Department.abrev_code)
     )
 
@@ -585,8 +595,8 @@ def get_department_attendance_summary(db: Session, dept: Department):
     attendance_data = [
         {
             'department_id': row.department_id,
-            'name': row.department_name,
-            'percentage': row.attendance_percentage
+            'department_name': row.department_name,
+            'attendance_percentage': row.attendance_percentage
         }
         for row in result
     ]
