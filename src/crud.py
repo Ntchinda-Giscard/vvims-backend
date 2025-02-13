@@ -534,5 +534,15 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
 
     result = query.all()
 
-    return result
+    # Convert result tuples to list of dictionaries
+    result_dicts = [
+        {
+            'id': res.id,
+            'firstname': res.firstname,
+            'present_count': res.present_count,
+            'avg_clock_in_time': res.avg_clock_in_time
+        }
+        for res in result
+    ]
 
+    return result_dicts
