@@ -583,8 +583,8 @@ def get_department_attendance_summary(db: Session, dept: Department):
     attendance_data = [
         {
             'department_id': row.department_id,
-            'department_name': row.department_name,
-            'attendance_percentage': row.attendance_percentage
+            'name': row.department_name,
+            'percentage': row.attendance_percentage
         }
         for row in result
     ]
