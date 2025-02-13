@@ -648,7 +648,8 @@ async def get_attendance_by_date_range(start_date, end_date):
 async def get_attendace_pdf_reports():
     with next(get_db()) as db:
         try:
-            pdf_bytes = generate_pdf()
+            result = get_employee_attendance_summary(db, Employee, Attendance)
+            pdf_bytes = generate_pdf(result)
             pdf_buffer = io.BytesIO(pdf_bytes)
             # Generate the current timestamp and a random number
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
@@ -665,8 +666,6 @@ async def get_attendace_pdf_reports():
                 to_date = datetime.now(),
                 name = "Attendance Report"
             )
-
-            result = get_employee_attendance_summary(db, Employee, Attendance)
 
             db.add(report)
             db.commit()

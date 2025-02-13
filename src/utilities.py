@@ -40,16 +40,16 @@ def generate_chart():
     
     return base64.b64encode(buf.read()).decode("utf-8")
 
-def render_html():
+def render_html(report_data):
     """Render the HTML report using Jinja2 with embedded data and chart."""
     template = env.get_template("reports.html")
     
     # Sample table data for the report
-    report_data = [
-        {"name": "John Doe", "present": 20, "avr_hrs": 98},
-        {"name": "Jane Smith", "present": 18, "avr_hrs": 98},
-        {"name": "Michael Brown", "present": 22, "avr_hrs": 98},
-    ]
+    # report_data = [
+    #     {"name": "John Doe", "present": 20, "avr_hrs": 98},
+    #     {"name": "Jane Smith", "present": 18, "avr_hrs": 98},
+    #     {"name": "Michael Brown", "present": 22, "avr_hrs": 98},
+    # ]
     
     rendered_html = template.render(
         date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
@@ -58,9 +58,9 @@ def render_html():
     )
     return rendered_html
 
-def generate_pdf():
+def generate_pdf(report_data):
     """Convert the rendered HTML to a PDF and return the PDF bytes."""
-    html_content = render_html()
+    html_content = render_html(report_data)
     pdf_bytes = HTML(string=html_content).write_pdf()
     return pdf_bytes
 
