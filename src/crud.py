@@ -3,7 +3,7 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
-from sqlalchemy import func, cast, Date, Time
+from sqlalchemy import func, cast, Date, Time, Numeric
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
