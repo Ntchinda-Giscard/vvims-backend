@@ -68,7 +68,7 @@
         </tr>
       </thead>
       <tbody>
-        {% for record in data_dept %}
+        {% for record in data %}
         <tr>
           <td>{{ record.name }}</td>
           <td>{{ record.present }}</td>
@@ -94,14 +94,14 @@
       <thead>
         <tr>
           <th>Department</th>
-          <th>Attendance Rate</th>
+          <th>Attendance Rate (%)</th>
         </tr>
       </thead>
       <tbody>
-        {% for record in data %}
+        {% for record in data_dept %}
         <tr>
-          <td>{{ record.department }}</td>
-          <td>{{ record.attendance_rate }}</td>
+          <td>{{ record.name }}</td>
+          <td>{{ record.percentage }}</td>
         </tr>
         {% endfor %}
       </tbody>

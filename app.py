@@ -650,7 +650,7 @@ async def get_attendace_pdf_reports():
         try:
             result = get_employee_attendance_summary(db, Employee, Attendance)
             result_dept = get_department_attendance_summary(db, Department)
-            pdf_bytes = generate_pdf(result)
+            pdf_bytes = generate_pdf(result, result_dept)
             pdf_buffer = io.BytesIO(pdf_bytes)
             # Generate the current timestamp and a random number
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
