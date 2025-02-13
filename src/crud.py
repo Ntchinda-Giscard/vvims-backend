@@ -508,7 +508,8 @@ def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentI
 
 
 def get_employee_attendance_summary(db: Session, employee: Employee, attendance: Attendance):
-
+    start_date = '2025-02-01'
+    end_date = '2025-02-28'
     query = (
         db.query(
             employee.id,
