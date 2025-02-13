@@ -3,7 +3,7 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
-from sqlalchemy import func, cast, Date, Time, Numeric
+from sqlalchemy import func, cast, Date, Time, Numeric, select
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
@@ -546,3 +546,54 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
     ]
 
     return result_dicts
+
+
+def get_department_attendance_summary(db: Session, dept: Department):
+
+    attendance_subquery = (
+        session.query(func.count(func.distinct(Attendance.clock_in_date)))
+        .filter(Attendance.clock_in_date.between('2025-02-01', '2025-02-28'))
+        .label('total_working_days')
+    )
+
+    query = (
+        db.query(
+            Department.id.label('department_id'),
+            Department.abrev_code.label('department_name'),
+            func.count(func.distinct(Employee.id)).label('total_employees'),
+            func.count(Attendance.id).label('total_attendances'),
+            case(
+                [
+                    (
+                        func.count(func.distinct(Employee.id)) == 0,
+                        0
+                    )
+                ],
+                else_=cast(
+                    (func.count(Attendance.id) / (
+                        func.count(func.distinct(Employee.id)) * attendance_subquery
+                    )) * 100,
+                    Numeric(5, 1)
+                )
+            ).label('attendance_percentage')
+        )
+        .join(Employee, Department.id == Employee.department_id)
+        .outerjoin(Attendance, Employee.id == Attendance.employee_id)
+        .group_by(Department.id, Department.abrev_code)
+    )
+
+    # Execute the query
+    result = query.all()
+
+    # Process the result
+    attendance_data = [
+        {
+            'id': row.department_id,
+            'name': row.department_name,
+            'percentage': row.attendance_percentage
+        }
+        for row in result
+    ]
+
+    return result
+

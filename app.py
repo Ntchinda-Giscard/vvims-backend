@@ -18,7 +18,7 @@ from src import models, logger
 from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee, get_employee_attendance_summary
 from src.database import engine, get_db
-from src.models import Employee, CompanySettings, Attendance, AttendanceState, AppVersions, UploadedFile, \
+from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses, \
     Report, ReportTypes
@@ -649,6 +649,7 @@ async def get_attendace_pdf_reports():
     with next(get_db()) as db:
         try:
             result = get_employee_attendance_summary(db, Employee, Attendance)
+            result_dept = get_department_attendance_summary(db, Department)
             pdf_bytes = generate_pdf(result)
             pdf_buffer = io.BytesIO(pdf_bytes)
             # Generate the current timestamp and a random number
