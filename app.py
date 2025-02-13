@@ -16,7 +16,7 @@ from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
-from src.crud import authenticate_employee, get_employee_attendance_summary
+from src.crud import authenticate_employee, get_employee_attendance_summary, get_department_attendance_summary
 from src.database import engine, get_db
 from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, \
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
