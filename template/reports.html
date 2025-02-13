@@ -1,21 +1,63 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <title>Attendance Report</title>
-    <style>
-      body { font-family: Arial, sans-serif; margin: 20px; }
-      h1 { text-align: center; color: #2E86C1; }
-      table { width: 100%; border-collapse: collapse; margin: 20px 0; }
-      th, td { border: 1px solid #ddd; padding: 8px; text-align: center; }
-      th { background-color: #2E86C1; color: white; }
-      .chart { text-align: center; margin-top: 20px; }
-    </style>
-  </head>
-  <body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Employee Attendance Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      background: #f9f9f9;
+      color: #333;
+    }
+    header, section, footer {
+      margin-bottom: 30px;
+    }
+    header h1 {
+      text-align: center;
+      color: #2E86C1;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0;
+      background: #fff;
+    }
+    th, td {
+      border: 1px solid #ddd;
+      padding: 10px;
+      text-align: center;
+    }
+    th {
+      background-color: #2E86C1;
+      color: white;
+    }
+    .chart {
+      text-align: center;
+      margin-top: 20px;
+    }
+    ul.summary-list {
+      list-style-type: none;
+      padding: 0;
+    }
+    ul.summary-list li {
+      padding: 5px 0;
+    }
+    footer {
+      text-align: center;
+      font-size: 0.9em;
+      color: #777;
+    }
+  </style>
+</head>
+<body>
+  <header>
     <h1>Employee Attendance Report</h1>
     <p>Generated on: {{ date }}</p>
+  </header>
 
+  <section>
     <h2>Summary Table</h2>
     <table>
       <thead>
@@ -23,6 +65,7 @@
           <th>Employee</th>
           <th>Present</th>
           <th>Absent</th>
+          <th>Avg. Working Hours</th>
         </tr>
       </thead>
       <tbody>
@@ -31,14 +74,49 @@
           <td>{{ record.name }}</td>
           <td>{{ record.present }}</td>
           <td>{{ record.absent }}</td>
+          <td>{{ record.avr_hrs }}</td>
         </tr>
         {% endfor %}
       </tbody>
     </table>
+  </section>
 
+  <section>
+    <h2>Company Attendance Summary</h2>
+    <ul class="summary-list">
+      <li>Average arrival time: {{ arrival_time }}</li>
+      <li>Average time on-site: {{ avr_office_hours }}</li>
+      <li>Overall attendance rate: {{ overall_perc }}</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Attendance Rate by Department</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Department</th>
+          <th>Attendance Rate</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for record in data %}
+        <tr>
+          <td>{{ record.department }}</td>
+          <td>{{ record.attendance_rate }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+
+  <section class="chart">
     <h2>Attendance Chart</h2>
-    <div class="chart">
-      <img src="data:image/png;base64,{{ chart }}" alt="Attendance Chart">
-    </div>
-  </body>
+    <img src="data:image/png;base64,{{ chart }}" alt="Attendance Chart">
+  </section>
+
+  <footer>
+    <p>&copy; {{ current_year }} Company Name. All rights reserved.</p>
+  </footer>
+</body>
 </html>

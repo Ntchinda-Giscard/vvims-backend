@@ -64,3 +64,6 @@ def generate_pdf():
     pdf_bytes = HTML(string=html_content).write_pdf()
     return pdf_bytes
 
+
+
+class ReportGenerator(ABC)
