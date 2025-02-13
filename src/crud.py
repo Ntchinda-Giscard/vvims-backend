@@ -516,10 +516,13 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
             Employee.firstname,
             func.count(Attendance.id).label('present_count'),
             cast(
-                func.time(
-                    func.avg(
-                        func.extract('epoch', Attendance.clock_in_time)
-                    )
+                func.to_char(
+                    func.to_timestamp(
+                        func.avg(
+                            func.extract('epoch', Attendance.clock_in_time)
+                        )
+                    ),
+                    'HH24:MI:SS'
                 ),
                 Time
             ).label('avg_clock_in_time')
