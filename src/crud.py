@@ -554,30 +554,44 @@ def get_department_attendance_summary(db: Session, dept: Department):
         db.query(func.count(func.distinct(Attendance.clock_in_date)).label('total_working_days'))
     ).subquery()
 
-    # Query to calculate attendance percentage by department
+# Main query to calculate attendance percentage by department
     query = (
         db.query(
             Department.id.label('department_id'),
             Department.name.label('department_name'),
-            (func.count(Attendance.id) * 100.0 / (
-                func.count(func.distinct(Employee.id)) * total_working_days_subquery.c.total_working_days
-            )).label('attendance_percentage')
+            func.count(Attendance.id).label('total_attendances'),
+            func.count(func.distinct(Employee.id)).label('total_employees'),
+            cast(
+                case(
+                    [
+                        (
+                            func.count(func.distinct(Employee.id)) == 0,
+                            0
+                        )
+                    ],
+                    else_=(func.count(Attendance.id) * 100.0) / (
+                        func.count(func.distinct(Employee.id)) * total_working_days_subquery.c.total_working_days
+                    )
+                ),
+                Numeric(5, 1)
+            ).label('attendance_percentage')
         )
-        .join(Employee, Department.id == Employee.department_id)
-        .join(Attendance, Employee.id == Attendance.employee_id)
-        .group_by(Department.id, Department.name)
+        .outerjoin(Employee, Department.id == Employee.department_id)
+        .outerjoin(Attendance, Employee.id == Attendance.employee_id)
+        .group_by(Department.id, Department.name, total_working_days_subquery.c.total_working_days)
     )
 
-    result = db.execute(query).fetchall()
+    # Execute the query
+    result = query.all()
 
-    # Convert result to list of dictionaries
-    department_attendance = [
+    # Process the result
+    attendance_data = [
         {
             'department_id': row.department_id,
-            'name': row.department_name,
-            'percentage': row.attendance_percentage
+            'department_name': row.department_name,
+            'attendance_percentage': row.attendance_percentage
         }
         for row in result
     ]
 
-    return department_attendance
+    return attendance_data
