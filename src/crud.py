@@ -551,7 +551,7 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
 def get_department_attendance_summary(db: Session, dept: Department):
 
     attendance_subquery = (
-        session.query(func.count(func.distinct(Attendance.clock_in_date)))
+        db.query(func.count(func.distinct(Attendance.clock_in_date)))
         .filter(Attendance.clock_in_date.between('2025-02-01', '2025-02-28'))
         .label('total_working_days')
     )
