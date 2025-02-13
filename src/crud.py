@@ -511,20 +511,22 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
     start_date = '2025-02-01'
     end_date = '2025-02-28'
     query = (
-        db.query(
-            employee.id,
-            employee.firstname,
-            func.count(attendance.id).label("present_count"),
+        session.query(
+            Employee.id,
+            Employee.firstname,
+            func.count(Attendance.id).label('present_count'),
             cast(
-                func.date("2000-01-01") + func.avg(
-                    func.extract('epoch', attendance.clock_in_time)
-                ) * func.interval('1 second'),
+                func.time(
+                    func.avg(
+                        func.extract('epoch', Attendance.clock_in_time)
+                    )
+                ),
                 Time
-            ).label("avg_clock_in_time")
+            ).label('avg_clock_in_time')
         )
-        .join(attendance, employee.id == attendance.employee_id)
-        .filter(attendance.clock_in_date.between(start_date, end_date))
-        .group_by(employee.id, employee.firstname)
+        .join(Attendance, Employee.id == Attendance.employee_id)
+        .filter(Attendance.clock_in_date.between(start_date, end_date))
+        .group_by(Employee.id, Employee.firstname)
     )
 
     result = query.all()
