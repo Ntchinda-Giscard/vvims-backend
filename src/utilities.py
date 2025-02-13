@@ -46,9 +46,9 @@ def render_html():
     
     # Sample table data for the report
     report_data = [
-        {"name": "John Doe", "present": 20, "absent": 5},
-        {"name": "Jane Smith", "present": 18, "absent": 7},
-        {"name": "Michael Brown", "present": 22, "absent": 3},
+        {"name": "John Doe", "present": 20, "avr_hrs": 98},
+        {"name": "Jane Smith", "present": 18, "avr_hrs": 98},
+        {"name": "Michael Brown", "present": 22, "avr_hrs": 98},
     ]
     
     rendered_html = template.render(

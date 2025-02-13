@@ -3,7 +3,7 @@ from typing import Any, Optional
 from passlib.context import CryptContext
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import and_
-from sqlalchemy import func, case, desc
+from sqlalchemy import func, cast, Date, Time
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
@@ -507,12 +507,26 @@ def get_appointment_today_percentage(db: Session, employee: EmployeeAppointmentI
         db.close()
 
 
-# def generate_report(db: Session, dataRange: DateRangeType) -> ReportsType:
-#     """
-#     Generates a report of the total number of employees, attendance percentage, and the number of employees on leave.
-#     :param db: A database session instance used to interact with the database.
-#     :param dataRange: A DateRangeType object containing the start and end dates for the report.
-#     """
+def get_employee_attendance_summary(db: Session, employee: Employee, attendance: Attendance):
 
-#     return -1
+    query = (
+        db.query(
+            employee.id,
+            employee.firstname,
+            func.count(attendance.id).label("present_count"),
+            cast(
+                func.date("2000-01-01") + func.avg(
+                    func.extract('epoch', attendance.clock_in_time)
+                ) * func.interval('1 second'),
+                Time
+            ).label("avg_clock_in_time")
+        )
+        .join(attendance, employee.id == attendance.employee_id)
+        .filter(attendance.clock_in_date.between(start_date, end_date))
+        .group_by(employee.id, employee.firstname)
+    )
+
+    result = query.all()
+
+    return result
 
