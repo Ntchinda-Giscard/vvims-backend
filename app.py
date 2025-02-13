@@ -670,8 +670,8 @@ async def get_attendace_pdf_reports():
             db.add(report)
             db.commit()
             print(f"Observation {s3_url}")
-            # return {"pdf_url": s3_url}
-            return result
+            return {"pdf_url": s3_url}
+            # return result
         except Exception as e:
             raise e
         finally:
