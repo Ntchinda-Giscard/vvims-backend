@@ -538,9 +538,9 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
     result_dicts = [
         {
             'id': res.id,
-            'firstname': res.firstname,
-            'present_count': res.present_count,
-            'avg_clock_in_time': res.avg_clock_in_time
+            'name': res.firstname,
+            'present': res.present_count,
+            'avr_hrs': res.avg_clock_in_time
         }
         for res in result
     ]
