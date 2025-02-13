@@ -590,3 +590,5 @@ def get_department_attendance_summary(db: Session, dept: Department):
         }
         for row in result
     ]
+
+    return attendance_data
