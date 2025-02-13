@@ -551,11 +551,12 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
 def get_department_attendance_summary(db: Session, dept: Department):
 
     attendance_subquery = (
-        db.query(func.count(func.distinct(Attendance.clock_in_date)))
-        .filter(Attendance.clock_in_date.between('2025-02-01', '2025-02-28'))
-        .label('total_working_days')
-    )
+    db.query(func.count(func.distinct(Attendance.clock_in_date)))
+    .filter(Attendance.clock_in_date.between('2025-02-01', '2025-02-28'))
+    .label('total_working_days')
+)
 
+# Define the main query
     query = (
         db.query(
             Department.id.label('department_id'),
@@ -563,12 +564,7 @@ def get_department_attendance_summary(db: Session, dept: Department):
             func.count(func.distinct(Employee.id)).label('total_employees'),
             func.count(Attendance.id).label('total_attendances'),
             case(
-                [
-                    (
-                        func.count(func.distinct(Employee.id)) == 0,
-                        0
-                    )
-                ],
+                (func.count(func.distinct(Employee.id)) == 0, 0),
                 else_=cast(
                     (func.count(Attendance.id) / (
                         func.count(func.distinct(Employee.id)) * attendance_subquery
@@ -588,12 +584,9 @@ def get_department_attendance_summary(db: Session, dept: Department):
     # Process the result
     attendance_data = [
         {
-            'id': row.department_id,
+            'department_id': row.department_id,
             'name': row.department_name,
             'percentage': row.attendance_percentage
         }
         for row in result
     ]
-
-    return result
-
