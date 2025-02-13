@@ -511,7 +511,7 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
     start_date = '2025-02-01'
     end_date = '2025-02-28'
     query = (
-        session.query(
+        db.query(
             Employee.id,
             Employee.firstname,
             func.count(Attendance.id).label('present_count'),
