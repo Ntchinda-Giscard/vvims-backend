@@ -551,24 +551,19 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
 def get_department_attendance_summary(db: Session, dept: Department):
 
     total_working_days_subquery = (
-        db.query(func.count(func.distinct(Attendance.clock_in_date)).label('total_working_days'))
+        session.query(func.count(func.distinct(Attendance.clock_in_date)).label('total_working_days'))
     ).subquery()
 
-# Main query to calculate attendance percentage by department
+    # Main query to calculate attendance percentage by department
     query = (
-        db.query(
+        session.query(
             Department.id.label('department_id'),
             Department.name.label('department_name'),
             func.count(Attendance.id).label('total_attendances'),
             func.count(func.distinct(Employee.id)).label('total_employees'),
             cast(
                 case(
-                    [
-                        (
-                            func.count(func.distinct(Employee.id)) == 0,
-                            0
-                        )
-                    ],
+                    (func.count(func.distinct(Employee.id)) == 0, 0),
                     else_=(func.count(Attendance.id) * 100.0) / (
                         func.count(func.distinct(Employee.id)) * total_working_days_subquery.c.total_working_days
                     )
