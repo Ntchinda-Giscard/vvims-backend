@@ -550,55 +550,34 @@ def get_employee_attendance_summary(db: Session, employee: Employee, attendance:
 
 def get_department_attendance_summary(db: Session, dept: Department):
 
-    attendance_subquery = (
-    db.query(func.count(func.distinct(Attendance.clock_in_date)))
-    .filter(Attendance.clock_in_date.between('2025-02-01', '2025-02-28'))
-    .label('total_working_days')
-)
+    total_working_days_subquery = (
+        db.query(func.count(func.distinct(Attendance.date)).label('total_working_days'))
+    ).subquery()
 
-# Define the main query
-    # Define aliases for clarity
-    EmpAlias = aliased(Employee)
-    AttAlias = aliased(Attendance)
-
-# Define the main query
+    # Query to calculate attendance percentage by department
     query = (
-        session.query(
+        db.query(
             Department.id.label('department_id'),
-            Department.abrev_code.label('department_name'),
-            func.count(func.distinct(EmpAlias.id)).label('total_employees'),
-            func.count(AttAlias.id).label('total_attendances'),
-            case(
-                [
-                    (
-                        func.count(func.distinct(EmpAlias.id)) == 0,
-                        0
-                    )
-                ],
-                else_=cast(
-                    (func.count(AttAlias.id) / (
-                        func.count(func.distinct(EmpAlias.id)) * total_working_days_subquery
-                    )) * 100,
-                    Numeric(5, 1)
-                )
-            ).label('attendance_percentage')
+            Department.name.label('department_name'),
+            (func.count(Attendance.id) * 100.0 / (
+                func.count(func.distinct(Employee.id)) * total_working_days_subquery.c.total_working_days
+            )).label('attendance_percentage')
         )
-        .outerjoin(EmpAlias, Department.id == EmpAlias.department_id)
-        .outerjoin(AttAlias, EmpAlias.id == AttAlias.employee_id)
-        .group_by(Department.id, Department.abrev_code)
+        .join(Employee, Department.id == Employee.department_id)
+        .join(Attendance, Employee.id == Attendance.employee_id)
+        .group_by(Department.id, Department.name)
     )
 
-    # Execute the query
-    result = query.all()
+    result = db.execute(query).fetchall()
 
-    # Process the result
-    attendance_data = [
+    # Convert result to list of dictionaries
+    department_attendance = [
         {
             'department_id': row.department_id,
-            'department_name': row.department_name,
-            'attendance_percentage': row.attendance_percentage
+            'name': row.department_name,
+            'percentage': row.attendance_percentage
         }
         for row in result
     ]
 
-    return attendance_data
+    return department_attendance
