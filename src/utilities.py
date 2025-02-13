@@ -65,5 +65,3 @@ def generate_pdf():
     return pdf_bytes
 
 
-
-class ReportGenerator(ABC)
