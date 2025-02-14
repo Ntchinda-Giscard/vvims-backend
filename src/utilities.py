@@ -40,7 +40,7 @@ def generate_chart():
     
     return base64.b64encode(buf.read()).decode("utf-8")
 
-def render_html(report_data, data_dept, summary):
+def render_html(report_data, data_dept, summary, company_name):
     """Render the HTML report using Jinja2 with embedded data and chart."""
     template = env.get_template("reports.html")
     
