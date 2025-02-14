@@ -5,6 +5,11 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Employee Attendance Report</title>
   <style>
+    .header {
+        background: #2c3e50;
+        color: white;
+        padding: 20px;
+      }
     body {
       font-family: Arial, sans-serif;
       margin: 20px;
@@ -19,20 +24,32 @@
       color: #2E86C1;
     }
     table {
-      width: 100%;
-      border-collapse: collapse;
-      margin: 20px 0;
-      background: #fff;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 10px;
-      text-align: center;
-    }
-    th {
-      background-color: #2E86C1;
-      color: white;
-    }
+        width: 100%;
+        border-collapse: collapse;
+      }
+      td,
+      th {
+        border: 1px solid #ddd;
+        padding: 8px;
+      }
+      body { font-family: Arial, sans-serif; margin: 20px; }
+      h1 { text-align: center; }
+      h2 { margin-top: 40px; }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+      }
+      table, th, td {
+        border: 1px solid #ccc;
+      }
+      th, td {
+        padding: 8px;
+        text-align: center;
+      }
+      th {
+        background-color: #f2f2f2;
+      }
     .chart {
       text-align: center;
       margin-top: 20px;
@@ -53,7 +70,7 @@
 </head>
 <body>
   <header>
-    <h1>Employee Attendance Report</h1>
+    <h1 class="header">Employee Attendance Report</h1>
     <p>Generated on: {{ date }}</p>
   </header>
 
