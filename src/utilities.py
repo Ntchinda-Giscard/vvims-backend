@@ -60,7 +60,7 @@ def render_html(report_data, data_dept, summary):
     )
     return rendered_html
 
-def generate_pdf(report_data, data_dept):
+def generate_pdf(report_data, data_dept, summary):
     """Convert the rendered HTML to a PDF and return the PDF bytes."""
     html_content = render_html(report_data, data_dept, summary)
     pdf_bytes = HTML(string=html_content).write_pdf()

@@ -657,7 +657,7 @@ async def get_attendace_pdf_reports():
             summary["avr_office_hours"] = average_time_in_office(db, Attendance)
             summary["overall_perc"] = attendance_percentage(db, Attendance, Employee)
 
-            pdf_bytes = generate_pdf(result, result_dept)
+            pdf_bytes = generate_pdf(result, result_dept, summary)
             pdf_buffer = io.BytesIO(pdf_bytes)
             # Generate the current timestamp and a random number
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
