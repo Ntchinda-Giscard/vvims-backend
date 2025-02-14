@@ -558,7 +558,7 @@ def get_department_attendance_summary(db: Session, dept: Department):
     query = (
         db.query(
             Department.id.label('department_id'),
-            Department.name.label('department_name'),
+            Department.abrev_code.label('department_name'),
             func.count(Attendance.id).label('total_attendances'),
             func.count(func.distinct(Employee.id)).label('total_employees'),
             cast(
@@ -573,7 +573,7 @@ def get_department_attendance_summary(db: Session, dept: Department):
         )
         .outerjoin(Employee, Department.id == Employee.department_id)
         .outerjoin(Attendance, Employee.id == Attendance.employee_id)
-        .group_by(Department.id, Department.name, total_working_days_subquery.c.total_working_days)
+        .group_by(Department.id, Department.abrev_code, total_working_days_subquery.c.total_working_days)
     )
 
     # Execute the query
