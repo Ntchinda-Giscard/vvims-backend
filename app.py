@@ -18,7 +18,7 @@ from src import models, logger
 from src.auth import create_token, get_current_user
 from src.crud import authenticate_employee, get_employee_attendance_summary, get_department_attendance_summary, attendance_percentage, average_time_in_office, average_compnay_arrival_time, get_company_name
 from src.database import engine, get_db
-from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, Company, TextContent\
+from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, Company, TextContent,\
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses, \
     Report, ReportTypes
