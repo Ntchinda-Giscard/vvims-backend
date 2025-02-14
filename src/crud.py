@@ -652,6 +652,6 @@ def get_company_name(db: Session, company: Company, text_content: TextContent):
     company_name = (
         db.query(
             text_content.content)
-            .join(cocompanympnay, company.name == text_content.id)
+            .join(company, company.name == text_content.id)
         )
     return company_name
