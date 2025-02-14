@@ -653,7 +653,7 @@ async def get_attendace_pdf_reports():
             result_dept = get_department_attendance_summary(db, Department)
 
             # Company anme
-            company_name = get_company_name(db, Company, TextContnent)
+            company_name = get_company_name(db, Company, TextContent)
 
             # Summary of Company
             summary["arrival_time"] = average_compnay_arrival_time(db, Attendance)
