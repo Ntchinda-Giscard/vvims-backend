@@ -55,7 +55,7 @@ def render_html(report_data, data_dept, summary):
         date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         data=report_data,
         chart=generate_chart(),
-        data_dept = data_dept
+        data_dept = data_dept,
         summary = summary
     )
     return rendered_html
