@@ -590,3 +590,60 @@ def get_department_attendance_summary(db: Session, dept: Department):
     ]
 
     return attendance_data
+
+
+
+def average_compnay_arrival_time(db: Session, attendance: Attendance):
+
+    average_arrival_query = (
+        db.query(
+            cast(func.avg(cast(func.extract('epoch', attendance.clock_in_time), Time)), Time).label('average_arrival_time')
+        )
+    )
+
+    # Execute the query
+    result = average_arrival_query.one()
+
+    # Extract the average arrival time
+    average_arrival_time = result.average_arrival_time
+
+    return average_arrival_time
+
+
+def average_time_in_office(db:Session, attendance: Attendance):
+
+    average_time_on_site_query = (
+        db.query(
+            func.to_char(
+                func.to_timestamp(
+                    func.avg(
+                        func.extract('epoch', attendance.clock_out_time - attendance.clock_in_time)
+                    )
+                ),
+                'HH24:MI:SS'
+            ).label('average_time_on_site')
+        )
+    )
+
+    result = average_time_on_site_query.one()
+    average_time_on_site = result.average_time_on_site
+
+    return average_time_on_site
+
+def attendance_percentage(db: Session, attendance: Attendance, employee: Employee):
+    # Calculate total attendance records
+    total_attendance = db.query(func.count(attendance.id)).scalar()
+
+    # Calculate total number of employees
+    total_employees = db.query(func.count(employee.id)).scalar()
+
+    # Calculate total working days (distinct clock_in_date values)
+    total_working_days = db.query(func.count(func.distinct(attendance.clock_in_date))).scalar()
+
+    # Avoid division by zero
+    if total_employees * total_working_days > 0:
+        overall_attendance_percentage = (total_attendance / (total_employees * total_working_days)) * 100
+    else:
+        overall_attendance_percentage = 0
+
+    return overall_attendance_percentage

@@ -40,7 +40,7 @@ def generate_chart():
     
     return base64.b64encode(buf.read()).decode("utf-8")
 
-def render_html(report_data, data_dept):
+def render_html(report_data, data_dept, summary):
     """Render the HTML report using Jinja2 with embedded data and chart."""
     template = env.get_template("reports.html")
     
@@ -56,12 +56,13 @@ def render_html(report_data, data_dept):
         data=report_data,
         chart=generate_chart(),
         data_dept = data_dept
+        summary = summary
     )
     return rendered_html
 
 def generate_pdf(report_data, data_dept):
     """Convert the rendered HTML to a PDF and return the PDF bytes."""
-    html_content = render_html(report_data, data_dept)
+    html_content = render_html(report_data, data_dept, summary)
     pdf_bytes = HTML(string=html_content).write_pdf()
     return pdf_bytes
 
