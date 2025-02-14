@@ -7,7 +7,7 @@ from sqlalchemy import func, cast, Date, Time, Numeric, select, case
 from src import logger
 from src.models import Employee, EmployeeRole, Role, Position, Attendance, Leave, Task, TaskStatusEnum, TaskStatus, \
     Visit, Vehicle, AttendanceState, Conversation, EmployeeConversation, ParticipantStatus, EventParticipant, Message, \
-    MessageStatus, Event, MessageStatuses, Appointment, Department
+    MessageStatus, Event, MessageStatuses, Appointment, Department, Company, TextContent
 from src.schema.output_type import EmployeeType, AttendnacePercentage, EmployeeOnLeave, TaskCompletionPercentage, \
     VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, AcceptParcipateEvent, \
     DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, EventType, ParticipantType, MessageStatusOutput, \
@@ -646,3 +646,12 @@ def attendance_percentage(db: Session, attendance: Attendance, employee: Employe
         overall_attendance_percentage = 0
 
     return overall_attendance_percentage
+
+
+def get_company_name(db: Session, company: Company, text_content: TextContent):
+    company_name = (
+        db.query(
+            text_content.content)
+            .join(cocompanympnay, company.name == text_content.id)
+        )
+    return company_name

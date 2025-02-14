@@ -16,9 +16,9 @@ from strawberry.fastapi import GraphQLRouter
 from schema import Mutation, Query, Subscription
 from src import models, logger
 from src.auth import create_token, get_current_user
-from src.crud import authenticate_employee, get_employee_attendance_summary, get_department_attendance_summary, attendance_percentage, average_time_in_office, average_compnay_arrival_time
+from src.crud import authenticate_employee, get_employee_attendance_summary, get_department_attendance_summary, attendance_percentage, average_time_in_office, average_compnay_arrival_time, get_company_name
 from src.database import engine, get_db
-from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, \
+from src.models import Employee, CompanySettings, Department, Attendance, AttendanceState, AppVersions, UploadedFile, Company, TextContent\
     EmployeeNotification, Visit, Visitor, EmployeeNotificationType, EventParticipant, ParticipantStatus, Conversation, \
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses, \
     Report, ReportTypes
@@ -652,12 +652,15 @@ async def get_attendace_pdf_reports():
             result = get_employee_attendance_summary(db, Employee, Attendance)
             result_dept = get_department_attendance_summary(db, Department)
 
+            # Company anme
+            company_name = get_company_name(db, Company, TextContnent)
+
             # Summary of Company
             summary["arrival_time"] = average_compnay_arrival_time(db, Attendance)
             summary["avr_office_hours"] = average_time_in_office(db, Attendance)
             summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(db, Attendance, Employee))
 
-            pdf_bytes = generate_pdf(result, result_dept, summary)
+            pdf_bytes = generate_pdf(result, result_dept, summary, company_name)
             pdf_buffer = io.BytesIO(pdf_bytes)
             # Generate the current timestamp and a random number
             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
