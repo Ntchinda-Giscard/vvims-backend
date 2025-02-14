@@ -655,7 +655,7 @@ async def get_attendace_pdf_reports():
             # Summary of Company
             summary["arrival_time"] = average_compnay_arrival_time(db, Attendance)
             summary["avr_office_hours"] = average_time_in_office(db, Attendance)
-            summary["overall_perc"] = attendance_percentage(db, Attendance, Employee)
+            summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(db, Attendance, Employee))
 
             pdf_bytes = generate_pdf(result, result_dept, summary)
             pdf_buffer = io.BytesIO(pdf_bytes)
