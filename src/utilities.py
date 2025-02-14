@@ -54,7 +54,7 @@ def render_html(report_data, data_dept, summary, company_name):
     rendered_html = template.render(
         date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         data=report_data,
-        chart=generate_chart(),
+        # chart=generate_chart(),
         data_dept = data_dept,
         summary = summary,
         company_name = company_name

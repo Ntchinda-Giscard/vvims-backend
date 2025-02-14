@@ -654,3 +654,4 @@ def get_company_name(db: Session, Company, TextContent):
           .one()
     )
     return result.content
+
