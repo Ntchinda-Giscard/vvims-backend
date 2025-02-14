@@ -647,11 +647,10 @@ def attendance_percentage(db: Session, attendance: Attendance, employee: Employe
 
     return overall_attendance_percentage
 
-
-def get_company_name(db: Session, company: Company, text_content: TextContent):
-    company_name = (
-        db.query(
-            text_content.content)
-            .join(company, company.name == text_content.id).one()
-        )
-    return company_name
+def get_company_name(db: Session, Company, TextContent):
+    result = (
+        db.query(TextContent.content)
+          .join(Company, Company.id == TextContent.company_id)
+          .one()
+    )
+    return result.content
