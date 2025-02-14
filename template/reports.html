@@ -38,7 +38,7 @@
       margin-top: 20px;
     }
     ul.summary-list {
-      list-style-type: none;
+      list-style-type: decimal-leading-zero;
       padding: 0;
     }
     ul.summary-list li {
@@ -82,9 +82,9 @@
   <section>
     <h2>Company Attendance Summary</h2>
     <ul class="summary-list">
-      <li>Average arrival time: {{ summary.arrival_time }}</li>
-      <li>Average time on-site: {{ summary.avr_office_hours }}</li>
-      <li>Overall attendance rate: {{ summary.overall_perc }}</li>
+      <li> <strong> Average arrival time: {{ summary.arrival_time }} </strong> </li>
+      <li> <strong> Average time on-site: {{ summary.avr_office_hours }} </strong> </li>
+      <li> <strong> Overall attendance rate: {{ summary.overall_perc }} </strong> </li>
     </ul>
   </section>
 
