@@ -597,17 +597,16 @@ def average_compnay_arrival_time(db: Session, attendance: Attendance):
 
     average_arrival_query = (
         db.query(
-            cast(func.avg(cast(func.extract('epoch', attendance.clock_in_time), Time)), Time).label('average_arrival_time')
+            func.to_char(
+                func.to_timestamp(
+                    func.avg(func.extract('epoch', attendance.clock_in_time))
+                ),
+                'HH24:MI:SS'
+            ).label('average_arrival_time')
         )
     )
-
-    # Execute the query
     result = average_arrival_query.one()
-
-    # Extract the average arrival time
-    average_arrival_time = result.average_arrival_time
-
-    return average_arrival_time
+    return result.average_arrival_time
 
 
 def average_time_in_office(db:Session, attendance: Attendance):
