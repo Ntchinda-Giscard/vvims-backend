@@ -1,4 +1,5 @@
 from jinja2 import Environment, FileSystemLoader
+from datetime import datetime
 from src.crud import (
     average_time_in_office,
     attendance_percentage,
