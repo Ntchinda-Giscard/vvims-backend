@@ -77,8 +77,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
 
 
 
-ReportType = 
-   { "visit_report": ReportGeneratorStrategy = VisitsReportGenerator(get_db(), Employee, Attendance)
+ReportType = { "visit_report": ReportGeneratorStrategy = VisitsReportGenerator(get_db(), Employee, Attendance),
     "attendance_report": ReportGeneratorStrategy = AttendanceReportGenerator(get_db(), Employee, Attendance)
 }
 @dataclass
