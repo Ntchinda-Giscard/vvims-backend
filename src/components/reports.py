@@ -1,3 +1,4 @@
+from weasyprint import HTML
 from jinja2 import Environment, FileSystemLoader
 from datetime import datetime
 from src.crud import (
