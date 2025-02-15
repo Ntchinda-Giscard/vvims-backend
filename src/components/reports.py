@@ -39,21 +39,21 @@ class VisitsReportGenerator(ReportGeneratorStrategy):
 
 class AttendanceReportGenerator(ReportGeneratorStrategy):
 
-    def __init__(self, db, Employee, Attendance):
+    def __init__(self, Employee, Attendance):
         self.template = env.get_template("reports.html")
-        self.db = db
         self.employee = Employee
         self.attendance = Attendance
         
 
     def report_crud(self):
         summary = {}
-        report_data = get_employee_attendance_summary(self.db, self.employee, self.attendance)
-        data_dept = get_department_attendance_summary(self.db, self.employee, self.attendance)
-        summary["arrival_time"] = average_compnay_arrival_time(self.db, self.attendance)
-        summary["avr_office_hours"] = average_time_in_office(self.db, self.attendance)
-        summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(self.db, self.attendance, self.employee))
-        company_name = get_company_name(self.db)
+        with next(get_db())as db:
+            report_data = get_employee_attendance_summary(db, self.employee, self.attendance)
+            data_dept = get_department_attendance_summary(db, self.employee, self.attendance)
+            summary["arrival_time"] = average_compnay_arrival_time(self.db, self.attendance)
+            summary["avr_office_hours"] = average_time_in_office(self.db, self.attendance)
+            summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(self.db, self.attendance, self.employee))
+            company_name = get_company_name(db)
 
         return report_data, data_dept, summary, company_name
     def render_html(self):
@@ -77,8 +77,8 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
 
 
 
-ReportType = { "visit": VisitsReportGenerator(get_db(), Employee, Attendance),
-    "attendance": AttendanceReportGenerator(get_db(), Employee, Attendance)
+ReportType = { "visit": VisitsReportGenerator(Employee, Attendance),
+    "attendance": AttendanceReportGenerator(Employee, Attendance)
 }
 @dataclass
 class ReportName:
