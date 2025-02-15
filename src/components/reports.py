@@ -18,6 +18,7 @@ from dataclasses import dataclass
 import boto3
 import os
 import io
+import random
 
 
 env = Environment(loader=FileSystemLoader("template"))
