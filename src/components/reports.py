@@ -4,7 +4,8 @@ from src.crud import (
     attendance_percentage,
     get_company_name,
     get_employee_attendance_summary,
-    get_department_attendance_summary
+    get_department_attendance_summary,
+    average_compnay_arrival_time
 )
 from src.models import Employee, Attendance, Department
 from src.database import get_db
