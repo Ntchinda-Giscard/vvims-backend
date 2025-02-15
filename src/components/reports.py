@@ -76,11 +76,11 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
         return pdf_bytes
 
 
-@dataclass
-class ReportType:
-    visit_report: ReportGeneratorStrategy = VisitsReportGenerator(get_db(), Employee, Attendance)
-    attendance_report: ReportGeneratorStrategy = AttendanceReportGenerator(get_db(), Employee, Attendance)
 
+ReportType = 
+   { "visit_report": ReportGeneratorStrategy = VisitsReportGenerator(get_db(), Employee, Attendance)
+    "attendance_report": ReportGeneratorStrategy = AttendanceReportGenerator(get_db(), Employee, Attendance)
+}
 @dataclass
 class ReportName:
     visit_report: str = "Visits Report"
