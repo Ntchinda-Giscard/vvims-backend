@@ -9,6 +9,7 @@ from src.crud import (
 from src.models import Employee, Attendance
 from src.database import get_db
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
 
 env = Environment(loader=FileSystemLoader("template"))
 
