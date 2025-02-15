@@ -8,7 +8,7 @@ from src.crud import (
 )
 from src.models import Employee, Attendance
 from src.database import get_db
-from abd import ABC, abstractmethod
+from abc import ABC, abstractmethod
 
 env = Environment(loader=FileSystemLoader("template"))
 
