@@ -46,7 +46,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
         self.attendance = Attendance
         
 
-    def generate_report(self):
+    def report_crud(self):
         summary = {}
         report_data = get_employee_attendance_summary(self.db, self.employee, self.attendance)
         data_dept = get_department_attendance_summary(self.db, self.employee, self.attendance)
