@@ -75,7 +75,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
 
     def generate_pdf(self):
         report_data, data_dept, summary, company_name = self.report_crud()
-        html_content = self.render_html(report_data, data_dept, summary, company_name)
+        html_content = self.render_html()
         pdf_bytes = HTML(string=html_content).write_pdf()
         
         return pdf_bytes
