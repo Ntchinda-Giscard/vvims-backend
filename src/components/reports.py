@@ -82,6 +82,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
 
 
 
+
 ReportType = { "visit": VisitsReportGenerator(Employee, Attendance),
     "attendance": AttendanceReportGenerator(Employee, Attendance, Department)
 }
