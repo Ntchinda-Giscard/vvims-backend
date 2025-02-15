@@ -6,7 +6,7 @@ from src.crud import (
     get_employee_attendance_summary,
     get_department_attendance_summary
 )
-from src.models import Employee, Attendance
+from src.models import Employee, Attendance, Department
 from src.database import get_db
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
