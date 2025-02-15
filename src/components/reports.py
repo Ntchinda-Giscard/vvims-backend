@@ -25,7 +25,7 @@ class ReportGeneratorStrategy(ABC):
 
 class VisitsReportGenerator(ReportGeneratorStrategy):
 
-    def __init__(self, db, Employee, Attendance)):
+    def __init__(self, db, Employee, Attendance):
         self.report_data = report_data
         self.data_dept = data_dept
         self.summary = summary
