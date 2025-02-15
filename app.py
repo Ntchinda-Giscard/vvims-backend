@@ -33,7 +33,7 @@ from src.utilities import generate_pdf
 from src.components.reports import (
     ReportGenetorContext
     )
-from src.components.reports import Reports
+from src.components.reports import ReportType
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -696,7 +696,7 @@ async def get_attendace_pdf_reports(report_type: str):
 @app.get("/api/v1/get-report")
 async def get_pdf_report(report_type: str):
     # take the report type and generate the report
-    report_strategy = Reports[report_type]
+    report_strategy = ReportType[report_type]
     report_context = ReportGenetorContext(report_strategy)
     pdf_report = report_context.generate_report()
     s3_url = upload_report_to_s3(pdf_report)
