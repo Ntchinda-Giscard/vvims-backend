@@ -7,7 +7,9 @@ from src.crud import (
     get_department_attendance_summary,
     average_compnay_arrival_time
 )
-from src.models import Employee, Attendance, Department
+from src.models import (
+    Employee, Attendance, Department,
+    Company, TextContent)
 from src.database import get_db
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
@@ -55,7 +57,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
             summary["arrival_time"] = average_compnay_arrival_time(db, self.attendance)
             summary["avr_office_hours"] = average_time_in_office(db, self.attendance)
             summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(db, self.attendance, self.employee))
-            company_name = get_company_name(db)
+            company_name = get_company_name(db, Company, TextContent)
 
         return report_data, data_dept, summary, company_name
   
