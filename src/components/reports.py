@@ -39,17 +39,18 @@ class VisitsReportGenerator(ReportGeneratorStrategy):
 
 class AttendanceReportGenerator(ReportGeneratorStrategy):
 
-    def __init__(self, Employee, Attendance):
+    def __init__(self, Employee, Attendance, Department):
         self.template = env.get_template("reports.html")
         self.employee = Employee
         self.attendance = Attendance
+        self.department = Department
         
 
     def report_crud(self):
         summary = {}
         with next(get_db())as db:
             report_data = get_employee_attendance_summary(db, self.employee, self.attendance)
-            data_dept = get_department_attendance_summary(db, self.employee, self.attendance)
+            data_dept = get_department_attendance_summary(db, self.department)
             summary["arrival_time"] = average_compnay_arrival_time(self.db, self.attendance)
             summary["avr_office_hours"] = average_time_in_office(self.db, self.attendance)
             summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(self.db, self.attendance, self.employee))
@@ -79,7 +80,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
 
 
 ReportType = { "visit": VisitsReportGenerator(Employee, Attendance),
-    "attendance": AttendanceReportGenerator(Employee, Attendance)
+    "attendance": AttendanceReportGenerator(Employee, Attendance, Department)
 }
 @dataclass
 class ReportName:
