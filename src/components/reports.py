@@ -52,7 +52,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
         with next(get_db())as db:
             report_data = get_employee_attendance_summary(db, self.employee, self.attendance)
             data_dept = get_department_attendance_summary(db, self.department)
-            summary["arrival_time"] = average_compnay_arrival_time(self.db, self.attendance)
+            summary["arrival_time"] = average_compnay_arrival_time(db, self.attendance)
             summary["avr_office_hours"] = average_time_in_office(db, self.attendance)
             summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(self.db, self.attendance, self.employee))
             company_name = get_company_name(db)
