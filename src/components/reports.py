@@ -112,7 +112,7 @@ class ReportGenetorContext:
         return self.strategy.generate_pdf()
 
 def upload_report_to_s3(pdf_data):
-    pdf_buffer = io.BytesIO(pdf_bytes)
+    pdf_buffer = io.BytesIO(pdf_data)
     # Generate the current timestamp and a random number
     now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
     random_number = str(random.randint(1, 99999)).zfill(5)
