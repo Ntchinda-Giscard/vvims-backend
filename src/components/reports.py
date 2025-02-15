@@ -27,7 +27,7 @@ class ReportGeneratorStrategy(ABC):
 
 class VisitsReportGenerator(ReportGeneratorStrategy):
 
-    def __init__(self, db, Employee, Attendance):
+    def __init__(self, Employee, Attendance):
         pass
 
     def render_html(self):
@@ -56,6 +56,7 @@ class AttendanceReportGenerator(ReportGeneratorStrategy):
             company_name = get_company_name(db)
 
         return report_data, data_dept, summary, company_name
+  
     def render_html(self):
         report_data, data_dept, summary, company_name = self.report_crud()
         rendered_html = self.template.render(
