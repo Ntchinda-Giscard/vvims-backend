@@ -649,7 +649,7 @@ async def get_attendance_by_date_range(start_date, end_date):
 
 
 @app.get("/api/v1/get-attendace-report")
-async def get_attendace_pdf_reports(report_type: str):
+async def get_attendace_pdf_reports():
     summary = {}
     with next(get_db()) as db:
         try:
@@ -695,12 +695,12 @@ async def get_attendace_pdf_reports(report_type: str):
 
 @app.get("/api/v1/get-report")
 async def get_pdf_report(report_type: str):
-    # take the report type and generate the report
-    report_strategy = ReportType[report_type]
-    report_context = ReportGenetorContext(report_strategy)
+    report_strategy = ReportType.get(report_type)
+    if not report_strategy:
+        return {"error": "Invalid report type"}
+    report_context = ReportGeneratorContext(report_strategy)
     pdf_report = report_context.generate_report()
     s3_url = upload_report_to_s3(pdf_report)
-
     return {"pdf_url": s3_url}
 
 
