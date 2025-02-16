@@ -31,7 +31,7 @@ from fastapi.staticfiles import StaticFiles
 from zoneinfo import ZoneInfo
 from src.utilities import generate_pdf
 from src.components.reports import (
-    ReportGenetorContext, upload_report_to_s3
+    ReportGeneratorContext, upload_report_to_s3
     )
 from src.components.reports import ReportType
 
