@@ -92,7 +92,7 @@ ReportType = {
 }
 
 ReportName = {
-    "visit": "Visits Report"
+    "visit": "Visits Report",
     "attendance":  "Atendance Report"}
 
 class ReportGeneratorContext:
