@@ -33,7 +33,7 @@ from src.utilities import generate_pdf
 from src.components.reports import (
     ReportGeneratorContext, upload_report_to_s3
     )
-from src.components.reports import ReportType
+from src.components.reports import ReportType, ReportName
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -701,6 +701,18 @@ async def get_pdf_report(report_type: str):
     report_context = ReportGeneratorContext(report_strategy)
     pdf_report = report_context.generate_report()
     s3_url = upload_report_to_s3(pdf_report)
+    with next(get_db()) as db:
+        report_name = ReportName[report_type]
+        types = { "attendance" : ReportTypes.ATTENDANCE,
+        "visit" : ReportTypes.VISITS,
+        "task" : ReportTypes.TASKS }
+            report = Report(
+                report_link=s3_url,
+                types = types,
+                from_date = datetime.now(),
+                to_date = datetime.now(),
+                name = report_name
+            )
     return {"pdf_url": s3_url}
 
 

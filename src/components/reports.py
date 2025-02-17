@@ -91,10 +91,9 @@ ReportType = {
     "attendance": AttendanceReportGenerator(Employee, Attendance, Department)
 }
 
-@dataclass
-class ReportName:
-    visit_report: str = "Visits Report"
-    attendance_report: str = "Attendance Report"
+ReportName = {
+    "visit": "Visits Report"
+    "attendance":  "Atendance Report"}
 
 class ReportGeneratorContext:
     def __init__(self, strategy: ReportGeneratorStrategy):
