@@ -702,17 +702,20 @@ async def get_pdf_report(report_type: str):
     pdf_report = report_context.generate_report()
     s3_url = upload_report_to_s3(pdf_report)
     with next(get_db()) as db:
+        
         report_name = ReportName[report_type]
         types = { "attendance" : ReportTypes.ATTENDANCE,
         "visit" : ReportTypes.VISITS,
         "task" : ReportTypes.TASKS }
-            report = Report(
-                report_link=s3_url,
-                types = types,
-                from_date = datetime.now(),
-                to_date = datetime.now(),
-                name = report_name
-            )
+        report = Report(
+            report_link=s3_url,
+            types = types[report_type],
+            from_date = datetime.now(),
+            to_date = datetime.now(),
+            name = report_name
+        )
+        db.add(report)
+        db.commit()
     return {"pdf_url": s3_url}
 
 
