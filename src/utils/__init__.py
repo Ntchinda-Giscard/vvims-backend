@@ -241,8 +241,8 @@ class LocalUploadStrategy(UploadStrategy):
 
 @dataclass
 class UploadStrategies:
-    online: Callable[[], UploadStrategy]
-    local: Callable[[], UploadStrategy]
+    online: UploadStrategy = S3UploadStrategy()
+    local: UploadStrategy = LocalUploadStrategy()
 
     def get_strategy(self, upload_type: str) -> UploadStrategy:
         """

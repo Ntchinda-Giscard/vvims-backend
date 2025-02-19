@@ -431,10 +431,11 @@ async def uploads_save(file: UploadFile, upload_type: Optional[str]):
 
 @app.post("/api/v1/upload-file")
 async def upload_file_strategy(upload_type: Optional[str]='online', file: UploadFile=File(...)):
-    strategies = UploadStrategies( local=LocalUploadStrategy, online=S3UploadStrategy)
+    strategies = UploadStrategies()
+    strategy = strategies.get_strategy(upload_type)
 
-    processor = UploadProcessor(strategies)
-    result = await processor.process(upload_type, file)
+    # processor = UploadProcessor(strategies)
+    result = await strategy.upload_process(file)
     print(result)
 
     return {"file_url" : result}
