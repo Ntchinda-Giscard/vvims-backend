@@ -716,6 +716,11 @@ class ReportTypes(PyEnum):
     VISITS = 'visits'
     TASKS = 'tasks'
 
+class CategoryType(str, PyEnum):
+    EMPLOYEE = "employee"
+    SERVICE = "service"
+    DEPARTMENT = "department"
+
 class Report(Base):
 
     __tablename__ = "reports"

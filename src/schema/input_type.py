@@ -165,3 +165,22 @@ class MessageStatusInput:
 @strawberry.input
 class EmployeeAppointmentId:
     id: uuid.UUID
+
+
+
+class ReportTypes(PyEnum):
+    ATTENDANCE = 'attendance'
+    VISITS = 'visits'
+    TASKS = 'tasks'
+
+class CategoryType(PyEnum):
+    EMPLOYEE = "employee"
+    SERVICE = "service"
+    DEPARTMENT = "department"
+
+
+class ReportRequest(BaseModel):
+    report_type: ReportType
+    filter_by: CategoryType
+    start_date: Optional[datetime] = None
+    end_date: Optional[datetime] = None

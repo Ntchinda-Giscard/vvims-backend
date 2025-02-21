@@ -14,6 +14,8 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 from src import logger
 from src.models import Attendance, Employee
+from src.schema.imput_type import ReportTypes, CategoryType, ReportRequest
+
 import boto3
 import os
 
@@ -106,13 +108,11 @@ def get_attendance_for_day(db, date):
 def run_hasura_mutation(mutation, variables, url, admin_secret):
     """
     Execute a GraphQL mutation against a Hasura instance.
-
     Args:
         mutation (str): The GraphQL mutation query as a string.
         variables (dict): A dictionary of variables to pass to the mutation.
         url (str): The Hasura GraphQL endpoint URL.
         admin_secret (str): The Hasura admin secret for authentication.
-
     Returns:
         dict: The response from Hasura, either the result of the mutation or an error.
     """
@@ -241,8 +241,8 @@ class LocalUploadStrategy(UploadStrategy):
 
 @dataclass
 class UploadStrategies:
-    online: UploadStrategy = S3UploadStrategy()
-    local: UploadStrategy = LocalUploadStrategy()
+    online: Callable[[], UploadStrategy]
+    local: Callable[[], UploadStrategy]
 
     def get_strategy(self, upload_type: str) -> UploadStrategy:
         """
@@ -269,3 +269,19 @@ class UploadProcessor:
         result  = await strategy.upload_process(file=file)
 
         return result
+
+
+class ReportGenerator(ABC):
+    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
+
+        return NotImplementedError
+
+class VisitReportGenerator(ReportGenerator):
+    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
+
+        return -1
+
+class AttendanceReportGenerator(ReportGenerator):
+    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
+
+        return -1
