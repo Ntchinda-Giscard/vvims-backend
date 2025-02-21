@@ -285,3 +285,29 @@ class AttendanceReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
 
         return -1
+
+
+
+class ReportService:
+
+    def __init__(self, db):
+        self.db = db
+        self.generators = {
+            ReportTypes.VISIT: VisitReportGenerator(),
+            ReportTypes.ATTENDANCE: AttendanceReportGenerator()
+        }
+    
+    async def generate_report(self, request: ReportRequest) -> dict:
+
+        end_date = request.end_date or datetime.nom()
+        start_date = request.start_date or (end_date - timedelta(days=30))
+
+        generator = self.generators[request.report_type]
+
+        data  = await generator.generate(
+            request.filter_by,
+            start_date,
+            end_date
+        )
+
+        summary = self.generate_summary(request.report_type, data)
