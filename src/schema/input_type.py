@@ -9,7 +9,7 @@ from enum import Enum as PyEnum
 
 
 @strawberry.enum
-class CreateEmployeeRole(Enum):
+class CreateEmployeeRole(PyEnum):
     ADMIN = 'ADMIN'
     EMPLOYEE = 'EMPLOYEE'
     GUARD = 'GUARD'
@@ -98,7 +98,7 @@ class CrateVisitWithVisitorType:
     reg_no: str
 
 @strawberry.enum
-class VisitStatus(Enum):
+class VisitStatus(PyEnum):
     ACCEPTED = 'ACCEPTED'
     REJECTED = 'REJECTED'
     PENDING = 'PENDING'
