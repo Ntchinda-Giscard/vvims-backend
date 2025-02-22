@@ -298,9 +298,8 @@ class VisitReportGenerator(ReportGenerator):
         if filter_by == CategoryType.EMPLOYEE:
             return base_query + """
                     FROM visits AS vi
-                    JOIN employees AS e ON vi.host_employee = e.id
                     JOIN visitors AS v ON vi.visitor = v.id
-                    WHERE e.id = :filter_id
+                    WHERE vi.host_employee = :filter_id
                     AND vi.date BETWEEN :start_date AND :end_date
                     ORDER BY vi.date;
             """
@@ -308,9 +307,8 @@ class VisitReportGenerator(ReportGenerator):
         elif filter_by == CategoryType.SERVICE:
             return base_query + """
                     FROM visits AS vi
-                    JOIN services AS s ON vi.host_service = s.id
                     JOIN visitors AS v ON vi.visitor = v.id
-                    WHERE s.id = :filter_id
+                    WHERE vi.host_service = :filter_id
                     AND vi.date BETWEEN :start_date AND :end_date
                     ORDER BY vi.date;
                 """
@@ -326,9 +324,15 @@ class VisitReportGenerator(ReportGenerator):
 
 
 class AttendanceReportGenerator(ReportGenerator):
+    
     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
 
         return -1
+    
+    def _build_query(self, filter_by: CategoryType) -> str:
+
+        base_query = """
+        """
 
 
 
