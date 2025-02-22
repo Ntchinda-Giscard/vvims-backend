@@ -5,6 +5,9 @@ import uuid
 from enum import Enum
 from datetime import datetime
 from datetime import date
+from enum import Enum as PyEnum
+
+
 @strawberry.enum
 class CreateEmployeeRole(Enum):
     ADMIN = 'ADMIN'
