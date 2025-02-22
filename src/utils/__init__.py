@@ -315,9 +315,8 @@ class VisitReportGenerator(ReportGenerator):
         elif filter_by == CategoryType.DEPARTMENT:
             return base_query + """ 
                     FROM visits AS vi
-                    JOIN departments AS d ON vi.host_department = d.id
                     JOIN visitors AS v ON vi.visitor = v.id
-                    WHERE d.id = :filter_id
+                    WHERE vi.host_department = :filter_id
                     AND vi.date BETWEEN :start_date AND :end_date
                     ORDER BY vi.date;
                 """
@@ -332,7 +331,29 @@ class AttendanceReportGenerator(ReportGenerator):
     def _build_query(self, filter_by: CategoryType) -> str:
 
         base_query = """
+        SELECT att.clock_in_date, att_state.is_late, att.clock_out_time, att.clock_in_time,
+            EXTRACT(EPOCH FROM (att.clock_out_time - att.clock_in_time))/3600 AS hours_worked
+        FROM attendance as att
+        JOIN attendance_state AS att_state ON att.id = att_state.attendance_id
         """
+
+        if filter_by == CategoryType.EMPLOYEE:
+            return base_query + """
+                WHERE att.employee_id = :filter_id
+                AND att.clock_in_date BETWEEN :start_date AND :end_date
+                ORDER BY att.clock_in_date;
+            """
+        elif filter_by == CategoryType.SERVICE:
+            return base_query + """
+                e.firstname, e.lastname
+                FROM attendance as att
+                JOIN attendance_state AS att_state ON att.id = att_state.attendance_id
+                JOIN employees as e ON e.id = att.employee_id
+                JOIN services as s ON e.service_id = s.id
+                WHERE s.id = :filter_id
+                AND att.clock_in_date BETWEEN :start_date AND :end_date
+                order by att.clock_in_date;
+            """
 
 
 
