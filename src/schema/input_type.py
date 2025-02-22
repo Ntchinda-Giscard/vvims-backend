@@ -185,5 +185,6 @@ class CategoryType(PyEnum):
 class ReportRequest(BaseModel):
     report_type: ReportTypes
     filter_by: CategoryType
+    filter_id: uuid.UUID
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None

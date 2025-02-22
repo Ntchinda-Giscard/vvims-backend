@@ -4,6 +4,7 @@ from typing import Callable
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
 from sqlalchemy import and_
+from sqlalchemy.orm import Session
 import uuid
 from datetime import datetime, timedelta, time, date
 import requests
@@ -15,7 +16,7 @@ import google.auth.transport.requests
 from src import logger
 from src.models import Attendance, Employee
 from src.schema.input_type import ReportTypes, CategoryType, ReportRequest
-
+from src.database import engine, get_db
 import boto3
 import os
 
@@ -272,36 +273,60 @@ class UploadProcessor:
 
 
 class ReportGenerator(ABC):
-    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
+    async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
 
         return NotImplementedError
 
 class VisitReportGenerator(ReportGenerator):
-    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
-
-        return -1
+    async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
+        sql_query = self._build_query(filter_by)
+        async with next(get_db()) as db:
+            result = await db.execute(sql_query,{
+                "filter_id" : 
+            })
     
     def _build_query(self, filter_by: CategoryType) -> str:
         base_query = """
             SELECT 
-                v.visit_date,
-                v.purpose,
-                v.status,
+                vi.date, 
+                vi.check_in_at, 
+                vi.reason, 
+                v.firstname, 
+                v.lastname
         """
         
         if filter_by == CategoryType.EMPLOYEE:
             return base_query + """
-                e.name as employee_name,
-                e.employee_code,
-                d.name as department_name
-            FROM visits v
-            JOIN employees e ON v.employee_id = e.id
-            JOIN departments d ON e.department_id = d.id
-            WHERE e.id = $1 AND v.visit_date BETWEEN $2 AND $3
+                    FROM visits AS vi
+                    JOIN employees AS e ON vi.host_employee = e.id
+                    JOIN visitors AS v ON vi.visitor = v.id
+                    WHERE e.id = :filter_id
+                    AND vi.date BETWEEN :start_date AND :end_date
+                    ORDER BY vi.date;
             """
+        
+        elif filter_by == CategoryType.SERVICE:
+            return base_query + """
+                    FROM visits AS vi
+                    JOIN services AS s ON vi.host_service = s.id
+                    JOIN visitors AS v ON vi.visitor = v.id
+                    WHERE s.id = :filter_id
+                    AND vi.date BETWEEN :start_date AND :end_date
+                    ORDER BY vi.date;
+                """
+        elif filter_by == CategoryType.DEPARTMENT:
+            return base_query + """ 
+                    FROM visits AS vi
+                    JOIN departments AS d ON vi.host_department = d.id
+                    JOIN visitors AS v ON vi.visitor = v.id
+                    WHERE d.id = :filter_id
+                    AND vi.date BETWEEN :start_date AND :end_date
+                    ORDER BY vi.date;
+                """
+
 
 class AttendanceReportGenerator(ReportGenerator):
-    async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
+    async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
 
         return -1
 
