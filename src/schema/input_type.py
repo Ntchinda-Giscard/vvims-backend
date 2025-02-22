@@ -183,7 +183,7 @@ class CategoryType(PyEnum):
 
 
 class ReportRequest(BaseModel):
-    report_type: ReportType
+    report_type: ReportTypes
     filter_by: CategoryType
     start_date: Optional[datetime] = None
     end_date: Optional[datetime] = None
