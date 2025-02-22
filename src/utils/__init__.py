@@ -14,7 +14,7 @@ from google.oauth2 import service_account
 import google.auth.transport.requests
 from src import logger
 from src.models import Attendance, Employee
-from src.schema.imput_type import ReportTypes, CategoryType, ReportRequest
+from src.schema.input_type import ReportTypes, CategoryType, ReportRequest
 
 import boto3
 import os
@@ -280,6 +280,25 @@ class VisitReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
 
         return -1
+    
+    def _build_query(self, filter_by: CategoryType) -> str:
+        base_query = """
+            SELECT 
+                v.visit_date,
+                v.purpose,
+                v.status,
+        """
+        
+        if filter_by == CategoryType.EMPLOYEE:
+            return base_query + """
+                e.name as employee_name,
+                e.employee_code,
+                d.name as department_name
+            FROM visits v
+            JOIN employees e ON v.employee_id = e.id
+            JOIN departments d ON e.department_id = d.id
+            WHERE e.id = $1 AND v.visit_date BETWEEN $2 AND $3
+            """
 
 class AttendanceReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, start_date: datetime, end_date: datetime):
@@ -309,5 +328,3 @@ class ReportService:
             start_date,
             end_date
         )
-
-        summary = self.generate_summary(request.report_type, data)
