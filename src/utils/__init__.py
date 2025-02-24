@@ -356,7 +356,7 @@ class AttendanceReportGenerator(ReportGenerator):
         
         elif filter_by == CategoryType.DEPARTMENT:
             return base_query + """
-                JOIN departments as d ON e.service_id = d.id
+                JOIN departments as d ON e.department_i = d.id
                 WHERE d.id = :filter_id
                 AND att.clock_in_date BETWEEN :start_date AND :end_date
                 ORDER BY att.clock_in_date;
