@@ -281,9 +281,10 @@ class VisitReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
         sql_query = self._build_query(filter_by)
         async with next(get_db()) as db:
-            result = await db.execute(sql_query,{
-                "filter_id" : 
-            })
+            #result = await db.execute(sql_query,{
+              #  "filter_id" : 
+           # })
+            result = 1
     
     def _build_query(self, filter_by: CategoryType) -> str:
         base_query = """
