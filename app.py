@@ -36,7 +36,7 @@ from src.components.reports import (
     ReportGeneratorContext, upload_report_to_s3
     )
 from src.components.reports import ReportType, ReportName
-from src.schema.input_types import (
+from src.schema.input_type import (
     ReportRequest,
     ReportTypes,
     CategoryType
