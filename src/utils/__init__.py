@@ -291,8 +291,9 @@ class VisitReportGenerator(ReportGenerator):
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
-           })
-        return [dict(zip(row.keys(), row)) for row in results]
+           }).mappings().all()
+        # return [dict(zip(row.keys(), row)) for row in results]
+        return results
     
     def _build_query(self, filter_by: CategoryType) -> str:
         base_query = """
@@ -345,7 +346,8 @@ class AttendanceReportGenerator(ReportGenerator):
                "end_date" : end_date
            }).mappings().all() 
 
-        return [dict(zip(row.keys(), row)) for row in results]
+        # return [dict(zip(row.keys(), row)) for row in results]
+        return results
     
     def _build_query(self, filter_by: CategoryType) -> str:
 
