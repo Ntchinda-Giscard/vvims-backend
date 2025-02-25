@@ -459,6 +459,7 @@ class ReportService:
             date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             entry=report_data,
             highest_day = {},
+            peak_hour = {},
             peak_hour = {}
             # summary = summary,
             # company_name = company_name
