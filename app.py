@@ -726,7 +726,7 @@ async def get_pdf_report(report_type: str):
     return {"pdf_url": s3_url}
 
 
-@app.get("/api/v1/get-reports")
+@app.post("/api/v1/get-reports")
 async def get_pdf_reports(
     request: ReportRequest
     ):
