@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Callable
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
-from sqlalchemy import and_
+from sqlalchemy import and_, text
 from sqlalchemy.orm import Session
 import uuid
 from datetime import datetime, timedelta, time, date
@@ -287,7 +287,7 @@ class VisitReportGenerator(ReportGenerator):
         print(f"Filter by ====> {filter_by}")
         print(f"Query built ====> {sql_query}")
         with next(get_db()) as db:
-            result = await db.execute(sql_query,{
+            result = await db.execute(text(sql_query),{
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
@@ -321,6 +321,8 @@ class VisitReportGenerator(ReportGenerator):
                     AND vi.date BETWEEN :start_date AND :end_date
                     ORDER BY vi.date;
                 """
+        
+        
         elif filter_by == CategoryType.DEPARTMENT:
             return base_query + """ 
                     FROM visits AS vi
@@ -335,7 +337,13 @@ class AttendanceReportGenerator(ReportGenerator):
     
     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
 
-        return -1
+        sql_query = self._build_query(filter_by)
+        with next(get_db()) as db:
+            result = await db.execute(text(sql_query), {
+               "filter_id" : filter_id,
+               "start_date" : start_date,
+               "end_date" : end_date
+           })
     
     def _build_query(self, filter_by: CategoryType) -> str:
 
