@@ -343,7 +343,7 @@ class AttendanceReportGenerator(ReportGenerator):
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
-           })
+           }).mappings().all() 
 
         return [dict(zip(row.keys(), row)) for row in results]
     
