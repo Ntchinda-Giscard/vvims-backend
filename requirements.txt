@@ -16,7 +16,7 @@ alembic
 python-dateutil
 boto3
 requests
-pinecone-client
+pinecone
 # deepface
 # tensorflow==2.12
 # tf-keras
