@@ -284,6 +284,7 @@ class ReportGenerator(ABC):
 class VisitReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
         sql_query = self._build_query(filter_by)
+        print(f"Filter by ====> {filter_by}")
         print(f"Query built ====> {sql_query}")
         async with next(get_db()) as db:
             result = await db.execute(sql_query,{
