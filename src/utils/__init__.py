@@ -21,6 +21,8 @@ import boto3
 from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 import os
+import asyncio
+
 
 
 env = Environment(loader=FileSystemLoader("template"))

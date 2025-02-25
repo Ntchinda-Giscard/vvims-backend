@@ -42,6 +42,9 @@ from src.schema.input_type import (
     CategoryType
 )
 
+import asyncio
+
+
 
 models.Base.metadata.create_all(bind=engine)
 
@@ -731,7 +734,7 @@ async def get_pdf_reports(
     request: ReportRequest
     ):
     report_service = ReportService()
-    data, pdf_bytes = report_service.generate_report(request)
+    data, pdf_bytes = asyncio.run(report_service.generate_report(request))
     s3_url = upload_report_to_s3(pdf_bytes)
 
     return {"s3_url": s3_url}
