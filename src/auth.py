@@ -53,7 +53,7 @@ def verify_token(token: str, credentials_exception):
             return user_id
     except Exception as e:
         logger.exception(e)
-        raise e
+        raise  HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
 
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(

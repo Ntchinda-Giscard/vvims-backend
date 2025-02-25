@@ -94,7 +94,6 @@ async  def login(user: LoginInput):
             logger.exception(e)
             db.rollback()
             db.close()
-            raise e
         finally:
             db.close()
 

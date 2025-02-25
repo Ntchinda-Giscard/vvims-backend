@@ -382,6 +382,21 @@ class ReportService:
 
         data  = await generator.generate(
             request.filter_by,
+            request.filter_id,
             start_date,
             end_date
         )
+
+        filter_details = await self._get_filter_details(
+            request.filter_by,
+            request.filter_id
+        )
+
+        summary = self._generate_summary(request.report_type, data)
+
+        async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
+            tables = {
+                CategoryType.EMPLOYEE: "employees",
+                CategoryType.SERVICE: "services",
+                CategoryType.DEPARTMENT: "departments"
+            }

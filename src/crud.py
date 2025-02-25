@@ -18,6 +18,7 @@ from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, Updat
 from datetime import timedelta, datetime
 import math
 from typing import List
+from fastapi import HTTPException, status, Depends
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
@@ -69,9 +70,9 @@ def authenticate_employee(db: Session, phone_number: str, password: str):
 
 
     if not employee:
-        raise Exception(f'Employee not found with phone number {phone_number}')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User does not exist")
     if not pwd_context.verify(password, employee.password):
-        raise Exception('Incorrect password')
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Wrong password")
 
     return  employee
 
