@@ -409,7 +409,7 @@ class ReportService:
             end_date
         )
 
-        pdf_bytes = await self.generate_pdf(data, request.report_type)
+        pdf_bytes = self.generate_pdf(data, request.report_type)
 
 
         print(f"Result data =====> {data}")
