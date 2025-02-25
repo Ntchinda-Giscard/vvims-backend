@@ -407,12 +407,12 @@ class ReportService:
             end_date
         )
 
-        html_template = self.render_html_template(data, request.report_type)
+        pdf_bytes = self.generate_pdf(data, request.report_type)
 
 
         print(f"Result data =====> {data}")
 
-        return data
+        return data, pdf_bytes
 
         async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
             tables = {
@@ -459,9 +459,9 @@ class ReportService:
 
             return rendered_html
 
-        def generate_pdf(report_data, summary, company_name, report_type: ReportType):
+        def generate_pdf(report_data, report_type: ReportType):
 
-            html_content = self.render_html_template(report_data, summary, company_name, report_type)
+            html_content = self.render_html_template(report_data, report_type)
             pdf_bytes = HTML(string=html_content).write_pdf
 
             return pdf_bytes
