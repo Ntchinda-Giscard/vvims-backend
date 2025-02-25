@@ -402,7 +402,7 @@ class ReportService:
 
         generator = self.generators[request.report_type]
 
-        data  = generator.generate(
+        data  = await generator.generate(
             request.filter_by,
             request.filter_id,
             start_date,
