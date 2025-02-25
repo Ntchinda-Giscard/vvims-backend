@@ -429,16 +429,16 @@ class ReportService:
                 {'filter_id': filter_id}
             )
     
-    def _generate_summary(self, report_type: ReportType, data):
+    def _generate_summary(self, report_type: ReportTypes, data):
 
-        if report_type == ReportType.VISIT:
+        if report_type == ReportTypes.VISIT:
             return{
                 "total_visits" : None,
                 "peack_visiting_hour" : None,
                 "most_visitied" : None,
                 "highest_visiting_dates" : None
             }
-        elif report_type ==  ReportType.ATTENDANCE:
+        elif report_type ==  ReportTypes.ATTENDANCE:
 
             return{
                 "average_arrival_time" : None,
@@ -447,7 +447,7 @@ class ReportService:
                 "average_arrival_time" : None,
             }
 
-    def render_html_template(self, report_data, report_type: ReportType):
+    def render_html_template(self, report_data, report_type: ReportTypes):
 
 
         template = env.get_template(f"{report_type}.html")
@@ -461,7 +461,7 @@ class ReportService:
 
         return rendered_html
 
-    def generate_pdf(self, report_data, report_type: ReportType):
+    def generate_pdf(self, report_data, report_type: ReportTypes):
 
         html_content = self.render_html_template(report_data, report_type)
         pdf_bytes = HTML(string=html_content).write_pdf
