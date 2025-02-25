@@ -23,8 +23,10 @@ from src.models import Employee, CompanySettings, Department, Attendance, Attend
     EmployeeConversation, Attachment, Message, MessageStatus, MessageStatuses, \
     Report, ReportTypes
 from src.schema.input_type import LoginInput
-from src.utils import is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, \
-    calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies
+from src.utils import (
+    is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies,
+    ReportService
+    )
 import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
@@ -34,6 +36,11 @@ from src.components.reports import (
     ReportGeneratorContext, upload_report_to_s3
     )
 from src.components.reports import ReportType, ReportName
+from src.schema.input_types(
+    ReportRequest,
+    ReportTypes,
+    CategoryType
+)
 
 
 models.Base.metadata.create_all(bind=engine)
@@ -719,7 +726,12 @@ async def get_pdf_report(report_type: str):
     return {"pdf_url": s3_url}
 
 
-
+@app.get("/api/v1/get-reports")
+async def get_pdf_reports(
+    request: ReportRequest
+    ):
+    report_service = ReportService()
+    return await report_service.generate_report(request)
 
 
 if __name__ == "__main__":

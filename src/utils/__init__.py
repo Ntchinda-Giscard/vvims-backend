@@ -18,8 +18,12 @@ from src.models import Attendance, Employee
 from src.schema.input_type import ReportTypes, CategoryType, ReportRequest
 from src.database import engine, get_db
 import boto3
+from jinja2 import Environment, FileSystemLoader
+from weasyprint import HTML
 import os
 
+
+env = Environment(loader=FileSystemLoader("template"))
 UPLOAD_DIR = '/app/uploads'
 
 s3 = boto3.client(
@@ -281,10 +285,12 @@ class VisitReportGenerator(ReportGenerator):
     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
         sql_query = self._build_query(filter_by)
         async with next(get_db()) as db:
-            #result = await db.execute(sql_query,{
-              #  "filter_id" : 
-           # })
-            result = 1
+            result = await db.execute(sql_query,{
+               "filter_id" : filter_id,
+               "start_date" : start_date,
+               "end_date" : end_date
+           })
+            return [dict(row) for row in results]
     
     def _build_query(self, filter_by: CategoryType) -> str:
         base_query = """
@@ -387,12 +393,14 @@ class ReportService:
             end_date
         )
 
-        filter_details = await self._get_filter_details(
-            request.filter_by,
-            request.filter_id
-        )
+        # filter_details = await self._get_filter_details(
+        #     request.filter_by,
+        #     request.filter_id
+        # )
 
-        summary = self._generate_summary(request.report_type, data)
+        # summary = self._generate_summary(request.report_type, data)
+
+        return data
 
         async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
             tables = {
@@ -401,5 +409,47 @@ class ReportService:
                 CategoryType.DEPARTMENT: "departments"
             }
 
-            # async with next(get_db()) as db:
-            #     record = await db.
+            async with self.db as db:
+                record = await db.execute(
+                    f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
+                    {'filter_id': filter_id}
+                )
+        
+        def _generate_summary(self, report_type: ReportType, data):
+
+            if report_type == ReportType.VISIT:
+                return{
+                    "total_visits" : None,
+                    "peack_visiting_hour" : None,
+                    "most_visitied" : None,
+                    "highest_visiting_dates" : None
+                }
+            elif report_type ==  ReportType.ATTENDANCE:
+
+                return{
+                    "average_arrival_time" : None,
+                    "average_time_at_work" : None,
+                    "average_arrival_time" : None,
+                    "average_arrival_time" : None,
+                }
+
+        def render_html_template(report_data, summary, company_name, report_type: ReportType):
+
+
+            template = env.get_template(f"{report_type}.html")
+
+            rendered_html = template.render(
+                date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+                entry=report_data,
+                summary = summary,
+                company_name = company_name
+            )
+
+            return rendered_html
+
+        def generate_pdf(report_data, summary, company_name, report_type: ReportType):
+
+            html_content = self.render_html_template(report_data, summary, company_name, report_type)
+            pdf_bytes = HTML(string=html_content).write_pdf
+
+            return pdf_bytes
