@@ -366,8 +366,8 @@ class AttendanceReportGenerator(ReportGenerator):
 
 class ReportService:
 
-    def __init__(self, db):
-        self.db = db
+    def __init__(self):
+        self.db = next(get_db())
         self.generators = {
             ReportTypes.VISIT: VisitReportGenerator(),
             ReportTypes.ATTENDANCE: AttendanceReportGenerator()
@@ -400,3 +400,6 @@ class ReportService:
                 CategoryType.SERVICE: "services",
                 CategoryType.DEPARTMENT: "departments"
             }
+
+            # async with next(get_db()) as db:
+            #     record = await db.
