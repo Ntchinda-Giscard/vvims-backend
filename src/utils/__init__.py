@@ -416,54 +416,54 @@ class ReportService:
 
         return data, pdf_bytes
 
-        async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
-            tables = {
-                CategoryType.EMPLOYEE: "employees",
-                CategoryType.SERVICE: "services",
-                CategoryType.DEPARTMENT: "departments"
+    async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
+        tables = {
+            CategoryType.EMPLOYEE: "employees",
+            CategoryType.SERVICE: "services",
+            CategoryType.DEPARTMENT: "departments"
+        }
+
+        async with self.db as db:
+            record = await db.execute(
+                f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
+                {'filter_id': filter_id}
+            )
+    
+    def _generate_summary(self, report_type: ReportType, data):
+
+        if report_type == ReportType.VISIT:
+            return{
+                "total_visits" : None,
+                "peack_visiting_hour" : None,
+                "most_visitied" : None,
+                "highest_visiting_dates" : None
+            }
+        elif report_type ==  ReportType.ATTENDANCE:
+
+            return{
+                "average_arrival_time" : None,
+                "average_time_at_work" : None,
+                "average_arrival_time" : None,
+                "average_arrival_time" : None,
             }
 
-            async with self.db as db:
-                record = await db.execute(
-                    f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
-                    {'filter_id': filter_id}
-                )
-        
-        def _generate_summary(self, report_type: ReportType, data):
-
-            if report_type == ReportType.VISIT:
-                return{
-                    "total_visits" : None,
-                    "peack_visiting_hour" : None,
-                    "most_visitied" : None,
-                    "highest_visiting_dates" : None
-                }
-            elif report_type ==  ReportType.ATTENDANCE:
-
-                return{
-                    "average_arrival_time" : None,
-                    "average_time_at_work" : None,
-                    "average_arrival_time" : None,
-                    "average_arrival_time" : None,
-                }
-
-        def render_html_template(report_data, report_type: ReportType):
+    def render_html_template(self, report_data, report_type: ReportType):
 
 
-            template = env.get_template(f"{report_type}.html")
+        template = env.get_template(f"{report_type}.html")
 
-            rendered_html = template.render(
-                date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-                entry=report_data,
-                # summary = summary,
-                # company_name = company_name
-            )
+        rendered_html = template.render(
+            date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            entry=report_data,
+            # summary = summary,
+            # company_name = company_name
+        )
 
-            return rendered_html
+        return rendered_html
 
-        def generate_pdf(self, report_data, report_type: ReportType):
+    def generate_pdf(self, report_data, report_type: ReportType):
 
-            html_content = self.render_html_template(report_data, report_type)
-            pdf_bytes = HTML(string=html_content).write_pdf
+        html_content = self.render_html_template(report_data, report_type)
+        pdf_bytes = HTML(string=html_content).write_pdf
 
-            return pdf_bytes
+        return pdf_bytes
