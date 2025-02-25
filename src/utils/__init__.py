@@ -407,14 +407,10 @@ class ReportService:
             end_date
         )
 
+        html_template = self.render_html_template(data, request.report_type)
+
+
         print(f"Result data =====> {data}")
-
-        # filter_details = await self._get_filter_details(
-        #     request.filter_by,
-        #     request.filter_id
-        # )
-
-        # summary = self._generate_summary(request.report_type, data)
 
         return data
 
@@ -449,7 +445,7 @@ class ReportService:
                     "average_arrival_time" : None,
                 }
 
-        def render_html_template(report_data, summary, company_name, report_type: ReportType):
+        def render_html_template(report_data, report_type: ReportType):
 
 
             template = env.get_template(f"{report_type}.html")
@@ -457,8 +453,8 @@ class ReportService:
             rendered_html = template.render(
                 date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
                 entry=report_data,
-                summary = summary,
-                company_name = company_name
+                # summary = summary,
+                # company_name = company_name
             )
 
             return rendered_html

@@ -52,6 +52,7 @@
 <body>
   <header>
     <h1> {{ company name }} {{ service_name }} Visits Report</h1>
+    <br> {{ date }} </br>
     <p>Overview of visit trends, peak hours, and employee performance</p>
   </header>
 
@@ -86,16 +87,20 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Visits</th>
+        <th>Time</th>
         <th>Notes</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
       </tr>
     </thead>
     <tbody>
       {% for entry in visit_data %}
       <tr>
         <td>{{ entry.date }}</td>
-        <td>{{ entry.visits }}</td>
-        <td>{{ entry.note }}</td>
+        <td>{{ entry.check_in_at }}</td>
+        <td>{{ entry.reason }}</td>
+        <td>{{ entry.firstname }}</td>
+        <td>{{ entry.lastname }}</td>
       </tr>
       {% endfor %}
     </tbody>
