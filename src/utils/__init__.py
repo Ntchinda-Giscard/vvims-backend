@@ -458,6 +458,7 @@ class ReportService:
         rendered_html = template.render(
             date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             entry=report_data,
+            highest_day = {}
             # summary = summary,
             # company_name = company_name
         )
