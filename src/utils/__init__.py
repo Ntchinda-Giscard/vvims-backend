@@ -292,7 +292,7 @@ class VisitReportGenerator(ReportGenerator):
                "start_date" : start_date,
                "end_date" : end_date
            })
-           return [dict(row) for row in results]
+        return [dict(row) for row in results]
     
     def _build_query(self, filter_by: CategoryType) -> str:
         base_query = """
@@ -345,7 +345,7 @@ class AttendanceReportGenerator(ReportGenerator):
                "end_date" : end_date
            })
 
-           return [dict(row) for row in results]
+        return [dict(row) for row in results]
     
     def _build_query(self, filter_by: CategoryType) -> str:
 
