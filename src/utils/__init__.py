@@ -461,7 +461,7 @@ class ReportService:
 
             return rendered_html
 
-        def generate_pdf(report_data, report_type: ReportType):
+        def generate_pdf(self, report_data, report_type: ReportType):
 
             html_content = self.render_html_template(report_data, report_type)
             pdf_bytes = HTML(string=html_content).write_pdf
