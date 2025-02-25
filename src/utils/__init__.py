@@ -377,7 +377,7 @@ class ReportService:
     def __init__(self):
         self.db = next(get_db())
         self.generators = {
-            ReportTypes.VISIT: VisitReportGenerator(),
+            ReportTypes.VISITS: VisitReportGenerator(),
             ReportTypes.ATTENDANCE: AttendanceReportGenerator()
         }
     
