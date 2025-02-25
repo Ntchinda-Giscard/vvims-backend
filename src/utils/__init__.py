@@ -287,7 +287,7 @@ class VisitReportGenerator(ReportGenerator):
         print(f"Filter by ====> {filter_by}")
         print(f"Query built ====> {sql_query}")
         with next(get_db()) as db:
-            result = await db.execute(text(sql_query),{
+            result = db.execute(text(sql_query),{
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
@@ -339,7 +339,7 @@ class AttendanceReportGenerator(ReportGenerator):
 
         sql_query = self._build_query(filter_by)
         with next(get_db()) as db:
-            result = await db.execute(text(sql_query), {
+            result = db.execute(text(sql_query), {
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
