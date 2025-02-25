@@ -395,6 +395,8 @@ class ReportService:
             end_date
         )
 
+        print(f"Result data =====> {data}")
+
         # filter_details = await self._get_filter_details(
         #     request.filter_by,
         #     request.filter_id
