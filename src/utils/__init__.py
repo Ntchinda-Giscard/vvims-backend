@@ -449,8 +449,11 @@ class ReportService:
 
     def render_html_template(self, report_data, report_type: ReportTypes):
 
-
-        template = env.get_template(f"{report_type}.html")
+        html_files = {
+            ReportTypes.VISITS: "visits",
+            ReportTypes.ATTENDANCE: "attendance"
+        }
+        template = env.get_template(f"{html_files[report_type]}.html")
 
         rendered_html = template.render(
             date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
