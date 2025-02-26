@@ -612,6 +612,6 @@ class ChromaService:
                     "similarity": similarity
                 })
 
-        return
+        return filtered_results[0] or None
 
 
