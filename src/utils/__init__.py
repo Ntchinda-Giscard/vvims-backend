@@ -409,6 +409,8 @@ class ReportService:
             end_date
         )
 
+        print(f"Printed data: ======> {data}")
+
         pdf_bytes = self.generate_pdf(data, request.report_type)
 
 
