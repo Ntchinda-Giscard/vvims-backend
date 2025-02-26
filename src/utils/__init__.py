@@ -4,7 +4,7 @@ from typing import Callable
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
 from sqlalchemy import and_, text
-from sqlalchemy.orm import Session
+from typing import Any
 import uuid
 from datetime import datetime, timedelta, time, date
 import requests
@@ -24,6 +24,7 @@ import os
 import asyncio
 from typing import Dict, List
 from collections import Counter
+from chromadb import Client
 
 
 
@@ -539,3 +540,13 @@ class ReportService:
         pdf_bytes = HTML(string=html_content).write_pdf()
 
         return pdf_bytes
+
+
+class ChromaConnectionSingleton:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(ChromaConnectionSingleton, cls).__new__(cls, *args, **kwargs)
+            cls._instance.client = Client()
+        return cls._instance

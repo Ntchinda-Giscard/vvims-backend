@@ -28,3 +28,4 @@ reportlab
 matplotlib
 pandas
 weasyprint
+chromadb
