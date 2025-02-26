@@ -22,6 +22,9 @@ from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 import os
 import asyncio
+from typing import Dict, List
+from collections import Counter
+
 
 
 
@@ -409,36 +412,96 @@ class ReportService:
             end_date
         )
 
-        print(f"REport ype: -----> {request.report_type}")
-        print(f"REport ype: -----> {request.filter_by}")
-        print(f"Printed data: ======> {data}")
+        filter_details = await self._get_filter_details(
+            request.filter_by,
+            request.filter_id
+        )
+
+        summary = self._generate_summary(request.report_type, filter_details)
 
         pdf_bytes = self.generate_pdf(data, request.report_type)
 
 
         return data, pdf_bytes
 
-    async def _get_filter_details(self, filter_by: CategoryType, flter_id: uuid.UUID):
+    async def _get_filter_details(self, filter_by: CategoryType, filter_id: uuid.UUID):
         tables = {
             CategoryType.EMPLOYEE: "employees",
             CategoryType.SERVICE: "services",
             CategoryType.DEPARTMENT: "departments"
         }
 
-        async with self.db as db:
-            record = await db.execute(
+        with self.db as db:
+            record = db.execute(
                 f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
                 {'filter_id': filter_id}
-            )
+            ).mappings().all() 
+
+        return record
     
-    def _generate_summary(self, report_type: ReportTypes, data):
+    def _calculate_peak_visiting_hour(self, records):
+        hours = []
+        for record in records:
+            check_in = record.get("check_in_at")
+            if check_in:
+                try:
+                    # If check_in is a datetime.time object:
+                    hour = check_in.hour
+                except AttributeError:
+                    # Otherwise, assume it's a string in "HH:MM:SS" format:
+                    hour = int(check_in.split(":")[0])
+                hours.append(hour)
+        
+        if not hours:
+            return None  # No check-ins found.
+        
+        # Count frequency of each hour.
+        hour_counts = Counter(hours)
+        # most_common(1) returns a list with one tuple: (hour, frequency)
+        peak_hour, _ = hour_counts.most_common(1)[0]
+        return peak_hour
+
+    def _calculate_highest_visiting_date(self, records):
+        """
+        Calculate and return the date with the highest number of visits from visit records.
+        
+        Args:
+            records (list of dict): Each dict represents a visit record with a "date" key.
+        
+        Returns:
+            date or None: The date (as a datetime.date object) with the most visits, or None if no dates exist.
+        """
+        dates = []
+        for record in records:
+            date_val = record.get("date")
+            if date_val:
+                if isinstance(date_val, str):
+                    try:
+                        # Parse the date assuming the format is YYYY-MM-DD
+                        parsed_date = datetime.strptime(date_val, "%Y-%m-%d").date()
+                        dates.append(parsed_date)
+                    except ValueError:
+                        # Fallback if parsing fails
+                        dates.append(date_val)
+                else:
+                    dates.append(date_val)
+        
+        if not dates:
+            return None
+        
+        # Count occurrences of each date
+        date_counts = Counter(dates)
+        # Get the date with the highest count
+        highest_date, _ = date_counts.most_common(1)[0]
+        return highest_date
+    
+    def _generate_summary(self, report_type: ReportTypes, data: List[Dict[str, Any]]) -> dict:
 
         if report_type == ReportTypes.VISIT:
             return{
-                "total_visits" : None,
-                "peack_visiting_hour" : None,
-                "most_visitied" : None,
-                "highest_visiting_dates" : None
+                "total_visits" : len(data),
+                "peack_visiting_hour" : self._calculate_peak_visiting_hour(data),
+                "highest_visiting_dates" : self._calculate_highest_visiting_date(data)
             }
         elif report_type ==  ReportTypes.ATTENDANCE:
 
