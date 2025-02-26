@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Department Service Visits Report</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      color: #333;
+    }
+    header {
+      text-align: start;
+      border: solid;
+      border-width: 0;
+      background: #ccc;
+      border-bottom-width: medium;
+      /* border-radius: 8px; */
+      margin-bottom: 20px;
+    }
+    .summary {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-around;
+      margin-bottom: 20px;
+    }
+    .card {
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      padding: 10px;
+      width: 30%;
+      text-align: center;
+      margin-bottom: 10px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 20px;
+    }
+    th, td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: center;
+    }
+    .insights {
+      background: #f9f9f9;
+      padding: 10px;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1> {{ company_name}} {{ service_name }} Visits Report</h1>
+    <br> {{ date }} </br>
+    <p>Overview of visit trends, peak hours, and employee performance</p>
+  </header>
+
+  <!-- Summary Section -->
+  <div class="summary">
+    <div class="card">
+      <h3>Total Visits</h3>
+      <p>{{ total_visits }}</p>
+    </div>
+    <div class="card">
+      <h3>Average Visits per Day</h3>
+      <p>{{ avg_visits }}</p>
+    </div>
+    <div class="card">
+      <h3>Highest Visits (Day)</h3>
+      <p>{{ highest_day.date }} ({{ highest_day.visits }})</p>
+    </div>
+    <div class="card">
+      <h3>Peak Visiting Hour</h3>
+      <p>{{ peak_hour.hour }} ({{ peak_hour.visits }})</p>
+    </div>
+    <div class="card">
+      <h3>Most Visited Employee</h3>
+      <p>{{ top_employee.name }} ({{ top_employee.visits }})</p>
+    </div>
+    
+  </div>
+
+  <!-- Detailed Daily Visit Data Table -->
+  <h2>Detailed Daily Visit Data</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Time</th>
+        <th>Notes</th>
+        <th>Firstname</th>
+        <th>Lastname</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for entry in visit_data %}
+      <tr>
+        <td>{{ entry.date }}</td>
+        <td>{{ entry.check_in_at }}</td>
+        <td>{{ entry.reason }}</td>
+        <td>{{ entry.firstname }}</td>
+        <td>{{ entry.lastname }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <!-- Insights Section -->
+  <div class="insights">
+    <h2>Insights & Trends</h2>
+    <p>{{ insights_text }}</p>
+  </div>
+</body>
+</html>
