@@ -419,7 +419,7 @@ class ReportService:
 
         summary = self._generate_summary(request.report_type, filter_details)
 
-        pdf_bytes = self.generate_pdf(data, request.report_type)
+        pdf_bytes = self.generate_pdf(data, request.report_type, summary)
 
 
         return data, pdf_bytes
@@ -512,7 +512,7 @@ class ReportService:
                 "average_arrival_time" : None,
             }
 
-    def render_html_template(self, report_data, report_type: ReportTypes):
+    def render_html_template(self, report_data, report_type: ReportTypes, summary):
 
         html_files = {
             ReportTypes.VISITS: "visits",
@@ -532,9 +532,9 @@ class ReportService:
 
         return rendered_html
 
-    def generate_pdf(self, report_data, report_type: ReportTypes):
+    def generate_pdf(self, report_data, report_type: ReportTypes, summary):
 
-        html_content = self.render_html_template(report_data, report_type)
+        html_content = self.render_html_template(report_data, report_type, summary)
         pdf_bytes = HTML(string=html_content).write_pdf()
 
         return pdf_bytes
