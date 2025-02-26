@@ -409,12 +409,12 @@ class ReportService:
             end_date
         )
 
+        print(f"REport ype: -----> {request.report_type}")
+        print(f"REport ype: -----> {request.filter_by}")
         print(f"Printed data: ======> {data}")
 
         pdf_bytes = self.generate_pdf(data, request.report_type)
 
-
-        print(f"Result data =====> {data}")
 
         return data, pdf_bytes
 
