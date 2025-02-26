@@ -25,7 +25,7 @@ import asyncio
 from typing import Dict, List
 from collections import Counter
 from chromadb import Client
-
+from enum import Enum as PyEnum
 
 
 
@@ -541,6 +541,9 @@ class ReportService:
 
         return pdf_bytes
 
+class Collectors(PyEnum):
+    VISIT = "visits_collector"
+    ATTENDANCE = "att_collector"
 
 class ChromaConnectionSingleton:
     _instance = None
@@ -562,3 +565,53 @@ class ChromaCollectionSingleton:
             # Get or create the collection
             cls._collections[collection_name] = client.get_or_create_collection(collection_name)
         return cls._collections[collection_name]
+
+
+
+
+class ChromaService:
+    def __init__(self, collection_name: str):
+        self.collection_name = collection_name
+        self.collection = ChromaCollectionSingleton.get_collection(collection_name)
+
+    def create_collection(self, collection_name: str):
+        # Optionally create and store another collection via the singleton
+        return ChromaCollectionSingleton.get_collection(collection_name)
+
+    def insert(self, emdedding, metadata, doc: str):
+        vector_id = uuid.uuid4()
+
+        self.collection.add(
+            documents = [doc],
+            embeddings=[emdedding],
+            metadatas=[metadata],
+            ids=[vector_id]
+        )
+
+    def retreive(self, embedding, top_k=1):
+
+        query_params = {
+            "query_embeddings" : [embedding],
+            "n_results": top_k,
+            "include": ["metadata", "ids", "distances"]
+        }
+
+        results = self.collection.query(**query_params)
+        return results
+
+    def filter_by_similarity(self, results):
+        threshold = 0.80
+        filtered_results = []
+
+        for _id, meta, distance in zip(results["ids"][0], results["metadata"][0], results["distances"][0]):
+            similarity = 1 - distance  # convert cosine distance to cosine similarity
+            if similarity >= threshold:
+                filtered_results.append({
+                    "id": _id,
+                    "metadata": meta,
+                    "similarity": similarity
+                })
+
+        return
+
+
