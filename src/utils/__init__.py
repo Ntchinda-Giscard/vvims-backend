@@ -457,7 +457,7 @@ class ReportService:
 
         rendered_html = template.render(
             date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-            visit_data=report_data,
+            table_data=report_data,
             highest_day = {},
             peak_hour = {},
             top_employee = {}
