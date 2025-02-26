@@ -526,8 +526,8 @@ class ReportService:
             table_data=report_data,
             highest_day = {},
             peak_hour = {},
-            top_employee = {}
-            summary = summary,
+            top_employee = {},
+            summary = summary
             # company_name = company_name
         )
 
