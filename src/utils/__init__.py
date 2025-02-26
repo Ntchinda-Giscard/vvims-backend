@@ -550,3 +550,15 @@ class ChromaConnectionSingleton:
             cls._instance = super(ChromaConnectionSingleton, cls).__new__(cls, *args, **kwargs)
             cls._instance.client = Client()
         return cls._instance
+
+class ChromaCollectionSingleton:
+    _collections = {}
+
+    @classmethod
+    def get_collection(cls, collection_name: str):
+        if collection_name not in cls._collections:
+            # Retrieve the Chroma client from the connection singleton
+            client = ChromaConnectionSingleton().client
+            # Get or create the collection
+            cls._collections[collection_name] = client.get_or_create_collection(collection_name)
+        return cls._collections[collection_name]
