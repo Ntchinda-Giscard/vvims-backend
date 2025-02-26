@@ -501,7 +501,8 @@ class ReportService:
             return{
                 "total_visits" : len(data),
                 "peack_visiting_hour" : self._calculate_peak_visiting_hour(data),
-                "highest_visiting_dates" : self._calculate_highest_visiting_date(data)
+                "highest_visiting_dates" : self._calculate_highest_visiting_date(data),
+                "avg_visits" : None
             }
         elif report_type ==  ReportTypes.ATTENDANCE:
 
@@ -526,7 +527,7 @@ class ReportService:
             highest_day = {},
             peak_hour = {},
             top_employee = {}
-            # summary = summary,
+            summary = summary,
             # company_name = company_name
         )
 

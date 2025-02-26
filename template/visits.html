@@ -60,23 +60,19 @@
   <div class="summary">
     <div class="card">
       <h3>Total Visits</h3>
-      <p>{{ total_visits }}</p>
+      <p>{{ summary.total_visits }}</p>
     </div>
     <div class="card">
       <h3>Average Visits per Day</h3>
-      <p>{{ avg_visits }}</p>
+      <p>{{ summary.avg_visits }}</p>
     </div>
     <div class="card">
       <h3>Highest Visits (Day)</h3>
-      <p>{{ highest_day.date }} ({{ highest_day.visits }})</p>
+      <p>{{ summary.highest_visiting_dates }}</p>
     </div>
     <div class="card">
       <h3>Peak Visiting Hour</h3>
-      <p>{{ peak_hour.hour }} ({{ peak_hour.visits }})</p>
-    </div>
-    <div class="card">
-      <h3>Most Visited Employee</h3>
-      <p>{{ top_employee.name }} ({{ top_employee.visits }})</p>
+      <p>{{ summary.peack_visiting_hour }} </p>
     </div>
     
   </div>
