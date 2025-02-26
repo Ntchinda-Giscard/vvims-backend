@@ -87,20 +87,24 @@
     <thead>
       <tr>
         <th>Date</th>
-        <th>Time</th>
-        <th>Notes</th>
+        <th>Is late</th>
+        <th>Clockin time</th>
+        <th>Clockout time</th>
         <th>Firstname</th>
         <th>Lastname</th>
+        <th>Hours</th>
       </tr>
     </thead>
     <tbody>
-      {% for entry in visit_data %}
+      {% for entry in att_data %}
       <tr>
-        <td>{{ entry.date }}</td>
-        <td>{{ entry.check_in_at }}</td>
-        <td>{{ entry.reason }}</td>
+        <td>{{ entry.clock_in_date }}</td>
+        <td>{{ entry.is_late }}</td>
+        <td>{{ entry.clock_out_time }}</td>
+        <td>{{ entry.clock_in_time }}</td>
         <td>{{ entry.firstname }}</td>
         <td>{{ entry.lastname }}</td>
+        <td>{{ entry.hours_worked }}</td>
       </tr>
       {% endfor %}
     </tbody>
