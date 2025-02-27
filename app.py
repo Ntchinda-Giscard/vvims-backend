@@ -24,9 +24,10 @@ from src.models import Employee, CompanySettings, Department, Attendance, Attend
     Report, ReportTypes
 from src.schema.input_type import LoginInput
 from src.utils import (
-    is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies,
-    ReportService
-    )
+    is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day,
+    calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies,
+    ReportService, ChromaService
+)
 import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
@@ -43,6 +44,7 @@ from src.schema.input_type import (
 )
 
 import asyncio
+from deepface import DeepFace
 
 
 
@@ -436,7 +438,7 @@ async def uploads_save(file: UploadFile, upload_type: Optional[str]):
     file_size = os.path.getsize(file_path)
 
 
-    return mime_type, file_size, file_url, file.filename
+    return mime_type, file_size, file_url, file.filename, file_path
 
 @app.post("/api/v1/upload-file")
 async def upload_file_strategy(upload_type: Optional[str]='online', file: UploadFile=File(...)):
@@ -485,7 +487,12 @@ async def add_visit_with_visitor(
         face_file_url = ''
         face_file_name = ''
         try:
-            mime_type, file_size, face_file_url, face_file_name = await uploads_save(face, upload_type=upload_type)
+            mime_type, file_size, face_file_url, face_file_name, file_path = await uploads_save(face, upload_type=upload_type)
+            embedding_objs = DeepFace.represent(
+                img_path= file_path
+            )
+            embedding = embedding_objs[0]["embedding"]
+
         except Exception as e:
             pass
         print(mime_type, file_size, face_file_url, face_file_name)
@@ -537,6 +544,8 @@ async def add_visit_with_visitor(
                 db.rollback()
                 raise HTTPException(status_code=500, detail=str(e))
 
+
+
         try:
             if visitor:
                 db_visits = Visit(
@@ -554,6 +563,16 @@ async def add_visit_with_visitor(
                 return JSONResponse(status_code=200, content={"visit": str(db_visits.id)})
             
             elif not visitor and (firstname or lastname or phone_number or id_number):
+                metadata = {
+                    "firstname": firstname,
+                    "lastname": lastname
+                }
+                chroma_service = ChromaService()
+                chroma_service.insert(
+                    embedding = embedding,
+                    metadata = metadata,
+                    doc = f"This is the face image of {firstname} {lastname}"
+                )
                 db_visitor = Visitor(
                     firstname=firstname,
                     lastname=lastname,
