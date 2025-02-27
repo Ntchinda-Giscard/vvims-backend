@@ -488,6 +488,7 @@ async def add_visit_with_visitor(
         face_file_name = ''
         try:
             mime_type, file_size, face_file_url, face_file_name, file_path = await uploads_save(face, upload_type=upload_type)
+            print(f"REsponse to uploads files vsits photo {mime_type}, {file_size}, {face_file_url}, {face_file_name}, {file_path}")
             embedding_objs = DeepFace.represent(
                 img_path= file_path
             )
