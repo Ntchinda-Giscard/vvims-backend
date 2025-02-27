@@ -493,6 +493,7 @@ async def add_visit_with_visitor(
                 img_path= file_path
             )
             embedding = embedding_objs[0]["embedding"]
+            print(f"EMBEDDING ====> {embedding}")
 
         except Exception as e:
             pass
