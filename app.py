@@ -505,8 +505,8 @@ async def add_visit_with_visitor(
                 db_face = UploadedFile(
                     file_name=face_file_name,
                     file_url=face_file_url,
-                    mime_type=mime_type,
-                    file_size= 0
+                    mime_type= mime_type,
+                    file_size = file_size
                 )
                 db.add(db_face)
                 db.commit()
@@ -518,10 +518,10 @@ async def add_visit_with_visitor(
         if front_id:
             try:
                 db_front = UploadedFile(
-                    file_name="front-id",
-                    file_url=front_id,
-                    mime_type="",
-                    file_size=""
+                    file_name= face_file_name,
+                    file_url=face_file_url,
+                    mime_type=mime_type,
+                    file_size=file_size
                 )
                 db.add(db_front)
                 db.commit()
