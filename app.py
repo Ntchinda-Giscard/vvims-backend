@@ -533,10 +533,10 @@ async def add_visit_with_visitor(
         if back_id:
             try:
                 db_back = UploadedFile(
-                    file_name="back-id",
-                    file_url=back_id,
-                    mime_type="",
-                    file_size=""
+                    file_name=face_file_name,
+                    file_url=face_file_url,
+                    mime_type=mime_type,
+                    file_size=file_size
                 )
                 db.add(db_back)
                 db.commit()
