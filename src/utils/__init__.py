@@ -551,15 +551,15 @@ class ChromaConnectionSingleton:
         return cls._instance
 
 
-class ChromaCollectionSingleton:
-    _collections = {}
-
-    @classmethod
-    def get_collection(cls, collection_name: str):
-        if collection_name not in cls._collections:
-            client = ChromaConnectionSingleton().client
-            cls._collections[collection_name] = client.get_or_create_collection(name=collection_name)
-        return cls._collections
+# class ChromaCollectionSingleton:
+#     _collections = None
+#
+#     @classmethod
+#     def get_collection(cls, collection_name: str):
+#         if collection_name not in cls._collections:
+#             client = ChromaConnectionSingleton().client
+#             cls._collections[collection_name] = client.get_or_create_collection(name=collection_name)
+#         return cls._collections
 
 
 
@@ -569,11 +569,12 @@ class ChromaCollectionSingleton:
 class ChromaService:
     def __init__(self):
         self.collection_name = "faces"
-        self.collection = ChromaCollectionSingleton.get_collection(self.collection_name)
+        self.client = ChromaConnectionSingleton().client
+        self.collection = self.client.get_or_create_collection(self.collection_name)
 
-    def create_collection(self):
-        # Optionally create and store another collection via the singleton
-        return ChromaCollectionSingleton.get_collection(self.collection_name)
+    # def create_collection(self):
+    #     # Optionally create and store another collection via the singleton
+    #     return ChromaCollectionSingleton.get_collection(self.collection_name)
 
     def insert(self, embedding, metadata: dict, doc: str = "", vector_id: str = None):
         """
