@@ -17,9 +17,9 @@ python-dateutil
 boto3
 requests
 pinecone
-# deepface
-# tensorflow==2.12
-# tf-keras
+deepface
+tensorflow==2.12
+tf-keras
 google-auth
 google-auth-oauthlib
 google-auth-httplib2
