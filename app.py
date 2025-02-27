@@ -506,7 +506,7 @@ async def add_visit_with_visitor(
                     file_name=face_file_name,
                     file_url=face_file_url,
                     mime_type=mime_type,
-                    file_size= int(file_size)
+                    file_size= float(file_size) if file_size != "" else None
                 )
                 db.add(db_face)
                 db.commit()
