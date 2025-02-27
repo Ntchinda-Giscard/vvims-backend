@@ -567,13 +567,13 @@ class ChromaCollectionSingleton:
 
 # ChromaService class with methods for creating collections, inserting embeddings, and querying
 class ChromaService:
-    def __init__(self, collection_name: str):
-        self.collection_name = collection_name
-        self.collection = ChromaCollectionSingleton.get_collection(collection_name)
+    def __init__(self):
+        self.collection_name = "faces"
+        self.collection = ChromaCollectionSingleton.get_collection(self.collection_name)
 
-    def create_collection(self, collection_name: str):
+    def create_collection(self):
         # Optionally create and store another collection via the singleton
-        return ChromaCollectionSingleton.get_collection(collection_name)
+        return ChromaCollectionSingleton.get_collection(self.collection_name)
 
     def insert(self, embedding, metadata: dict, doc: str = "", vector_id: str = None):
         """
