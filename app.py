@@ -476,7 +476,7 @@ async def add_visit_with_visitor(
         face: UploadFile = File(None),
         front_id: Optional[str] = Form(None),
         back_id: Optional[str] = Form(None),
-        user: str = Depends(get_current_user),
+        # user: str = Depends(get_current_user),
     ):
     if not host_employee and not host_service and not host_department:
         raise HTTPException(status_code=400, detail="Bad request. Missing one of these: Department, service and employee") 
