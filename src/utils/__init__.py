@@ -4,7 +4,7 @@ from typing import Callable
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
 from sqlalchemy import and_, text
-from typing import Any
+from sqlalchemy.orm import Session
 import uuid
 from datetime import datetime, timedelta, time, date
 import requests
@@ -24,8 +24,7 @@ import os
 import asyncio
 from typing import Dict, List
 from collections import Counter
-from chromadb import Client
-from enum import Enum as PyEnum
+from typing import Any
 
 
 
@@ -389,7 +388,6 @@ class AttendanceReportGenerator(ReportGenerator):
             """
 
 
-
 class ReportService:
 
     def __init__(self):
@@ -541,77 +539,40 @@ class ReportService:
 
         return pdf_bytes
 
-class Collectors(PyEnum):
-    VISIT = "visits_collector"
-    ATTENDANCE = "att_collector"
 
-class ChromaConnectionSingleton:
+
+class ChromaDBSingleton:
     _instance = None
 
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
-            cls._instance = super(ChromaConnectionSingleton, cls).__new__(cls, *args, **kwargs)
-            cls._instance.client = Client()
+            cls._instance = super(ChromaDBSingleton, cls).__new__(cls, *args, **kwargs)
+            cls._instance.pinecone_client = Pinecone(api_key="dc53a991-1d1a-4f03-b718-1ec0df3b0f00")
+            cls._instance.index = cls._instance.pinecone_client.Index("faces-id")
         return cls._instance
 
-class ChromaCollectionSingleton:
-    _collections = {}
-
-    @classmethod
-    def get_collection(cls, collection_name: str):
-        if collection_name not in cls._collections:
-            # Retrieve the Chroma client from the connection singleton
-            client = ChromaConnectionSingleton().client
-            # Get or create the collection
-            cls._collections[collection_name] = client.get_or_create_collection(collection_name)
-        return cls._collections[collection_name]
-
-
-
-
-class ChromaService:
-    def __init__(self, collection_name: str):
-        self.collection_name = collection_name
-        self.collection = ChromaCollectionSingleton.get_collection(collection_name)
-
-    def create_collection(self, collection_name: str):
-        # Optionally create and store another collection via the singleton
-        return ChromaCollectionSingleton.get_collection(collection_name)
-
-    def insert(self, emdedding, metadata, doc: str):
-        vector_id = uuid.uuid4()
-
-        self.collection.add(
-            documents = [doc],
-            embeddings=[emdedding],
-            metadatas=[metadata],
-            ids=[vector_id]
+    def insert(self, embedding, firstname="", lastname="", phone_number="", date=""):
+        self.index.upsert(vectors=[
+            {
+                "id": str(uuid.uuid4()),
+                "values": embedding,
+                "metadata": {"firstname": firstname, "lastname": lastname, "phone_number": phone_number, "date": date},
+            }],
+            namespace="ns1"
         )
 
-    def retreive(self, embedding, top_k=1):
+    def query(self, embedding, top_k=1):
+        today = date.today()
+        matches = self.index.query(
+            namespace="ns1",
+            vector=embedding,
+            top_k=top_k,
+            include_values=False,
+            include_metadata=True,
+            filter={"date": {"$eq": str(today.strftime('%B %d, %Y'))}}
+        )
 
-        query_params = {
-            "query_embeddings" : [embedding],
-            "n_results": top_k,
-            "include": ["metadata", "ids", "distances"]
-        }
+        print(matches["matches"])
 
-        results = self.collection.query(**query_params)
-        return results
-
-    def filter_by_similarity(self, results):
-        threshold = 0.80
-        filtered_results = []
-
-        for _id, meta, distance in zip(results["ids"][0], results["metadata"][0], results["distances"][0]):
-            similarity = 1 - distance  # convert cosine distance to cosine similarity
-            if similarity >= threshold:
-                filtered_results.append({
-                    "id": _id,
-                    "metadata": meta,
-                    "similarity": similarity
-                })
-
-        return filtered_results[0] or None
-
+        return matches["matches"]
 
