@@ -483,7 +483,7 @@ async def add_visit_with_visitor(
     if face:
         # Use 'await' to call the asynchronous 'uploads_save' function
         mime_type = ''
-        file_size = ''
+        file_size = 0
         face_file_url = ''
         face_file_name = ''
         try:
