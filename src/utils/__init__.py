@@ -151,7 +151,7 @@ class PineconeSigleton:
         if not cls._instance:
             cls._instance = super(PineconeSigleton, cls).__new__(cls, *args, **kwargs)
             cls._instance.pinecone_client = Pinecone(api_key="dc53a991-1d1a-4f03-b718-1ec0df3b0f00")
-            cls._instance.index = cls._instance.pinecone_client.Index("faces-id")
+            cls._instance.index = cls._instance.pinecone_client.Index("2-vmedia")
         return cls._instance
 
     def insert(self, embedding, firstname="", lastname="", phone_number="", date=""):
@@ -251,8 +251,8 @@ class LocalUploadStrategy(UploadStrategy):
 
 @dataclass
 class UploadStrategies:
-    online: Callable[[], UploadStrategy]
-    local: Callable[[], UploadStrategy]
+    online: UploadStrategy = S3UploadStrategy()
+    local: UploadStrategy = LocalUploadStrategy()
 
     def get_strategy(self, upload_type: str) -> UploadStrategy:
         """
