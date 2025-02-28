@@ -49,7 +49,7 @@ from deepface import DeepFace
 
 
 models.Base.metadata.create_all(bind=engine)
-
+server_instance = os.getenv('SERVER_INSTANCE'),
 s3 = boto3.client(
     's3',
     aws_access_key_id= os.getenv('AWS_ACCESS_KEY'),
@@ -442,8 +442,8 @@ async def uploads_save(file: UploadFile, upload_type: Optional[str]):
 
 @app.post("/api/v1/upload-file")
 async def upload_file_strategy(upload_type: Optional[str]='online', file: UploadFile=File(...)):
-    strategies = UploadStrategies()
-    strategy = strategies.get_strategy(upload_type)
+    # strategies = UploadStrategies()
+    strategy = UploadStrategies.get_strategy(upload_type)
 
     # processor = UploadProcessor(strategies)
     result = await strategy.upload_process(file)

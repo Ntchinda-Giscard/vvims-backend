@@ -594,7 +594,7 @@ class ChromaService:
             ids=[vector_id]
         )
 
-    def retrieve(self, embedding, top_k=1, filter_dict=None):
+    def query(self, embedding, top_k=1, filter_dict=None):
         """
         Queries the collection for similar embeddings.
 
@@ -620,25 +620,11 @@ class ChromaService:
 
         pass
 # Example usage:
-if __name__ == '__main__':
-    # Instantiate the service for the "faces" collection
-    service = ChromaService("faces")
 
-    # Sample 1024-dimensional embedding (dummy values for illustration)
-    sample_embedding = [0.01] * 1024
-    sample_metadata = {
-        "firstname": "John",
-        "lastname": "Doe",
-        "phone_number": "123456789",
-        "date": "November 20, 2024"
-    }
 
-    # Insert an embedding
-    service.insert(sample_embedding, sample_metadata, doc="Face embedding for John Doe")
+class FaceDetectionService:
 
-    # Query using the same sample embedding; for example, filter by today's date
-    # (Format your date filter as stored in metadata)
-    query_filter = {"date": {"$eq": "November 20, 2024"}}
-    query_results = service.query(sample_embedding, top_k=1, filter_dict=query_filter)
+    def __init__(self, ):
+        self.vector_db_client = {
 
-    print("Query Results:", query_results)
+        }
