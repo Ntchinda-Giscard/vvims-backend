@@ -72,7 +72,7 @@ schema = strawberry.Schema(mutation=Mutation, query=Query, subscription=Subscrip
 graphql_app = GraphQLRouter(schema)
 app.include_router(graphql_app, prefix="/graphql")
 
-pinecone_client = PineconeSigleton()
+# pinecone_client = PineconeSigleton()
 UPLOAD_DIR = '/app/uploads'
 os.makedirs('/uploads', exist_ok=True)
 
