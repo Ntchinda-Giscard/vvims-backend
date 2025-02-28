@@ -249,24 +249,10 @@ class LocalUploadStrategy(UploadStrategy):
             raise e
 
 
-@dataclass
-class UploadStrategies:
-    online: UploadStrategy = S3UploadStrategy()
-    local: UploadStrategy = LocalUploadStrategy()
 
-    def get_strategy(self, upload_type: str) -> UploadStrategy:
-        """
-        Dynamically fetch the correct strategy based on client input
-        """
-
-        strategy_creator = getattr(self, upload_type, None)
-        if not strategy_creator:
-            raise ValueError(f"Unsupported upload type: {upload_type} ")
-        strategy_instance = strategy_creator()
-        if not isinstance(strategy_instance, UploadStrategy):
-            raise TypeError(f"Strategy is not of type UploadStrategy: {strategy_instance}")
-
-        return strategy_instance
+UploadStrategies = {
+    "online": S3UploadStrategy(),
+    "local": LocalUploadStrategy()}
 
 class UploadProcessor:
 
