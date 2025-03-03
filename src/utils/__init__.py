@@ -211,7 +211,7 @@ class S3UploadStrategy(UploadStrategy):
 
     async def upload_process(self, file: UploadFile = File(...)) -> str:
         try:
-            file_path = f"uploads/file"
+            file_path = f"uploads/{file.filename}"
             # mime_type, _ = mimetypes.guess_type(file_path)
             # file_size = os.path.getsize(file_path)
             with open(file_path, "wb") as f:

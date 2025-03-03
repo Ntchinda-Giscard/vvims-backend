@@ -1,5 +1,5 @@
 import random
-from reportlab.pdfgen import canvas
+from pathlib import Path
 import os
 import io
 from typing import Optional, Any
@@ -420,13 +420,8 @@ async def upload_app(name: str, version: str, apps: UploadFile = File(...)):
             db.close()
 
 async def uploads_save(file: UploadFile, upload_type: Optional[str]):
-
-    file_path = f"uploads/{file.filename}"
-
-    # Asynchronously read and save the file
-    content = await file.read()
-    with open(file_path, "wb") as f:
-        f.write(content)
+    UPLOAD_DIR = '/app/uploads'
+    file_path = Path(UPLOAD_DIR)/file.filename
 
     strategies = UploadStrategies[upload_type]
 
