@@ -405,7 +405,7 @@ def get_event_by_user(db: Session, inputs: EventByUserInput) -> List[EventWithUs
         .filter(
             Event.start_date == inputs.date,
             EventParticipant.employee_id == inputs.employee_id,
-            EventParticipant.status == ParticipantStatus.COMPLETED
+            EventParticipant.status == "COMPLETED"
         )
     )
 
