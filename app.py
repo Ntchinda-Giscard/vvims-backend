@@ -486,7 +486,7 @@ async def add_visit_with_visitor(
         file_size = 0
         face_file_url = ''
         face_file_name = ''
-        embedding = None
+        embedding = []
         try:
             mime_type, file_size, face_file_url, face_file_name, file_path = await uploads_save(face, upload_type=upload_type)
             print(f"type=={mime_type}, size=={file_size}, url=={face_file_url}, filename=={face_file_name}, path=={file_path}")
