@@ -428,10 +428,10 @@ async def uploads_save(file: UploadFile, upload_type: Optional[str]):
     with open(file_path, "wb") as f:
         f.write(content)
 
-    strategies = UploadStrategies(local=LocalUploadStrategy, online=S3UploadStrategy)
+    strategies = UploadStrategies[upload_type]
 
-    processor = UploadProcessor(strategies)
-    file_url = await processor.process(upload_type, file)
+    # processor = strategies.upload_process(file)
+    file_url = await strategies.upload_process(file)
 
     # Determine the MIME type and file size
     mime_type, _ = mimetypes.guess_type(file_path)
