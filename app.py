@@ -486,14 +486,9 @@ async def add_visit_with_visitor(
         file_size = 0
         face_file_url = ''
         face_file_name = ''
-        embedding = []
         try:
             mime_type, file_size, face_file_url, face_file_name, file_path = await uploads_save(face, upload_type=upload_type)
             print(f"type=={mime_type}, size=={file_size}, url=={face_file_url}, filename=={face_file_name}, path=={file_path}")
-            embedding_objs = DeepFace.represent(
-                img_path= file_path
-            )
-            embedding = embedding_objs[0]["embedding"]
 
         except Exception as e:
             pass
@@ -565,16 +560,7 @@ async def add_visit_with_visitor(
                 return JSONResponse(status_code=200, content={"visit": str(db_visits.id)})
             
             elif not visitor and (firstname or lastname or phone_number or id_number):
-                metadata = {
-                    "firstname": firstname,
-                    "lastname": lastname
-                }
-                chroma_service = ChromaService()
-                chroma_service.insert(
-                    embedding = embedding,
-                    metadata = metadata,
-                    doc = f"This is the face image of {firstname} {lastname}"
-                )
+
                 db_visitor = Visitor(
                     firstname=firstname,
                     lastname=lastname,
