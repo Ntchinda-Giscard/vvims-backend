@@ -761,7 +761,7 @@ async def get_pdf_reports(
 async def insert_visitor(
         face: UploadFile = File(None)
     ):
-
+    print(f"Server type {server_instance}")
     file_path = Path(UPLOAD_DIR) / face.filename
 
     with open(file_path, "wb") as f:
