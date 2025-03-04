@@ -49,7 +49,7 @@ from deepface import DeepFace
 
 
 models.Base.metadata.create_all(bind=engine)
-server_instance = os.getenv('SERVER_INSTANCE'),
+server_instance = os.getenv('SERVER_INSTANCE')
 s3 = boto3.client(
     's3',
     aws_access_key_id= os.getenv('AWS_ACCESS_KEY'),
