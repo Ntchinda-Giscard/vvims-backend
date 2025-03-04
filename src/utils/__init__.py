@@ -502,11 +502,12 @@ class ChromaConnectionSingleton:
 
 
 class VectoDatabasor(ABC):
-    @staticmethod
+
+    @abstractmethod
     def insert(self, embedding, metadata: dict):
         return NotImplementedError
 
-    @staticmethod
+    @abstractmethod
     def query(self, embedding, metadata: dict):
         return NotImplementedError
 
@@ -594,8 +595,8 @@ class FaceDetectionService:
 
     def __init__(self):
         self.vector_db_client = {
-            "local" : PineconeSigleton(),
-            "online" : ChromaService()
+            "online" : PineconeSigleton(),
+            "local" : ChromaService()
         }
 
     def add_face(self, server_type, embedding, metadata):
@@ -604,4 +605,4 @@ class FaceDetectionService:
             metadata=metadata,
             embedding=embedding
         )
-        pass
+
