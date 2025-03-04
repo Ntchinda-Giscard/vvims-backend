@@ -26,7 +26,7 @@ from src.schema.input_type import LoginInput
 from src.utils import (
     is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day,
     calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies,
-    ReportService, ChromaService
+    ReportService, ChromaService, FaceDetectionService
 )
 import boto3
 from pathlib import Path
@@ -769,7 +769,20 @@ async def insert_visitor(
 
     embedding_objs = DeepFace.represent(
         img_path = file_path,
-        model_name = "VGG-Face"
+        model_name = "VGG-Face",
+        enforce_detection=True
+    )
+    metadata = {
+        "firstname" : "John",
+        "lastname" : "Doe",
+        "date" : date.today()
+    }
+
+    face_service = FaceDetectionService()
+    face_service.add_face(
+        server_instance,
+        embedding= embedding_objs[0]["embedding"],
+        metadata= metadata
     )
 
 

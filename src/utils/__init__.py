@@ -592,7 +592,7 @@ class PineconeSigleton(VectoDatabasor):
 
 class FaceDetectionService:
 
-    def __init__(self, ):
+    def __init__(self):
         self.vector_db_client = {
             "local" : PineconeSigleton(),
             "online" : ChromaService()
