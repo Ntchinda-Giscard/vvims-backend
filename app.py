@@ -775,7 +775,7 @@ async def insert_visitor(
     metadata = {
         "firstname" : "John",
         "lastname" : "Doe",
-        "date" : date.today()
+        "date" : date.today().isoformat()
     }
 
     face_service = FaceDetectionService()
