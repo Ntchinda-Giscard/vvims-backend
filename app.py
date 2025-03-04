@@ -757,6 +757,22 @@ async def get_pdf_reports(
     return {"s3_url": s3_url}
 
 
+@app.post("/api/v1/add-visitor")
+async def insert_visitor(
+        face: UploadFile = File(None)
+    ):
+
+    file_path = Path(UPLOAD_DIR) / face.filename
+
+    with open(file_path, "wb") as f:
+        f.write(await face.read())
+
+    embedding_objs = DeepFace.represent(
+        img_path = file_path,
+        model_name = "VGG-Face"
+    )
+
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=7860)
