@@ -490,10 +490,10 @@ async def add_visit_with_visitor(
                 enforce_detection=True
             )
             metadata = {
-                "firstname": firstname,
-                "lastname": lastname,
+                "firstname": firstname or "Jonh",
+                "lastname": lastname or "Doe",
                 "date": date.today().isoformat(),
-                "phone_number": phone_number
+                "phone_number": phone_number or "672021428"
             }
 
             face_service = FaceDetectionService()
