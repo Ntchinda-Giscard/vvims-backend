@@ -748,7 +748,8 @@ async def get_pdf_reports(
     #     db.add(report)
     #     db.commit()
 
-    return {"s3_url": s3_url}
+    return {"s3_url": s3_url, "data" : data
+            }
 
 
 @app.post("/api/v1/add-visitor")
