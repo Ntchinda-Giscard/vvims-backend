@@ -382,8 +382,8 @@ class ReportService:
 
         with self.db as db:
             record = db.execute(
-                f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
-                {'filter_id': filter_id}
+                text(f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id",
+                {'filter_id': filter_id})
             ).mappings().all() 
 
         return record
