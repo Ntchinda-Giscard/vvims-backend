@@ -19,7 +19,7 @@ import boto3
 import os
 import io
 import random
-
+from src.schema.input_type import ReportTypes
 
 env = Environment(loader=FileSystemLoader("template"))
 s3 = boto3.client(
