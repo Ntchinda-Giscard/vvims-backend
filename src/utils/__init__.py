@@ -295,7 +295,7 @@ class AttendanceReportGenerator(ReportGenerator):
 
         sql_query = self._build_query(filter_by)
         with next(get_db()) as db:
-            results = db.execute(text(text(sql_query)), {
+            results = db.execute(text(sql_query), {
                "filter_id" : filter_id,
                "start_date" : start_date,
                "end_date" : end_date
