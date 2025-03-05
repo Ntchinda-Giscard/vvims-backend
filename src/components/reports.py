@@ -92,8 +92,8 @@ ReportType = {
 }
 
 ReportName = {
-    "visit": "Visits Report",
-    "attendance":  "Atendance Report"}
+    ReportTypes.VISITS : "Visits Report",
+    ReportTypes.ATTENDANCE :  "Attendance Report"}
 
 class ReportGeneratorContext:
     def __init__(self, strategy: ReportGeneratorStrategy):
