@@ -447,7 +447,7 @@ class ReportService:
     
     def _generate_summary(self, report_type: ReportTypes, data: List[Dict[str, Any]]) -> dict:
 
-        if report_type == ReportTypes.VISIT:
+        if report_type == ReportTypes.VISITS:
             return{
                 "total_visits" : len(data),
                 "peack_visiting_hour" : self._calculate_peak_visiting_hour(data),
