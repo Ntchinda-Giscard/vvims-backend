@@ -730,6 +730,7 @@ async def get_pdf_reports(
     ):
     report_service = ReportService()
     data, pdf_bytes = await report_service.generate_report(request)
+    print(f"REport type ====> {request.report_type}")
     report_name = ReportName[request.report_type]
     s3_url = upload_report_to_s3(pdf_bytes, report_name)
     with next(get_db()) as db:
