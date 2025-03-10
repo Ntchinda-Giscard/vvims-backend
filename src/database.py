@@ -6,7 +6,8 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-
+print( "Aws access key", os.getenv('AWS_ACCESS_KEY'))
+print( "Aws secret key", os.getenv('AWS_SECRET_KEY'))
 DATABASE_URL = os.getenv("DATABASE_URL")
 
 print(DATABASE_URL)
