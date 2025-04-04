@@ -511,6 +511,7 @@ async def add_visit_with_visitor(
     with next(get_db()) as db:
        
         if face:
+            print("THere is a face")
             try:
                 db_face = UploadedFile(
                     file_name=face_file_name,
@@ -520,10 +521,14 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_face)
                 db.commit()
+                print(f"THere is a face {db_face.id}")
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
+                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
+            finally:
+                db.close()
 
         if front_id:
             try:
@@ -538,7 +543,10 @@ async def add_visit_with_visitor(
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
+                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
+            finally:
+                db.close()
 
         if back_id:
             try:
@@ -550,9 +558,11 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_back)
                 db.commit()
+                db.close()
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
+                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -599,10 +609,12 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_visit)
                 db.commit()
+                db.close()
                 return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id), "face_file_url": face_file_url})
         except Exception as e:
             logger.exception(e)
             db.rollback()
+            db.close()
             raise HTTPException(status_code=500, detail=str(e))
 
 
