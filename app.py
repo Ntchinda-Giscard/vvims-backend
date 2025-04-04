@@ -525,10 +525,7 @@ async def add_visit_with_visitor(
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
-                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
-            finally:
-                db.close()
 
         if front_id:
             try:
@@ -543,11 +540,7 @@ async def add_visit_with_visitor(
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
-                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
-            finally:
-                db.close()
-
         if back_id:
             try:
                 db_back = UploadedFile(
@@ -558,11 +551,9 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_back)
                 db.commit()
-                db.close()
             except Exception as e:
                 logger.exception(e)
                 db.rollback()
-                db.close()
                 raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -609,13 +600,14 @@ async def add_visit_with_visitor(
                 )
                 db.add(db_visit)
                 db.commit()
-                db.close()
                 return JSONResponse(status_code=200, content={"visitor": str(db_visitor.id), "face_file_url": face_file_url})
         except Exception as e:
             logger.exception(e)
             db.rollback()
             db.close()
             raise HTTPException(status_code=500, detail=str(e))
+        finally:
+            db.close()
 
 
 
