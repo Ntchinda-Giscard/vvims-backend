@@ -193,3 +193,9 @@ class AppointmentTodayPercentage:
 @strawberry.type
 class ReportsType:
     link:  str
+
+
+@strawberry.type
+class GenerateReportPayload:
+    report_link: str
+    filename: str

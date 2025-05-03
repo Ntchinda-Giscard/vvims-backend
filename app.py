@@ -148,7 +148,6 @@ async def attendance_trigger(body: Dict):
         finally:
             db.close()
 
-
     return {"message" : "Received and printed"}
 
 @app.post("/api/v1/visit-trigger")

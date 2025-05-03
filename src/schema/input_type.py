@@ -171,20 +171,21 @@ class EmployeeAppointmentId:
 
 
 
-class ReportTypes(PyEnum):
-    ATTENDANCE = 'attendance'
-    VISITS = 'visits'
-    TASKS = 'tasks'
+class ReportTypeEnum(PyEnum):
+    VISITS = "visits"
+    ATTENDANCE = "attendance"
 
-class CategoryType(PyEnum):
-    EMPLOYEE = "employee"
-    SERVICE = "service"
+@strawberry.enum
+class CategoryTypeEnum(PyEnum):
     DEPARTMENT = "department"
+    SERVICE = "service"
+    EMPLOYEE = "employee"
 
-
-class ReportRequest(BaseModel):
-    report_type: ReportTypes
-    filter_by: CategoryType
-    filter_id: uuid.UUID
-    start_date: Optional[datetime] = None
-    end_date: Optional[datetime] = None
+# Input and Payload Types
+@strawberry.input
+class GenerateReportInput:
+    report_type: ReportTypeEnum
+    category: CategoryTypeEnum
+    category_id: uuid.UUID
+    from_date: Optional[date] = None
+    to_date: Optional[date] = None
