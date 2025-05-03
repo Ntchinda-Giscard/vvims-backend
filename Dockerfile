@@ -35,5 +35,5 @@ RUN pip install --no-cache-dir --upgrade -r requirements.txt
 COPY --chown=myuser . /app
 
 # Step 9: Command to run the application
-# CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
-CMD ["fastapi", "run", "app.py"]
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "7860"]
+# CMD ["fastapi", "run", "app.py"]
