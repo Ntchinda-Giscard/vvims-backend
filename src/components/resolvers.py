@@ -5,7 +5,8 @@ from datetime import date, timedelta
 from pathlib import Path
 from sqlalchemy.orm import Session
 from src.database import SessionLocal
-from src.models import Leave, Visit, Attendance, Employee
+from src.models import Leave, Report, Visit, Attendance, Employee, ReportTypes
+
 
 # Compute a directory relative to this file for storing reports
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -49,7 +50,7 @@ def generate_report(
                     v.reason or '',
                     v.status or '',
                 ])
-
+        
     # Attendance report
     else:
         # Select employees
@@ -78,7 +79,7 @@ def generate_report(
         ).all()
 
         filename = f"attendance_{category}_{category_id}_{from_date}_{to_date}.csv"
-        filepath = REPORT_DIR / filename
+        filepath = f"{REPORT_DIR}/filename"
         with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             # Updated header: include arrival, departure, late
@@ -119,6 +120,17 @@ def generate_report(
                         reason
                     ])
                 curr += timedelta(days=1)
-
+    
     public_url = f"http://172.17.15.28:30088/uploads/{filename}"
+    report_enum = ReportTypes.ATTENDANCE if report_type == "attendance" else ReportTypes.VISITS
+    reports = Report(
+        report_link=public_url,
+        from_date=from_date,
+        to_date=to_date,
+        name=category,
+        types=report_enum
+    )
+    db.add(reports)
+    db.commit()
+    db.refresh(reports)
     return public_url, filename
