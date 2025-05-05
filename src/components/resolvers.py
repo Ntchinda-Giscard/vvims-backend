@@ -7,11 +7,6 @@ from sqlalchemy.orm import Session
 from src.database import SessionLocal
 from src.models import Leave, Report, Visit, Attendance, Employee, ReportTypes
 
-
-# Compute a directory relative to this file for storing reports
-# BASE_DIR = Path(__file__).resolve().parent.parent
-# REPORT_DIR = BASE_DIR / "uploads"
-# REPORT_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR = '/app/uploads'
 
 def generate_report(
@@ -27,17 +22,22 @@ def generate_report(
     # Visits report
     if report_type == "visits":
         date_field = Visit.date
-        rows = session.query(Visit).filter(
+        filters = [
             date_field >= from_date,
-            date_field <= to_date,
-            # category filtering
-            **({Visit.host_department: category_id} if category == "department" else {}),
-            **({Visit.host_service: category_id} if category == "service" else {}),
-            **({Visit.host_employee: category_id} if category == "employee" else {})
-        ).all()
+            date_field <= to_date
+        ]
+
+        if category == "department":
+            filters.append(Visit.host_department == category_id)
+        elif category == "service":
+            filters.append(Visit.host_service == category_id)
+        elif category == "employee":
+            filters.append(Visit.host_employee == category_id)
+
+        rows = session.query(Visit).filter(*filters).all()
 
         filename = f"visits_{category}_{category_id}_{from_date}_{to_date}.csv"
-        filepath = REPORT_DIR / filename
+        filepath = Path(REPORT_DIR) / filename
         with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
             writer.writerow(["Visitor Name", "Date", "Check In", "Check Out", "Reason", "Status"])
@@ -50,10 +50,9 @@ def generate_report(
                     v.reason or '',
                     v.status or '',
                 ])
-        
+
     # Attendance report
     else:
-        # Select employees
         emp_q = session.query(Employee)
         if category == "department":
             emp_q = emp_q.filter(Employee.department_id == category_id)
@@ -63,11 +62,11 @@ def generate_report(
             emp_q = emp_q.filter(Employee.id == category_id)
         employees = emp_q.all()
 
-        # Preload data
         attendances = session.query(Attendance).filter(
             Attendance.clock_in_date >= from_date,
             Attendance.clock_in_date <= to_date
         ).all()
+
         leaves = session.query(
             Leave.employee_id,
             Leave.start_date,
@@ -79,10 +78,9 @@ def generate_report(
         ).all()
 
         filename = f"attendance_{category}_{category_id}_{from_date}_{to_date}.csv"
-        filepath = f"{REPORT_DIR}/filename"
+        filepath = Path(REPORT_DIR) / filename
         with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
             writer = csv.writer(csvfile)
-            # Updated header: include arrival, departure, late
             writer.writerow(["Employee", "Date", "Status", "Arrival", "Departure", "Late", "Reason"])
 
             curr = from_date
@@ -120,9 +118,10 @@ def generate_report(
                         reason
                     ])
                 curr += timedelta(days=1)
-    
+
     public_url = f"http://172.17.15.28:30088/uploads/{filename}"
     report_enum = ReportTypes.ATTENDANCE if report_type == "attendance" else ReportTypes.VISITS
+
     reports = Report(
         report_link=public_url,
         from_date=from_date,
@@ -133,4 +132,5 @@ def generate_report(
     db.add(reports)
     db.commit()
     db.refresh(reports)
+
     return public_url, filename
