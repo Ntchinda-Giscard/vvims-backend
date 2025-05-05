@@ -26,25 +26,25 @@ from src.schema.input_type import LoginInput
 from src.utils import (
     is_employee_late, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day,
     calculate_time_in_building, LocalUploadStrategy, S3UploadStrategy, UploadProcessor, UploadStrategies,
-    ReportService, ChromaService, FaceDetectionService
+    # ReportService, ChromaService, FaceDetectionService
 )
 import boto3
 from pathlib import Path
 from fastapi.staticfiles import StaticFiles
 from zoneinfo import ZoneInfo
-from src.utilities import generate_pdf
-from src.components.reports import (
-    ReportGeneratorContext, upload_report_to_s3
-    )
-from src.components.reports import ReportType, ReportName
-from src.schema.input_type import (
-    ReportRequest,
-    ReportTypes,
-    CategoryType
-)
+# from src.utilities import generate_pdf
+# from src.components.reports import (
+#     ReportGeneratorContext, upload_report_to_s3
+#     )
+# from src.components.reports import ReportType, ReportName
+# from src.schema.input_type import (
+#     ReportRequest,
+#     ReportTypes,
+#     CategoryType
+# )
 
 import asyncio
-from deepface import DeepFace
+# from deepface import DeepFace
 
 
 
@@ -76,7 +76,7 @@ app.include_router(graphql_app, prefix="/graphql")
 UPLOAD_DIR = '/app/uploads'
 os.makedirs('/uploads', exist_ok=True)
 
-app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+# app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 @app.get("/")
 def greet_json():
@@ -483,11 +483,11 @@ async def add_visit_with_visitor(
         try:
             print(f"Upload type =======> {upload_type}")
             mime_type, file_size, face_file_url, face_file_name, file_path = await uploads_save(face, upload_type=upload_type)
-            embedding_objs = DeepFace.represent(
-                img_path=file_path,
-                model_name="VGG-Face",
-                enforce_detection=True
-            )
+            # embedding_objs = DeepFace.represent(
+            #     img_path=file_path,
+            #     model_name="VGG-Face",
+            #     enforce_detection=True
+            # )
             metadata = {
                 "firstname": firstname or "Jonh",
                 "lastname": lastname or "Doe",
@@ -495,12 +495,12 @@ async def add_visit_with_visitor(
                 "phone_number": phone_number or "672021428"
             }
 
-            face_service = FaceDetectionService()
-            face_service.add_face(
-                server_instance,
-                embedding=embedding_objs[0]["embedding"],
-                metadata=metadata
-            )
+            # face_service = FaceDetectionService()
+            # face_service.add_face(
+            #     server_instance,
+            #     embedding=embedding_objs[0]["embedding"],
+            #     metadata=metadata
+            # )
             print(f"type=={mime_type}, size=={file_size}, url=={face_file_url}, filename=={face_file_name}, path=={file_path}")
 
         except Exception as e:
@@ -656,135 +656,135 @@ async def get_attendance_by_date_range(start_date, end_date):
         return result
 
 
-@app.get("/api/v1/get-attendace-report")
-async def get_attendace_pdf_reports():
-    summary = {}
-    with next(get_db()) as db:
-        try:
-            result = get_employee_attendance_summary(db, Employee, Attendance)
-            result_dept = get_department_attendance_summary(db, Department)
+# @app.get("/api/v1/get-attendace-report")
+# async def get_attendace_pdf_reports():
+#     summary = {}
+#     with next(get_db()) as db:
+#         try:
+#             result = get_employee_attendance_summary(db, Employee, Attendance)
+#             result_dept = get_department_attendance_summary(db, Department)
 
-            # Company anme
-            company_name = get_company_name(db, Company, TextContent)
+#             # Company anme
+#             company_name = get_company_name(db, Company, TextContent)
 
-            # Summary of Company
-            summary["arrival_time"] = average_compnay_arrival_time(db, Attendance)
-            summary["avr_office_hours"] = average_time_in_office(db, Attendance)
-            summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(db, Attendance, Employee))
+#             # Summary of Company
+#             summary["arrival_time"] = average_compnay_arrival_time(db, Attendance)
+#             summary["avr_office_hours"] = average_time_in_office(db, Attendance)
+#             summary["overall_perc"] = "{:.1f}%".format(attendance_percentage(db, Attendance, Employee))
 
-            pdf_bytes = generate_pdf(result, result_dept, summary, company_name)
-            pdf_buffer = io.BytesIO(pdf_bytes)
-            # Generate the current timestamp and a random number
-            now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
-            random_number = str(random.randint(1, 99999)).zfill(5)
+#             pdf_bytes = generate_pdf(result, result_dept, summary, company_name)
+#             pdf_buffer = io.BytesIO(pdf_bytes)
+#             # Generate the current timestamp and a random number
+#             now = datetime.now().strftime("%Y-%m-%d_%H:%M:%S")
+#             random_number = str(random.randint(1, 99999)).zfill(5)
 
-            s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random_number}.pdf")
-            s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
+#             s3.upload_fileobj(pdf_buffer, "vvims-visitor", f"attendance_report_{now}_{random_number}.pdf")
+#             s3_url = f"https://vvims-visitor.s3.eu-north-1.amazonaws.com/attendance_report_{now}_{random_number}.pdf"
 
-            types = ReportTypes.ATTENDANCE
-            report = Report(
-                report_link=s3_url,
-                types = types,
-                from_date = datetime.now(),
-                to_date = datetime.now(),
-                name = "Attendance Report"
-            )
+#             types = ReportTypes.ATTENDANCE
+#             report = Report(
+#                 report_link=s3_url,
+#                 types = types,
+#                 from_date = datetime.now(),
+#                 to_date = datetime.now(),
+#                 name = "Attendance Report"
+#             )
 
-            db.add(report)
-            db.commit()
-            print(f"Observation {s3_url}")
-            return {"pdf_url": s3_url}
-            # return result
-        except Exception as e:
-            raise e
-        finally:
-            db.close()
+#             db.add(report)
+#             db.commit()
+#             print(f"Observation {s3_url}")
+#             return {"pdf_url": s3_url}
+#             # return result
+#         except Exception as e:
+#             raise e
+#         finally:
+#             db.close()
 
 
-@app.get("/api/v1/get-report")
-async def get_pdf_report(report_type: str):
-    report_strategy = ReportType.get(report_type)
-    if not report_strategy:
-        return {"error": "Invalid report type"}
-    report_context = ReportGeneratorContext(report_strategy)
-    pdf_report = report_context.generate_report()
-    s3_url = upload_report_to_s3(pdf_report)
-    with next(get_db()) as db:
+# @app.get("/api/v1/get-report")
+# async def get_pdf_report(report_type: str):
+#     report_strategy = ReportType.get(report_type)
+#     if not report_strategy:
+#         return {"error": "Invalid report type"}
+#     report_context = ReportGeneratorContext(report_strategy)
+#     pdf_report = report_context.generate_report()
+#     s3_url = upload_report_to_s3(pdf_report)
+#     with next(get_db()) as db:
         
-        report_name = ReportName[report_type]
-        types = { "attendance" : ReportTypes.ATTENDANCE,
-        "visit" : ReportTypes.VISITS,
-        "task" : ReportTypes.TASKS }
-        report = Report(
-            report_link=s3_url,
-            types = types[report_type],
-            from_date = datetime.now(),
-            to_date = datetime.now(),
-            name = report_name
-        )
-        db.add(report)
-        db.commit()
-    return {"pdf_url": s3_url}
+#         report_name = ReportName[report_type]
+#         types = { "attendance" : ReportTypes.ATTENDANCE,
+#         "visit" : ReportTypes.VISITS,
+#         "task" : ReportTypes.TASKS }
+#         report = Report(
+#             report_link=s3_url,
+#             types = types[report_type],
+#             from_date = datetime.now(),
+#             to_date = datetime.now(),
+#             name = report_name
+#         )
+#         db.add(report)
+#         db.commit()
+#     return {"pdf_url": s3_url}
 
 
-@app.post("/api/v1/get-reports")
-async def get_pdf_reports(
-    request: ReportRequest
-    ):
-    report_service = ReportService()
-    data, pdf_bytes = await report_service.generate_report(request)
-    print(f"Report type ====> {request.report_type}")
-    report_name = ReportName[request.report_type]
-    report_name= "None"
-    s3_url = upload_report_to_s3(pdf_bytes, report_name)
-    with next(get_db()) as db:
+# @app.post("/api/v1/get-reports")
+# async def get_pdf_reports(
+#     request: ReportRequest
+#     ):
+#     report_service = ReportService()
+#     data, pdf_bytes = await report_service.generate_report(request)
+#     print(f"Report type ====> {request.report_type}")
+#     report_name = ReportName[request.report_type]
+#     report_name= "None"
+#     s3_url = upload_report_to_s3(pdf_bytes, report_name)
+#     with next(get_db()) as db:
 
 
 
-        report = Report(
-            report_link=s3_url,
-            types = request.report_type,
-            from_date = datetime.now(),
-            to_date = datetime.now(),
-            name = report_name
-        )
-        db.add(report)
-    #     db.commit()
+#         report = Report(
+#             report_link=s3_url,
+#             types = request.report_type,
+#             from_date = datetime.now(),
+#             to_date = datetime.now(),
+#             name = report_name
+#         )
+#         db.add(report)
+#     #     db.commit()
 
-    return {"s3_url": s3_url, "data" : data
-            }
+#     return {"s3_url": s3_url, "data" : data
+#             }
 
 
-@app.post("/api/v1/add-visitor")
-async def insert_visitor(
-        face: UploadFile = File(None)
-    ):
-    print(f"Server type {server_instance}")
-    file_path = Path(UPLOAD_DIR) / face.filename
+# @app.post("/api/v1/add-visitor")
+# async def insert_visitor(
+#         face: UploadFile = File(None)
+#     ):
+#     print(f"Server type {server_instance}")
+#     file_path = Path(UPLOAD_DIR) / face.filename
 
-    with open(file_path, "wb") as f:
-        f.write(await face.read())
+#     with open(file_path, "wb") as f:
+#         f.write(await face.read())
 
-    embedding_objs = DeepFace.represent(
-        img_path = file_path,
-        model_name = "VGG-Face",
-        enforce_detection=True
-    )
-    metadata = {
-        "firstname" : "John",
-        "lastname" : "Doe",
-        "date" : date.today().isoformat(),
-        "phone_number" : "+2370212121212"
-    }
+#     embedding_objs = DeepFace.represent(
+#         img_path = file_path,
+#         model_name = "VGG-Face",
+#         enforce_detection=True
+#     )
+#     metadata = {
+#         "firstname" : "John",
+#         "lastname" : "Doe",
+#         "date" : date.today().isoformat(),
+#         "phone_number" : "+2370212121212"
+#     }
 
-    face_service = FaceDetectionService()
-    face_service.add_face(
-        server_instance,
-        embedding= embedding_objs[0]["embedding"],
-        metadata= metadata
-    )
+#     face_service = FaceDetectionService()
+#     face_service.add_face(
+#         server_instance,
+#         embedding= embedding_objs[0]["embedding"],
+#         metadata= metadata
+#     )
 
-    return {"deep_end" : "deep_end"}
+#     return {"deep_end" : "deep_end"}
 
 
 if __name__ == "__main__":

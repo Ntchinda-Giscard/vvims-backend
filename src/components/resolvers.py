@@ -1,68 +1,124 @@
 import csv
 import os
 import uuid
-from datetime import date
+from datetime import date, timedelta
+from pathlib import Path
 from sqlalchemy.orm import Session
-from src.database import SessionLocal, get_db
-from src.models import Visit, Attendance, Employee
+from src.database import SessionLocal
+from src.models import Leave, Visit, Attendance, Employee
 
+# Compute a directory relative to this file for storing reports
+# BASE_DIR = Path(__file__).resolve().parent.parent
+# REPORT_DIR = BASE_DIR / "uploads"
+# REPORT_DIR.mkdir(parents=True, exist_ok=True)
 REPORT_DIR = '/app/uploads'
-os.makedirs(REPORT_DIR, exist_ok=True)
 
-def generate_report(report_type: str, category: str, category_id: uuid.UUID, from_date: date, to_date: date, db: Session):
+def generate_report(
+    report_type: str,
+    category: str,
+    category_id: uuid.UUID,
+    from_date: date,
+    to_date: date,
+    db: Session = None
+):
+    session: Session = db or SessionLocal()
 
+    # Visits report
     if report_type == "visits":
-        query = db.query(Visit)
-
         date_field = Visit.date
-    else:
-        query = db.query(Attendance)
-        date_field = Attendance.clock_in_date
-    
-    query = query.filter(date_field >= from_date, date_field <= to_date)
+        rows = session.query(Visit).filter(
+            date_field >= from_date,
+            date_field <= to_date,
+            # category filtering
+            **({Visit.host_department: category_id} if category == "department" else {}),
+            **({Visit.host_service: category_id} if category == "service" else {}),
+            **({Visit.host_employee: category_id} if category == "employee" else {})
+        ).all()
 
-    if category == "department":
-        if report_type == "visits":
-            query = query.filter(Visit.host_department == category_id)
-        else:
-            query = query.filter(Attendance.employee).filter(Employee.department_id == category_id)
-    elif category == "service":
-        if report_type == "visits":
-            query = query.filter(Visit.host_service == category_id)
-        else:
-            query = query.join(Attendance.employee).filter(Employee.service_id == category_id)
-    else:
-        if report_type == "visits":
-            query = query.filter(Visit.host_employee == category_id)
-        else:
-            query = query.filter(Attendance.employee_id == category_id)
-    
-    rows = query.all()
-    filename = f"{report_type}_{category}_{category_id}_{from_date}_{to_date}.csv"
-    filepath = os.path.join(REPORT_DIR, filename)
-
-    with open(filepath, "w", newline='') as csvfile:
-        writer = csv.writer(csvfile)
-        if report_type == "visits":
+        filename = f"visits_{category}_{category_id}_{from_date}_{to_date}.csv"
+        filepath = REPORT_DIR / filename
+        with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
             writer.writerow(["Visitor Name", "Date", "Check In", "Check Out", "Reason", "Status"])
             for v in rows:
                 writer.writerow([
                     f"{v.visitors.firstname} {v.visitors.lastname}",
-                    v.date,
-                    v.check_in_at,
-                    v.check_out_at,
-                    v.reason,
-                    v.status
+                    v.date.isoformat(),
+                    v.check_in_at.isoformat() if v.check_in_at else '',
+                    v.check_out_at.isoformat() if v.check_out_at else '',
+                    v.reason or '',
+                    v.status or '',
                 ])
+
+    # Attendance report
+    else:
+        # Select employees
+        emp_q = session.query(Employee)
+        if category == "department":
+            emp_q = emp_q.filter(Employee.department_id == category_id)
+        elif category == "service":
+            emp_q = emp_q.filter(Employee.service_id == category_id)
         else:
-            writer.writerow(["Employee", "Date", "Clock In", "Clock Out", "Late"])
-            for a in rows:
-                writer.writerow([
-                    f"{a.employee.firstname} {a.employee.lastname}",
-                    a.clock_in_date,
-                    a.clock_in_time,
-                    a.clock_out_time,
-                    getattr(a.attendance_state, 'is_late', False),
-                ])
-    
-    return  f"http://172.17.15.28:30088/uploads/{filename}", filename
+            emp_q = emp_q.filter(Employee.id == category_id)
+        employees = emp_q.all()
+
+        # Preload data
+        attendances = session.query(Attendance).filter(
+            Attendance.clock_in_date >= from_date,
+            Attendance.clock_in_date <= to_date
+        ).all()
+        leaves = session.query(
+            Leave.employee_id,
+            Leave.start_date,
+            Leave.end_date,
+            Leave.comment
+        ).filter(
+            Leave.start_date <= to_date,
+            Leave.end_date >= from_date
+        ).all()
+
+        filename = f"attendance_{category}_{category_id}_{from_date}_{to_date}.csv"
+        filepath = REPORT_DIR / filename
+        with open(filepath, 'w', newline='', encoding='utf-8') as csvfile:
+            writer = csv.writer(csvfile)
+            # Updated header: include arrival, departure, late
+            writer.writerow(["Employee", "Date", "Status", "Arrival", "Departure", "Late", "Reason"])
+
+            curr = from_date
+            while curr <= to_date:
+                for emp in employees:
+                    att = next((a for a in attendances if a.employee_id == emp.id and a.clock_in_date == curr), None)
+                    lv = next((e for e in leaves if e[0] == emp.id and e[1] <= curr <= e[2]), None)
+
+                    if att:
+                        status = 'Present'
+                        arrival = att.clock_in_time.isoformat() if att.clock_in_time else ''
+                        departure = att.clock_out_time.isoformat() if att.clock_out_time else ''
+                        late = getattr(att.attendance_state, 'is_late', False)
+                        reason = ''
+                    elif lv:
+                        status = 'On Leave'
+                        arrival = ''
+                        departure = ''
+                        late = ''
+                        reason = lv[3] or ''
+                    else:
+                        status = 'Absent'
+                        arrival = ''
+                        departure = ''
+                        late = ''
+                        reason = ''
+
+                    writer.writerow([
+                        f"{emp.firstname} {emp.lastname}",
+                        curr.isoformat(),
+                        status,
+                        arrival,
+                        departure,
+                        late,
+                        reason
+                    ])
+                curr += timedelta(days=1)
+
+    public_url = f"http://172.17.15.28:30088/uploads/{filename}"
+    return public_url, filename

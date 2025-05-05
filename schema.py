@@ -8,6 +8,7 @@ from fastapi import Depends
 from sqlalchemy.sql.coercions import expect
 from strawberry.types import Info
 from src.auth import create_token, get_current_user, oauth2_scheme
+from src.components.resolvers import generate_report
 from src.crud import pwd_context, authenticate_employee, count_attendance_percentage, total_employee_on_leave, \
     get_task_completion_percentage, get_visits_group_by_week_day, get_vehicle_group_by_week_day, \
     get_weekly_attendance_summary, create_conversation, accept_participate_event, deny_participate_event, \
@@ -15,18 +16,18 @@ from src.crud import pwd_context, authenticate_employee, count_attendance_percen
     update_message_status, get_appointment_today_percentage
 from src.database import get_db
 from src.models import Employee, Role, EmployeeRole, Visit, Visitor
-from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, UpdateEmployeeInput, UpdatePasswordInputType, \
+from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, GenerateReportInput, UpdateEmployeeInput, UpdatePasswordInputType, \
     AddVisitorBrowserInputType, AttendanceInpuType, EmployeeId, CreateConvInput, ParticipantInput, MessageInput, \
     EventByUserInput, MessageStatusInput, EmployeeAppointmentId
 from src import logger
-from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, \
+from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, GenerateReportPayload, \
     LoginReturnType, EmployeeUpdateType, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, \
     DayAttendanceType, \
     TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, \
     AcceptParcipateEvent, DenyParcipateEvent, InsertMesaageOuput, EventWithUserParticipant, MessageStatusOutput, \
     AppointmentTodayPercentage
-from src.utils import is_employee_late, run_hasura_mutation, PineconeSigleton, upload_to_s3, generate_date_range, get_attendance_for_day, calculate_time_in_building
+from src.utils import  generate_date_range, get_attendance_for_day, calculate_time_in_building
 from typing import AsyncGenerator
 
 # Custom context to hold the user info
@@ -47,6 +48,16 @@ async def get_context(token: typing.Optional[str] = Depends(oauth2_scheme)) -> C
 
 @strawberry.type
 class Query:
+
+    @strawberry.field
+    def get_employees(self) -> str:
+
+        with next(get_db()) as db:
+           query =  db.query(Visit).filter(Visit.host_employee == "862dcc85-ae68-46b3-ad03-1a7d59c57fca")
+           for rows in query.all():
+               print(rows.host_employee)
+
+        return "done"
     @strawberry.field
     def name(self) -> str:
         return "Strawberry"
@@ -458,3 +469,16 @@ class Mutation:
             result = update_message_status(db, message_ids)
 
             return result
+    
+    @strawberry.mutation
+    def generate_csv_report(self, info: Info, input: GenerateReportInput) -> GenerateReportPayload:
+        with next(get_db()) as db:
+            link, filename = generate_report(
+                report_type=input.report_type.value,
+                category=input.category.value,
+                category_id=input.category_id,
+                from_date=input.from_date,
+                to_date=input.to_date,
+                db= db
+            )
+        return GenerateReportPayload(report_link=link, filename=filename)
