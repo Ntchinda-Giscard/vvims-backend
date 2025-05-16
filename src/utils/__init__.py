@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable
+from typing import Callable, Type
 from fastapi import UploadFile, File, HTTPException
 from abc import abstractmethod, ABC
 from sqlalchemy import and_, text
@@ -215,280 +215,27 @@ class LocalUploadStrategy(UploadStrategy):
 
 
 UploadStrategies = {
-    "online": S3UploadStrategy(),
-    "local": LocalUploadStrategy()}
+    "online": S3UploadStrategy,
+    "local": LocalUploadStrategy
+    }
 
 class UploadProcessor:
 
-    def __init__(self, strategy: UploadStrategies):
-        self.strategies = strategy
+    def __init__(self, strategies: Dict[str, Type]):
+        self.strategies = strategies
 
-    async def process(self, upload_type: str, file: UploadFile=File(...)) -> str:
-
-        strategy = self.strategies.get_strategy(upload_type)
-        result  = await strategy.upload_process(file=file)
+    async def process(self, upload_type: str, file: UploadFile = File(...)) -> str:
+        strategy_class = self.strategies.get(upload_type)
+        if not strategy_class:
+            raise ValueError(f"Unknown upload type: {upload_type}")
+        
+        strategy = strategy_class()
+        result = await strategy.upload_process(file=file)
 
         return result
 
 
-# class ReportGenerator(ABC):
-#     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
 
-#         return NotImplementedError
-
-# class VisitReportGenerator(ReportGenerator):
-#     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
-#         sql_query = self._build_query(filter_by)
-#         print(f"Filter by ====> {filter_by}")
-#         print(f"Query built ====> {sql_query}")
-#         with next(get_db()) as db:
-#             results = db.execute(text(sql_query),{
-#                "filter_id" : filter_id,
-#                "start_date" : start_date,
-#                "end_date" : end_date
-#            }).mappings().all()
-#         # return [dict(zip(row.keys(), row)) for row in results]
-#         return results
-    
-#     def _build_query(self, filter_by: CategoryType) -> str:
-#         base_query = """
-#             SELECT 
-#                 vi.date, 
-#                 vi.check_in_at, 
-#                 vi.reason, 
-#                 v.firstname, 
-#                 v.lastname
-#         """
-        
-#         if filter_by == CategoryType.EMPLOYEE:
-#             return base_query + """
-#                     FROM visits AS vi
-#                     JOIN visitors AS v ON vi.visitor = v.id
-#                     WHERE vi.host_employee = :filter_id
-#                     AND vi.date BETWEEN :start_date AND :end_date
-#                     ORDER BY vi.date;
-#             """
-        
-#         elif filter_by == CategoryType.SERVICE:
-#             return base_query + """
-#                     FROM visits AS vi
-#                     JOIN visitors AS v ON vi.visitor = v.id
-#                     WHERE vi.host_service = :filter_id
-#                     AND vi.date BETWEEN :start_date AND :end_date
-#                     ORDER BY vi.date;
-#                 """
-        
-        
-#         elif filter_by == CategoryType.DEPARTMENT:
-#             return base_query + """ 
-#                     FROM visits AS vi
-#                     JOIN visitors AS v ON vi.visitor = v.id
-#                     WHERE vi.host_department = :filter_id
-#                     AND vi.date BETWEEN :start_date AND :end_date
-#                     ORDER BY vi.date;
-#                 """
-
-
-# class AttendanceReportGenerator(ReportGenerator):
-    
-#     async def generate(self, filter_by: CategoryType, filter_id: uuid.UUID, start_date: datetime, end_date: datetime):
-
-#         sql_query = self._build_query(filter_by)
-#         with next(get_db()) as db:
-#             results = db.execute(text(sql_query), {
-#                "filter_id" : filter_id,
-#                "start_date" : start_date,
-#                "end_date" : end_date
-#            }).mappings().all() 
-
-#         # return [dict(zip(row.keys(), row)) for row in results]
-#         return results
-    
-#     def _build_query(self, filter_by: CategoryType) -> str:
-
-#         base_query = """
-#         SELECT att.clock_in_date, att_state.is_late, att.clock_out_time, att.clock_in_time, e.firstname, e.lastname,
-#             EXTRACT(EPOCH FROM (att.clock_out_time - att.clock_in_time))/3600 AS hours_worked
-#         FROM attendance as att
-#         JOIN attendance_state AS att_state ON att.id = att_state.attendance_id
-#         JOIN employees as e ON e.id = att.employee_id
-#         """
-
-#         if filter_by == CategoryType.EMPLOYEE:
-#             return base_query + """
-#                 WHERE att.employee_id = :filter_id
-#                 AND att.clock_in_date BETWEEN :start_date AND :end_date
-#                 ORDER BY att.clock_in_date;
-#             """
-#         elif filter_by == CategoryType.SERVICE:
-#             return base_query + """
-                
-#                 JOIN services as s ON e.service_id = s.id
-#                 WHERE s.id = :filter_id
-#                 AND att.clock_in_date BETWEEN :start_date AND :end_date
-#                 ORDER BY att.clock_in_date;
-#             """
-        
-#         elif filter_by == CategoryType.DEPARTMENT:
-#             return base_query + """
-#                 JOIN departments as d ON e.department_id = d.id
-#                 WHERE d.id = :filter_id
-#                 AND att.clock_in_date BETWEEN :start_date AND :end_date
-#                 ORDER BY att.clock_in_date;
-#             """
-
-
-# class ReportService:
-
-#     def __init__(self):
-#         self.db = next(get_db())
-#         self.generators = {
-#             ReportTypes.VISITS: VisitReportGenerator(),
-#             ReportTypes.ATTENDANCE: AttendanceReportGenerator()
-#         }
-    
-#     async def generate_report(self, request: ReportRequest) -> dict:
-
-#         end_date = request.end_date or datetime.nom()
-#         start_date = request.start_date or (end_date - timedelta(days=30))
-
-#         generator = self.generators[request.report_type]
-
-#         data  = await generator.generate(
-#             request.filter_by,
-#             request.filter_id,
-#             start_date,
-#             end_date
-#         )
-
-#         filter_details = await self._get_filter_details(
-#             request.filter_by,
-#             request.filter_id
-#         )
-
-#         summary = self._generate_summary(request.report_type, filter_details)
-
-#         pdf_bytes = self.generate_pdf(data, request.report_type, summary)
-
-
-#         return data, pdf_bytes
-
-#     async def _get_filter_details(self, filter_by: CategoryType, filter_id: uuid.UUID):
-#         tables = {
-#             CategoryType.EMPLOYEE: "employees",
-#             CategoryType.SERVICE: "services",
-#             CategoryType.DEPARTMENT: "departments"
-#         }
-
-#         with self.db as db:
-
-#             record = db.execute(
-#                 text(f"SELECT * FROM {tables[filter_by]} WHERE id= :filter_id"),
-#                 {'filter_id': filter_id}
-#             ).mappings().all() 
-
-#         return record
-    
-#     def _calculate_peak_visiting_hour(self, records):
-#         hours = []
-#         for record in records:
-#             check_in = record.get("check_in_at")
-#             if check_in:
-#                 try:
-#                     # If check_in is a datetime.time object:
-#                     hour = check_in.hour
-#                 except AttributeError:
-#                     # Otherwise, assume it's a string in "HH:MM:SS" format:
-#                     hour = int(check_in.split(":")[0])
-#                 hours.append(hour)
-        
-#         if not hours:
-#             return None  # No check-ins found.
-        
-#         # Count frequency of each hour.
-#         hour_counts = Counter(hours)
-#         # most_common(1) returns a list with one tuple: (hour, frequency)
-#         peak_hour, _ = hour_counts.most_common(1)[0]
-#         return peak_hour
-
-#     def _calculate_highest_visiting_date(self, records):
-#         """
-#         Calculate and return the date with the highest number of visits from visit records.
-        
-#         Args:
-#             records (list of dict): Each dict represents a visit record with a "date" key.
-        
-#         Returns:
-#             date or None: The date (as a datetime.date object) with the most visits, or None if no dates exist.
-#         """
-#         dates = []
-#         for record in records:
-#             date_val = record.get("date")
-#             if date_val:
-#                 if isinstance(date_val, str):
-#                     try:
-#                         # Parse the date assuming the format is YYYY-MM-DD
-#                         parsed_date = datetime.strptime(date_val, "%Y-%m-%d").date()
-#                         dates.append(parsed_date)
-#                     except ValueError:
-#                         # Fallback if parsing fails
-#                         dates.append(date_val)
-#                 else:
-#                     dates.append(date_val)
-        
-#         if not dates:
-#             return None
-        
-#         # Count occurrences of each date
-#         date_counts = Counter(dates)
-#         # Get the date with the highest count
-#         highest_date, _ = date_counts.most_common(1)[0]
-#         return highest_date
-    
-#     def _generate_summary(self, report_type: ReportTypes, data: List[Dict[str, Any]]) -> dict:
-
-#         if report_type == ReportTypes.VISITS:
-#             return{
-#                 "total_visits" : len(data),
-#                 "peack_visiting_hour" : self._calculate_peak_visiting_hour(data),
-#                 "highest_visiting_dates" : self._calculate_highest_visiting_date(data),
-#                 "avg_visits" : None
-#             }
-#         elif report_type ==  ReportTypes.ATTENDANCE:
-
-#             return{
-#                 "average_arrival_time" : None,
-#                 "average_time_at_work" : None,
-#                 "average_arrival_time" : None,
-#                 "average_arrival_time" : None,
-#             }
-
-#     def render_html_template(self, report_data, report_type: ReportTypes, summary):
-
-#         html_files = {
-#             ReportTypes.VISITS: "visits",
-#             ReportTypes.ATTENDANCE: "attendance"
-#         }
-#         template = env.get_template(f"{html_files[report_type]}.html")
-
-#         rendered_html = template.render(
-#             date=datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
-#             table_data=report_data,
-#             highest_day = {},
-#             peak_hour = {},
-#             top_employee = {},
-#             summary = summary
-#             # company_name = company_name
-#         )
-
-#         return rendered_html
-
-#     def generate_pdf(self, report_data, report_type: ReportTypes, summary):
-
-#         html_content = self.render_html_template(report_data, report_type, summary)
-#         pdf_bytes = HTML(string=html_content).write_pdf()
-
-#         return pdf_bytes
 
 
 class ChromaConnectionSingleton:
@@ -512,47 +259,6 @@ class VectoDatabasor(ABC):
     def query(self, embedding, metadata: dict):
         return NotImplementedError
 
-# ChromaService class with methods for creating collections, inserting embeddings, and querying
-# class ChromaService(VectoDatabasor):
-#     def __init__(self):
-#         self.collection_name = "faces"
-#         self.client = ChromaConnectionSingleton().client
-#         self.collection = self.client.get_or_create_collection(self.collection_name)
-
-#     def insert(self, embedding, metadata: dict):
-#         """
-#         Inserts an embedding with metadata into the collection.
-
-#         Args:
-#             embedding (list[float]): The embedding vector (e.g., 1024-dimensional for facial recognition).
-#             metadata (dict): Metadata to store (e.g., firstname, lastname, phone_number, date).
-#         """
-#         vector_id =  str(uuid.uuid4())
-#         self.collection.add(
-#             embeddings=[embedding],
-#             metadatas=[metadata],
-#             ids=[vector_id]
-#         )
-
-#     def query(self, embedding, top_k=1):
-#         """
-#         Queries the collection for similar embeddings.
-
-#         Args:
-#             embedding (list[float]): The query embedding vector.
-#             top_k (int): Number of top results to return.
-#             filter_dict (dict): Optional filter for metadata, e.g., {"date": {"$eq": "November 20, 2024"}}
-
-#         Returns:
-#             dict: Query results including ids, metadata, distances, etc.
-#         """
-#         query_params = {
-#             "query_embeddings": [embedding],
-#             "n_results": top_k,
-#             "include": ["metadata", "ids", "distances"]
-#         }
-#         results = self.collection.query(**query_params)
-#         return results
 
 class PineconeSigleton(VectoDatabasor):
     _instance = None
