@@ -199,3 +199,31 @@ class ReportsType:
 class GenerateReportPayload:
     report_link: str
     filename: str
+
+
+@strawberry.type
+class VisitReportRow:
+    visitor_name: str
+    date: str
+    check_in: Optional[str]
+    check_out: Optional[str]
+    reason: Optional[str]
+    status: Optional[str]
+
+
+@strawberry.type
+class AttendanceReportRow:
+    employee: str
+    date: str
+    status: str
+    arrival: Optional[str]
+    departure: Optional[str]
+    late: Optional[bool]
+    reason: Optional[str]
+
+
+@strawberry.type
+class ReportResult:
+    type: str  # "visits" or "attendance"
+    visit_data: Optional[List[VisitReportRow]] = None
+    attendance_data: Optional[List[AttendanceReportRow]] = None

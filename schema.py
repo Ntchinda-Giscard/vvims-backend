@@ -21,7 +21,7 @@ from src.schema.input_type import CreateEmployeeInput, CreateEmployeeRole, Gener
     EventByUserInput, MessageStatusInput, EmployeeAppointmentId
 from src import logger
 from src.schema.output_type import EmployeeOnLeave, AttendnacePercentage, EmployeeCreationType, EmployeeType, GenerateReportPayload, \
-    LoginReturnType, EmployeeUpdateType, \
+    LoginReturnType, EmployeeUpdateType, ReportResult, \
     UpdatePasswordOutputType, DataType, CreateVisitorType, DayAttendanceType, EmployeeAttendatceType, AttendanceType, \
     DayAttendanceType, \
     TaskCompletionPercentage, VisitsCountByDay, VehicleCountByDay, AttendanceCountByWeek, CreateConvOutput, \
@@ -471,9 +471,9 @@ class Mutation:
             return result
     
     @strawberry.mutation
-    def generate_csv_report(self, info: Info, input: GenerateReportInput) -> GenerateReportPayload:
+    def generate_csv_report(self, info: Info, input: GenerateReportInput) -> ReportResult:
         with next(get_db()) as db:
-            link, filename = generate_report(
+            return generate_report(
                 report_type=input.report_type.value,
                 category=input.category.value,
                 category_id=input.category_id,
@@ -481,4 +481,3 @@ class Mutation:
                 to_date=input.to_date,
                 db= db
             )
-        return GenerateReportPayload(report_link=link, filename=filename)
