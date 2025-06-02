@@ -473,7 +473,8 @@ class Mutation:
     @strawberry.mutation
     def generate_csv_report(self, info: Info, input: GenerateReportInput) -> ReportResult:
         with next(get_db()) as db:
-            return generate_report(
+            try:
+                reports = generate_report(
                 report_type=input.report_type.value,
                 category=input.category.value,
                 category_id=input.category_id,
@@ -481,3 +482,10 @@ class Mutation:
                 to_date=input.to_date,
                 db= db
             )
+            except Exception as e:
+                logger.error(f"{e}")
+                db.rollback()
+                db.close()
+            finally:
+                db.close()
+            return reports
