@@ -298,18 +298,3 @@ class PineconeSigleton(VectoDatabasor):
 
 
 
-# class FaceDetectionService:
-
-#     def __init__(self):
-#         self.vector_db_client = {
-#             "online" : PineconeSigleton(),
-#             "local" : ChromaService()
-#         }
-
-#     def add_face(self, server_type, embedding, metadata):
-#         vector_db:VectoDatabasor = self.vector_db_client[server_type]
-#         vector_db.insert(
-#             metadata=metadata,
-#             embedding=embedding
-#         )
-

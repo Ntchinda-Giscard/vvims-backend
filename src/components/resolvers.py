@@ -135,16 +135,21 @@ REPORT_DIR = '/app/uploads'
 #     db.refresh(reports)
 
 #     return public_url, filename
+from datetime import date, timedelta
+from typing import Optional
 
 def generate_report(
     report_type: str,
     category: str,
     category_id: uuid.UUID,
     from_date: date,
-    to_date: date,
+    to_date: Optional[date] = None,
     db: Session = None
 ) -> ReportResult:
     session: Session = db or SessionLocal()
+
+    # Handle single-day report by defaulting to_date
+    to_date = to_date or from_date
 
     if report_type == "visits":
         filters = [
@@ -240,3 +245,4 @@ def generate_report(
             curr += timedelta(days=1)
 
         return ReportResult(type="attendance", attendance_data=data)
+
