@@ -221,9 +221,25 @@ class AttendanceReportRow:
     late: Optional[bool]
     reason: Optional[str]
 
+@strawberry.type
+class LeaveReportRow:
+    employee: str
+    start_date: str
+    end_date: str
+    duration: int
+    reason: Optional[str]
+
+
 
 @strawberry.type
 class ReportResult:
     type: str  # "visits" or "attendance"
     visit_data: Optional[List[VisitReportRow]] = None
     attendance_data: Optional[List[AttendanceReportRow]] = None
+
+@strawberry.type
+class ReportResult:
+    type: str  # "visits", "attendance", or "leaves"
+    visit_data: Optional[List[VisitReportRow]] = None
+    attendance_data: Optional[List[AttendanceReportRow]] = None
+    leave_data: Optional[List[LeaveReportRow]] = None  # <--- Ajouté

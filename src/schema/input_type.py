@@ -174,6 +174,8 @@ class EmployeeAppointmentId:
 class ReportTypeEnum(PyEnum):
     VISITS = "visits"
     ATTENDANCE = "attendance"
+    LEAVES = "leaves"  # ← Ajouté
+
 
 @strawberry.enum
 class CategoryTypeEnum(PyEnum):
