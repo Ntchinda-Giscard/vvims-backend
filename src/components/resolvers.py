@@ -77,6 +77,8 @@ def generate_report(
                 duration=(leave.end_date - leave.start_date).days + 1,
                 reason=leave.comment
             ))
+            print(leave)
+            print(f"Leave for {leave.employee.firstname} {leave.employee.lastname} from {leave.start_date} to {leave.end_date}")
 
         return ReportResult(type="leaves", leave_data=data)
 
