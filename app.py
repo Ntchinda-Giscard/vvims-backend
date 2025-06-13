@@ -76,7 +76,7 @@ app.include_router(graphql_app, prefix="/graphql")
 UPLOAD_DIR = '/app/uploads'
 os.makedirs('/uploads', exist_ok=True)
 
-# app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
+app.mount("/uploads", StaticFiles(directory="/app/uploads"), name="uploads")
 
 @app.get("/")
 def greet_json():
